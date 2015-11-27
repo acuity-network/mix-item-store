@@ -14,7 +14,7 @@ contract BlobStore {
 
     function storeBlob(bytes blob) returns (bytes32 hash) {
         hash = sha3(blob);
-        if (blobBlock[hash] != 0) {
+        if (blobBlock[hash] == 0) {
             logBlob(hash, blob);
             blobBlock[hash] = block.number;
         }
