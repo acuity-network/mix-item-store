@@ -1,0 +1,26 @@
+{
+  "name": "blobstore-ethereum",
+  "version": "0.0.0",
+  "description": "Stores arbitrary-sized blobs of data in Ethereum's transaction log.",
+  "main": "blobstore.js",
+  "dependencies": {
+    "web3": "^0.15.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bluedroplet/blobstore-ethereum.git"
+  },
+  "keywords": [
+    "ethereum",
+    "cas"
+  ],
+  "author": "Jonathan Brown <jbrown@bluedroplet.com>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/bluedroplet/blobstore-ethereum/issues"
+  }
+}
