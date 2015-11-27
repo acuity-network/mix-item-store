@@ -4,19 +4,19 @@
  */
 contract BlobStore {
 
-    mapping (bytes32 => bool) stored;
+    mapping (bytes32 => uint) blobBlock;
 
     event logBlob(bytes32 indexed hash, bytes blob) anonymous;
 
-    function isStored(bytes32 hash) constant returns (bool) {
-        return stored[hash];
+    function getBlobBlock(bytes32 hash) constant returns (uint) {
+        return blobBlock[hash];
     }
 
     function storeBlob(bytes blob) returns (bytes32 hash) {
         hash = sha3(blob);
-        if (!isStored(hash)) {
+        if (blobBlock[hash] != 0) {
             logBlob(hash, blob);
-            stored[hash] = true;
+            blobBlock[hash] = block.number;
         }
     }
 
