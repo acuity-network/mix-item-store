@@ -10,6 +10,7 @@ var blobstore = blobstoreContract.at(blobstoreAddress);
 
 var storeBlob = function(blob) {
   blobstore.storeBlob('0x' + blob.toString('hex'), {gas: 3141592});
+  return '0x' + web3.sha3(blob.toString('ascii'));
 }
 
 var getBlobBlock = function(hash) {
