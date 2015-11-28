@@ -17,13 +17,13 @@ var getBlobBlock = function(hash) {
   return blobstore.getBlobBlock(hash).toFixed();
 }
 
-var getBlob = function(hash) {
+var getBlob = function(hash, callback) {
 
   var block = blobstore.getBlobBlock(hash).toFixed();
   var filter = web3.eth.filter({fromBlock: block, toBlock: block, address: blobstoreAddress, topics: [hash]});
   filter.get(function(error, result) {
     var length = parseInt(result[0].data.substr(66, 64), 16);
-    return new Buffer(result[0].data.substr(130, length * 2), 'hex');
+    callback(new Buffer(result[0].data.substr(130, length * 2), 'hex'));
   });
 }
 
