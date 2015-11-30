@@ -29,9 +29,10 @@ var storeBlob = function(blob) {
 }
 
 var getBlob = function(hash, callback) {
-
-  var block = getBlobBlock(hash);
-  var filter = web3.eth.filter({fromBlock: block, toBlock: block, address: blobstoreAddress, topics: [hash]});
+  // Start searching for the log at least an hour in the past in case of block
+  // re-arrangement.
+  var fromBlock = Math.min(getBlobBlock(hash), web3.eth.blockNumber - 200);
+  var filter = web3.eth.filter({fromBlock: fromBlock, toBlock: 'latest', address: blobstoreAddress, topics: [hash]});
   filter.get(function(error, result) {
     var length = parseInt(result[0].data.substr(66, 64), 16);
     callback(new Buffer(result[0].data.substr(130, length * 2), 'hex'));
