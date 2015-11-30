@@ -49,25 +49,31 @@ var getBlob = function(hash, callback) {
       // Does it have the correct hash?
       if (getBlobHash(blob) == hash) {
         callback(null, blob);
-        break;
+        return;
       }
     }
+    // We didn't find the blob. Check in the blocks one more time in case it
+    // just got mined and we missed it.
+    blobBlock = getBlobBlock(hash);
+    if (blobBlock == 0) {
+      // We didn't find it. Report the Error.
+      callback('error');
+      return;
+    }
   }
-  else {
-    // Start searching for the log at least an hour in the past in case of block
-    // re-arrangement.
-    var fromBlock = Math.min(blobBlock, web3.eth.blockNumber - 200);
-    var filter = web3.eth.filter({fromBlock: fromBlock, toBlock: 'latest', address: blobstoreAddress, topics: [hash]});
-    filter.get(function(error, result) {
-      if (result != 0) {
-        var length = parseInt(result[0].data.substr(66, 64), 16);
-        callback(null, new Buffer(result[0].data.substr(130, length * 2), 'hex'));
-      }
-      else {
-        callback('error');
-      }
-    });
-  }
+  // Start searching for the log at least an hour in the past in case of block
+  // re-arrangement.
+  var fromBlock = Math.min(blobBlock, web3.eth.blockNumber - 200);
+  var filter = web3.eth.filter({fromBlock: fromBlock, toBlock: 'latest', address: blobstoreAddress, topics: [hash]});
+  filter.get(function(error, result) {
+    if (result != 0) {
+      var length = parseInt(result[0].data.substr(66, 64), 16);
+      callback(null, new Buffer(result[0].data.substr(130, length * 2), 'hex'));
+    }
+    else {
+      callback('error');
+    }
+  });
 }
 
 module.exports = {
