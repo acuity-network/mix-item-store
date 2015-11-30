@@ -6,7 +6,8 @@ var blobstoreContract = web3.eth.contract(blobstoreAbi);
 var blobstoreAddress = '0x3c531591cb807e01404574076f429d205f5ee981';
 var blobstore = blobstoreContract.at(blobstoreAddress);
 
-//Solidity version: 0.1.7-f86451cd/.-Emscripten/clang/int linked to libethereum-1.1.0-35b67881/.-Emscripten/clang/int
+// https://github.com/bluedroplet/blobstore-ethereum/blob/c65287e0ff249fec047834e7895cb46c0e090228/blobstore.sol
+// Solidity version: 0.1.7-f86451cd/.-Emscripten/clang/int linked to libethereum-1.1.0-35b67881/.-Emscripten/clang/int
 
 var getBlobHash = function(blob) {
   return '0x' + web3.sha3(blob.toString('ascii'));
