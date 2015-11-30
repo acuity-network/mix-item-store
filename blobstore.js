@@ -61,10 +61,18 @@ var getBlob = function(hash, callback) {
       return;
     }
   }
-  // Start searching for the log at least an hour in the past in case of block
-  // re-arrangement.
-  var fromBlock = Math.min(blobBlock, web3.eth.blockNumber - 200);
-  var filter = web3.eth.filter({fromBlock: fromBlock, toBlock: 'latest', address: blobstoreAddress, topics: [hash]});
+  // If the blob is in a block that occured within the past hour, search from an
+  // hour ago until the latest block in case there has been a re-arragement
+  // since we got the block number (very conservative).
+  var fromBlock, toBlock;
+  if (blobBlock > web3.eth.blockNumber - 200) {
+    fromBlock = web3.eth.blockNumber - 200;
+    toBlock = 'latest';
+  }
+  else {
+    fromBlock = toBlock = blobBlock;
+  }
+  var filter = web3.eth.filter({fromBlock: fromBlock, toBlock: toBlock, address: blobstoreAddress, topics: [hash]});
   filter.get(function(error, result) {
     if (result.length != 0) {
       var length = parseInt(result[0].data.substr(66, 64), 16);
