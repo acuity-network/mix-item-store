@@ -8,6 +8,10 @@ var blobstore = blobstoreContract.at(blobstoreAddress);
 
 //Solidity version: 0.1.7-f86451cd/.-Emscripten/clang/int linked to libethereum-1.1.0-35b67881/.-Emscripten/clang/int
 
+var getBlobHash = function(blob) {
+  return '0x' + web3.sha3(blob.toString('ascii'));
+}
+
 var getBlobBlock = function(hash) {
   // Determine the block that includes the transaction for this blob.
   return blobstore.getBlobBlock(hash, {}, 'latest').toFixed();
@@ -15,7 +19,7 @@ var getBlobBlock = function(hash) {
 
 var storeBlob = function(blob) {
   // Determine hash of blob.
-  var hash = '0x' + web3.sha3(blob.toString('ascii'));
+  var hash = getBlobHash(blob);
   // Check if this blob is in a block yet.
   if (getBlobBlock(hash) == 0) {
     // Calculate maximum transaction gas.
@@ -29,14 +33,40 @@ var storeBlob = function(blob) {
 }
 
 var getBlob = function(hash, callback) {
-  // Start searching for the log at least an hour in the past in case of block
-  // re-arrangement.
-  var fromBlock = Math.min(getBlobBlock(hash), web3.eth.blockNumber - 200);
-  var filter = web3.eth.filter({fromBlock: fromBlock, toBlock: 'latest', address: blobstoreAddress, topics: [hash]});
-  filter.get(function(error, result) {
-    var length = parseInt(result[0].data.substr(66, 64), 16);
-    callback(new Buffer(result[0].data.substr(130, length * 2), 'hex'));
-  });
+  var blobBlock = getBlobBlock(hash);
+  if (blobBlock == 0) {
+    // The blob isn't in a block yet. See if it is in a pending transaction.
+    var txids = web3.eth.getBlock('pending').transactions;
+    for (var i in txids) {
+      var tx = web3.eth.getTransaction(txids[i]);
+      if (tx.to != blobstoreAddress) {
+        continue;
+      }
+      // Extract the blob from the transaction.
+      var length = parseInt(tx.input.substr(74, 64), 16);
+      var blob = new Buffer(tx.input.substr(138, length * 2), 'hex');
+      // Does it have the correct hash?
+      if (getBlobHash(blob) == hash) {
+        callback(null, blob);
+        break;
+      }
+    }
+  }
+  else {
+    // Start searching for the log at least an hour in the past in case of block
+    // re-arrangement.
+    var fromBlock = Math.min(blobBlock, web3.eth.blockNumber - 200);
+    var filter = web3.eth.filter({fromBlock: fromBlock, toBlock: 'latest', address: blobstoreAddress, topics: [hash]});
+    filter.get(function(error, result) {
+      if (result != 0) {
+        var length = parseInt(result[0].data.substr(66, 64), 16);
+        callback(null, new Buffer(result[0].data.substr(130, length * 2), 'hex'));
+      }
+      else {
+        callback('error');
+      }
+    });
+  }
 }
 
 module.exports = {
