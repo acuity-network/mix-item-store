@@ -66,7 +66,7 @@ var getBlob = function(hash, callback) {
   var fromBlock = Math.min(blobBlock, web3.eth.blockNumber - 200);
   var filter = web3.eth.filter({fromBlock: fromBlock, toBlock: 'latest', address: blobstoreAddress, topics: [hash]});
   filter.get(function(error, result) {
-    if (result != 0) {
+    if (result.length != 0) {
       var length = parseInt(result[0].data.substr(66, 64), 16);
       callback(null, new Buffer(result[0].data.substr(130, length * 2), 'hex'));
     }
