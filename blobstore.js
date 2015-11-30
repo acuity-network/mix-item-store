@@ -9,7 +9,8 @@ var blobstore = blobstoreContract.at(blobstoreAddress);
 //Solidity version: 0.1.7-f86451cd/.-Emscripten/clang/int linked to libethereum-1.1.0-35b67881/.-Emscripten/clang/int
 
 var storeBlob = function(blob) {
-  blobstore.storeBlob('0x' + blob.toString('hex'), {gas: 300000});
+  var gas = 45000 + 80 * blob.length;
+  blobstore.storeBlob('0x' + blob.toString('hex'), {gas: gas});
   return '0x' + web3.sha3(blob.toString('ascii'));
 }
 
