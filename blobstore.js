@@ -15,12 +15,12 @@ var storeBlob = function(blob) {
 }
 
 var getBlobBlock = function(hash) {
-  return blobstore.getBlobBlock(hash).toFixed();
+  return blobstore.getBlobBlock(hash, {}, 'latest').toFixed();
 }
 
 var getBlob = function(hash, callback) {
 
-  var block = blobstore.getBlobBlock(hash).toFixed();
+  var block = getBlobBlock(hash);
   var filter = web3.eth.filter({fromBlock: block, toBlock: block, address: blobstoreAddress, topics: [hash]});
   filter.get(function(error, result) {
     var length = parseInt(result[0].data.substr(66, 64), 16);
