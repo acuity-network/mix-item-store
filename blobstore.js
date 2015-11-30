@@ -79,7 +79,9 @@ var getBlob = function(hash, callback) {
       callback(null, new Buffer(result[0].data.substr(130, length * 2), 'hex'));
     }
     else {
-      callback('error');
+      // There has just been a re-arrangement and the trasaction is now back to
+      // pending. Let's try again from the start.
+      getBlob(hash, callback);
     }
   });
 }
