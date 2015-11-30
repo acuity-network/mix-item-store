@@ -8,14 +8,24 @@ var blobstore = blobstoreContract.at(blobstoreAddress);
 
 //Solidity version: 0.1.7-f86451cd/.-Emscripten/clang/int linked to libethereum-1.1.0-35b67881/.-Emscripten/clang/int
 
-var storeBlob = function(blob) {
-  var gas = 44800 + 78 * blob.length;
-  blobstore.storeBlob('0x' + blob.toString('hex'), {gas: gas});
-  return '0x' + web3.sha3(blob.toString('ascii'));
+var getBlobBlock = function(hash) {
+  // Determine the block that includes the transaction for this blob.
+  return blobstore.getBlobBlock(hash, {}, 'latest').toFixed();
 }
 
-var getBlobBlock = function(hash) {
-  return blobstore.getBlobBlock(hash, {}, 'latest').toFixed();
+var storeBlob = function(blob) {
+  // Determine hash of blob.
+  var hash = '0x' + web3.sha3(blob.toString('ascii'));
+  // Check if this blob is in a block yet.
+  if (getBlobBlock(hash) == 0) {
+    // Calculate maximum transaction gas.
+    var gas = 44800 + 78 * blob.length;
+    // Broadcast the transaction. If this blob is already in a pending
+    // transaction, or has just been mined, this will be handled by the
+    // contract.
+    blobstore.storeBlob('0x' + blob.toString('hex'), {gas: gas});
+  }
+  return hash;
 }
 
 var getBlob = function(hash, callback) {
