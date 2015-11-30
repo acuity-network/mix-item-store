@@ -9,35 +9,24 @@ var blobstore = blobstoreContract.at(blobstoreAddress);
 //Solidity version: 0.1.7-f86451cd/.-Emscripten/clang/int linked to libethereum-1.1.0-35b67881/.-Emscripten/clang/int
 
 var storeBlob = function(blob) {
-  var gas = 44800 + 78 * blob.length;
+  var gas = 45000 + 80 * blob.length;
   blobstore.storeBlob('0x' + blob.toString('hex'), {gas: gas});
   return '0x' + web3.sha3(blob.toString('ascii'));
 }
 
 var getBlobBlock = function(hash) {
-  return blobstore.getBlobBlock(hash, {}, 'latest').toFixed();
+  return blobstore.getBlobBlock(hash).toFixed();
 }
 
 var getBlob = function(hash, callback) {
 
-  var block = getBlobBlock(hash);
+  var block = blobstore.getBlobBlock(hash).toFixed();
   var filter = web3.eth.filter({fromBlock: block, toBlock: block, address: blobstoreAddress, topics: [hash]});
   filter.get(function(error, result) {
-    if (result != 0) {
-      var length = parseInt(result[0].data.substr(66, 64), 16);
-      callback(new Buffer(result[0].data.substr(130, length * 2), 'hex'));
-    }
-    else {
-      
-    }
+    var length = parseInt(result[0].data.substr(66, 64), 16);
+    callback(new Buffer(result[0].data.substr(130, length * 2), 'hex'));
   });
 }
-
-web3.eth.defaultAccount = web3.eth.accounts[0];
-//var hash = storeBlob(new Buffer("hello again5"));
-//console.log(hash);
-var hash = "0x71cc9e8819a5c08ffd3f05ab192e7de94d0265905b2da039000e2aa0024424ac";
-console.log(getBlobBlock(hash));
 
 module.exports = {
   storeBlob: storeBlob,
