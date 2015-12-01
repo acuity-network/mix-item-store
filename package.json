@@ -1,6 +1,6 @@
 {
   "name": "blobstore-ethereum",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Stores arbitrary-sized blobs of data in Ethereum's transaction log.",
   "main": "blobstore.js",
   "dependencies": {
