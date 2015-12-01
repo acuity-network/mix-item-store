@@ -10,7 +10,7 @@ var blobstore = blobstoreContract.at(blobstoreAddress);
 // Solidity version: 0.1.7-f86451cd/.-Emscripten/clang/int linked to libethereum-1.1.0-35b67881/.-Emscripten/clang/int
 
 var getBlobHash = function(blob) {
-  return '0x' + web3.sha3(blob.toString('ascii'));
+  return '0x' + web3.sha3(blob.toString('hex'), {encoding: 'hex'});
 }
 
 var getBlobBlock = function(hash) {
