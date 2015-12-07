@@ -13,8 +13,8 @@ contract BlobStore {
      * @param hash sha3 of the blob.
      * @return Block number.
      */
-    function getBlobBlock(bytes32 hash) constant returns (uint) {
-        return blobBlock[hash];
+    function getBlobBlock(bytes32 hash) constant returns (uint blockNumber) {
+        blockNumber = blobBlock[hash];
     }
 
     /**
