@@ -86,7 +86,8 @@ var getBlob = function(hash, callback) {
 }
 
 module.exports = {
-  storeBlob: storeBlob,
+  getBlobHash: getBlobHash,
   getBlobBlock: getBlobBlock,
+  storeBlob: storeBlob,
   getBlob: getBlob
 };
