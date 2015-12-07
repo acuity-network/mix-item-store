@@ -86,14 +86,6 @@ var getBlob = function(hash, callback) {
   });
 }
 
-/*
-web3.eth.defaultAccount = web3.eth.accounts[0];
-var hash = "0x83aa0ea300753e722c73c1de85ff8079c63e4e6713d5fe91cffd194b05af1319";
-getBlob(hash, function(error, result) {
-  console.log(result.toString());
-});
-*/
-
 module.exports = {
   storeBlob: storeBlob,
   getBlobBlock: getBlobBlock,
