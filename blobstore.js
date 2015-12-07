@@ -36,6 +36,7 @@ var getBlob = function(hash, callback) {
   var blobBlock = getBlobBlock(hash);
   if (blobBlock == 0) {
     // The blob isn't in a block yet. See if it is in a pending transaction.
+    // This will only work if the blob was stored directly by a transaction.
     var txids = web3.eth.getBlock('pending').transactions;
     for (var i in txids) {
       var tx = web3.eth.getTransaction(txids[i]);
