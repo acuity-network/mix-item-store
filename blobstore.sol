@@ -11,7 +11,7 @@ contract BlobStore {
     /**
      * @dev Gets the block that a blob is logged in.
      * @param hash sha3 of the blob.
-     * @return Block number.
+     * @return blockNumber Number of the block that the blob is logged in.
      */
     function getBlobBlock(bytes32 hash) constant returns (uint blockNumber) {
         blockNumber = blobBlock[hash];
