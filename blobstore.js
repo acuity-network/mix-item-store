@@ -14,7 +14,7 @@ var getBlobHash = function(blob) {
 
 var getBlobBlock = function(hash) {
   // Determine the block that includes the transaction for this blob.
-  return blobstore.getBlobBlock(hash, {}, 'latest').toFixed();
+  return blobstore.getBlobBlock(hash, {}, 'latest').toNumber();
 }
 
 var storeBlob = function(blob) {
