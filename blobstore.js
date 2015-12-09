@@ -13,7 +13,7 @@ else {
 
 var blobstoreAbi = require('./blobstore.abi.json');
 var blobstoreContract = web3.eth.contract(blobstoreAbi);
-var blobstoreAddress = '0x8f3fae469b08e48d8e2a692e0b9805c38509231b';
+var blobstoreAddress = '0x75f633c204d5c7dc428c6f9ca866566cf87511d0';
 var blobstore = blobstoreContract.at(blobstoreAddress);
 
 // solc version: 0.2.0-0/Release-Linux/g++/int linked to libethereum-1.1.0-0/Release-Linux/g++/int
