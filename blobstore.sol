@@ -22,8 +22,8 @@ contract BlobStore {
      * @param blob Blob that should be stored.
      * @return hash sha3 of the blob.
      */
-    function storeBlob(bytes blob) returns (bytes32 hash) {
-        hash = sha3(blob);
+    function storeBlob(bytes blob) {
+        bytes32 hash = sha3(blob);
         if (blobBlock[hash] == 0) {
             blobBlock[hash] = block.number;
             logBlob(hash, blob);
