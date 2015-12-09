@@ -22,28 +22,31 @@ var getBlobHash = function(blob) {
   return '0x' + web3.sha3(blob.toString('hex'), {encoding: 'hex'});
 }
 
-var getBlobBlock = function(hash) {
+var getBlobBlock = function(hash, block) {
   // Determine the block that includes the transaction for this blob.
-  return blobstore.getBlobBlock(hash, {}, 'latest').toNumber();
+  return blobstore.getBlobBlock(hash, {}, block).toNumber();
 }
 
 var storeBlob = function(blob) {
   // Determine hash of blob.
   var hash = getBlobHash(blob);
-  // Check if this blob is in a block yet.
-  if (getBlobBlock(hash) == 0) {
+  // Check if this blob already exists 200 blocks back.
+  if (getBlobBlock(hash, web3.eth.blockNumber - 200) == 0) {
     // Calculate maximum transaction gas.
     var gas = 44800 + 78 * blob.length;
-    // Broadcast the transaction. If this blob is already in a pending
-    // transaction, or has just been mined, this will be handled by the
-    // contract.
+    // Broadcast the transaction. If this blob is already in a transaction this
+    // will be handled by the contract.
     blobstore.storeBlob('0x' + blob.toString('hex'), {gas: gas});
+    // Check that the blob is pending.
+    if (getBlobBlock(hash, 'pending') == 0) {
+      throw "Failed to publish blob.";
+    }
   }
   return hash;
 }
 
 var getBlob = function(hash, callback) {
-  var blobBlock = getBlobBlock(hash);
+  var blobBlock = getBlobBlock(hash, 'latest');
   if (blobBlock == 0) {
     // The blob isn't in a block yet. See if it is in a pending transaction.
     // This will only work if the blob was stored directly by a transaction.
@@ -64,7 +67,7 @@ var getBlob = function(hash, callback) {
     }
     // We didn't find the blob. Check in the blocks one more time in case it
     // just got mined and we missed it.
-    blobBlock = getBlobBlock(hash);
+    blobBlock = getBlobBlock(hash, 'latest');
     if (blobBlock == 0) {
       // We didn't find it. Report the Error.
       callback('error');
