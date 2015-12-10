@@ -24,10 +24,8 @@ contract BlobStore {
      */
     function storeBlob(bytes blob) {
         bytes32 hash = sha3(blob);
-        if (blobBlock[hash] == 0) {
-            blobBlock[hash] = block.number;
-            logBlob(hash, blob);
-        }
+        blobBlock[hash] = block.number;
+        logBlob(hash, blob);
     }
 
 }
