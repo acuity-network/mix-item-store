@@ -77,8 +77,7 @@ function getBlobFromBlock(blobBlock, hash, callback) {
   else {
     fromBlock = toBlock = blobBlock;
   }
-  var filter = web3.eth.filter({fromBlock: fromBlock, toBlock: toBlock, address: blobstoreAddress, topics: [hash]});
-  filter.get(function(error, result) {
+  web3.eth.filter({fromBlock: fromBlock, toBlock: toBlock, address: blobstoreAddress, topics: [hash]}).get(function(error, result) {
     if (error) { callback(error); return; }
     if (result.length != 0) {
       var length = parseInt(result[0].data.substr(66, 64), 16);
