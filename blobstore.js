@@ -22,7 +22,7 @@ var getBlobHash = function(blob) {
   return '0x' + web3.sha3(blob.toString('hex'), {encoding: 'hex'});
 }
 
-var getBlobBlock = function(hash, block, callback) {
+var getBlobBlockNumber = function(hash, block, callback) {
   // Determine the block that includes the transaction for this blob.
   blobstore.blobBlockNumber(hash, {}, block, function(error, result) {
     if (error) {
@@ -43,7 +43,7 @@ var storeBlob = function(blob, callback) {
   blobstore.storeBlob('0x' + blob.toString('hex'), {gas: gas}, function(error, result) {
     if (error) { callback(error); return; }
     // Check that the blob is pending.
-    getBlobBlock(hash, 'pending', function(error, blobBlock) {
+    getBlobBlockNumber(hash, 'pending', function(error, blobBlock) {
       if (blobBlock == 0) {
         callback("Blob failed to broadcast.");
       }
@@ -82,7 +82,7 @@ function getBlobFromBlock(blobBlock, hash, callback) {
 }
 
 var getBlob = function(hash, callback) {
-  getBlobBlock(hash, 'latest', function(error, blobBlock) {
+  getBlobBlockNumber(hash, 'latest', function(error, blobBlock) {
     if (error) { callback(error); return; }
     if (blobBlock == 0) {
       // The blob isn't in a block yet. See if it is in a pending transaction.
@@ -105,7 +105,7 @@ var getBlob = function(hash, callback) {
         }
         // We didn't find the blob. Check in the blocks one more time in case it
         // just got mined and we missed it.
-        blobBlock = getBlobBlock(hash, 'latest', function(error, blobBlock) {
+        blobBlock = getBlobBlockNumber(hash, 'latest', function(error, blobBlock) {
           if (error) { callback(error); return; }
           if (blobBlock == 0) {
             // We didn't find it. Report the Error.
@@ -125,7 +125,7 @@ var getBlob = function(hash, callback) {
 
 module.exports = {
   getBlobHash: getBlobHash,
-  getBlobBlock: getBlobBlock,
+  getBlobBlockNumber: getBlobBlockNumber,
   storeBlob: storeBlob,
   getBlob: getBlob
 };
