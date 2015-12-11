@@ -13,7 +13,7 @@ else {
 
 var blobstoreAbi = require('./blobstore.abi.json');
 var blobstoreContract = web3.eth.contract(blobstoreAbi);
-var blobstoreAddress = '0x75f633c204d5c7dc428c6f9ca866566cf87511d0';
+var blobstoreAddress = '0x20b6ec3206e90fbd64282fd9b311e86ee550accc';
 var blobstore = blobstoreContract.at(blobstoreAddress);
 
 // solc version: 0.2.0-0/Release-Linux/g++/int linked to libethereum-1.1.0-0/Release-Linux/g++/int
@@ -24,7 +24,7 @@ var getBlobHash = function(blob) {
 
 var getBlobBlock = function(hash, block, callback) {
   // Determine the block that includes the transaction for this blob.
-  blobstore.getBlobBlock(hash, {}, block, function(error, result) {
+  blobstore.blobBlockNumber(hash, {}, block, function(error, result) {
     if (error) {
       callback(error);
     }
