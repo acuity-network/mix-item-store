@@ -37,30 +37,20 @@ var getBlobBlock = function(hash, block, callback) {
 var storeBlob = function(blob, callback) {
   // Determine hash of blob.
   var hash = getBlobHash(blob);
-  // Check if this blob already exists 200 blocks back.
-  getBlobBlock(hash, web3.eth.blockNumber - 200, function(error, blobBlock) {
+  // Calculate maximum transaction gas.
+  var gas = 44800 + 78 * blob.length;
+  // Broadcast the transaction.
+  blobstore.storeBlob('0x' + blob.toString('hex'), {gas: gas}, function(error, result) {
     if (error) { callback(error); return; }
-    if (blobBlock == 0) {
-      // Calculate maximum transaction gas.
-      var gas = 44800 + 78 * blob.length;
-      // Broadcast the transaction. If this blob is already in a transaction this
-      // will be handled by the contract.
-      blobstore.storeBlob('0x' + blob.toString('hex'), {gas: gas}, function(error, result) {
-        if (error) { callback(error); return; }
-        // Check that the blob is pending.
-        getBlobBlock(hash, 'pending', function(error, blobBlock) {
-          if (blobBlock == 0) {
-            callback("Blob failed to broadcast.");
-          }
-          else {
-            callback(null, true);
-          }
-        });
-      });
-    }
-    else {
-      callback(null, true);
-    }
+    // Check that the blob is pending.
+    getBlobBlock(hash, 'pending', function(error, blobBlock) {
+      if (blobBlock == 0) {
+        callback("Blob failed to broadcast.");
+      }
+      else {
+        callback(null, true);
+      }
+    });
   });
   return hash;
 }
