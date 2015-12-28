@@ -1,6 +1,6 @@
 {
   "name": "blobstore-ethereum",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Stores arbitrary-sized blobs of data in Ethereum's transaction log.",
   "main": "blobstore.js",
   "dependencies": {
@@ -16,7 +16,7 @@
   },
   "keywords": [
     "ethereum",
-    "cas"
+    "blob storage"
   ],
   "author": "Jonathan Brown <jbrown@bluedroplet.com>",
   "license": "Unlicense",
