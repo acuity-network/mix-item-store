@@ -62,7 +62,7 @@ var getBlob = function(id, callback) {
   var blockNumber = parseInt(id.substr(2, 12), 16);
   var hash = '0x000000000000' + id.substr(14);
   if (blockNumber == 0 || blockNumber > web3.eth.blockNumber) {
-    // We don't know which block the blog is in, or it isn't in a block yet. See
+    // We don't know which block the blob is in, or it isn't in a block yet. See
     // if it is in a pending transaction. This will only work if the blob was
     // stored directly by a transaction.
     web3.eth.getBlock('pending', true, function(error, result) {
@@ -97,7 +97,7 @@ var getBlob = function(id, callback) {
     toBlock = 'latest';
   }
   else {
-    // We know exactly which block the blog is in.
+    // We know exactly which block the blob is in.
     fromBlock = toBlock = blockNumber;
   }
   // Perform the search.
