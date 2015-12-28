@@ -13,13 +13,14 @@ else {
 
 var blobStoreAbi = require('./blobstore.abi.json');
 var blobStoreContract = web3.eth.contract(blobStoreAbi);
-var blobStoreAddress = '0x3ed94117c369f92f2aa8500da996f1ae4f6460fd';
+var blobStoreAddress = '0xd2fb51f4049b79677812c8deef6740c6b31af338';
 var blobStore = blobStoreContract.at(blobStoreAddress);
 
 // solc version: 0.2.0-0/Release-Linux/g++/int linked to libethereum-1.1.0-0/Release-Linux/g++/int
 
-getBlobHash = function(blob) {
-  return '0x' + web3.sha3(blob.toString('hex'), {encoding: 'hex'});
+var getBlobHash = function(blob) {
+  // Calculate the hash and zero-out the first six bytes.
+  return '0x000000000000' + web3.sha3(blob.toString('hex'), {encoding: 'hex'}).substr(12);
 }
 
 function getBlobTx(blob) {
@@ -31,7 +32,7 @@ function getBlobTx(blob) {
 
 var getGas = function(blob, callback) {
   // Calculate maximum transaction gas.
-  web3.eth.estimateGas(tx(blob), 'pending', callback);
+  web3.eth.estimateGas(getBlobTx(blob), 'pending', callback);
 }
 
 var storeBlob = function(blob, callback) {
@@ -56,34 +57,55 @@ var storeBlob = function(blob, callback) {
   return hash;
 }
 
-var getBlob = function(hash, callback) {
-  web3.eth.filter({fromBlock: 736860, toBlock: 'latest', address: blobStoreAddress, topics: [hash]}).get(function(error, result) {
+var getBlob = function(id, callback) {
+  // Break up the blob id into block number and hash.
+  var blockNumber = parseInt(id.substr(2, 12), 16);
+  var hash = '0x000000000000' + id.substr(14);
+  if (blockNumber == 0 || blockNumber > web3.eth.blockNumber) {
+    // We don't know which block the blog is in, or it isn't in a block yet. See
+    // if it is in a pending transaction. This will only work if the blob was
+    // stored directly by a transaction.
+    web3.eth.getBlock('pending', true, function(error, result) {
+      if (error) { callback(error); return; }
+      for (var i in result.transactions) {
+        var tx = result.transactions[i];
+        if (tx.to != blobStoreAddress) {
+          continue;
+        }
+        // Extract the blob from the transaction.
+        var length = parseInt(tx.input.substr(74, 64), 16);
+        var blob = new Buffer(tx.input.substr(138, length * 2), 'hex');
+        // Does it have the correct hash?
+        if (getBlobHash(blob) == hash) {
+          callback(null, blob);
+          return;
+        }
+      }
+    });
+  }
+  var fromBlock, toBlock;
+  // If we don't know the block number, search the whole log index.
+  if (blockNumber == 0) {
+    fromBlock = 760000;
+    toBlock = 'latest';
+  }
+  // If the blob is in a block that occured within the past hour, search from an
+  // hour ago until the latest block in case there has been a re-arragement
+  // since we got the block number (very conservative).
+  else if (blockNumber > web3.eth.blockNumber - 200) {
+    fromBlock = web3.eth.blockNumber - 200;
+    toBlock = 'latest';
+  }
+  else {
+    // We know exactly which block the blog is in.
+    fromBlock = toBlock = blockNumber;
+  }
+  // Perform the search.
+  web3.eth.filter({fromBlock: fromBlock, toBlock: toBlock, address: blobStoreAddress, topics: [hash]}).get(function(error, result) {
     if (error) { callback(error); return; }
     if (result.length != 0) {
       var length = parseInt(result[0].data.substr(66, 64), 16);
       callback(null, new Buffer(result[0].data.substr(130, length * 2), 'hex'));
-    }
-    else {
-      // The blob isn't in a block yet. See if it is in a pending transaction.
-      // This will only work if the blob was stored directly by a transaction.
-      web3.eth.getBlock('pending', true, function(error, result) {
-        if (error) { callback(error); return; }
-        for (var i in result.transactions) {
-          var tx = result.transactions[i];
-          if (tx.to != blobStoreAddress) {
-            continue;
-          }
-          // Extract the blob from the transaction.
-          var length = parseInt(tx.input.substr(74, 64), 16);
-          var blob = new Buffer(tx.input.substr(138, length * 2), 'hex');
-          // Does it have the correct hash?
-          if (getBlobHash(blob) == hash) {
-            callback(null, blob);
-            return;
-          }
-        }
-        callback("Blob not found.");
-      });
     }
   });
 }
