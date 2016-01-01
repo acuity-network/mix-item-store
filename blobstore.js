@@ -13,14 +13,14 @@ else {
 
 var blobStoreAbi = require('./blobstore.abi.json');
 var blobStoreContract = web3.eth.contract(blobStoreAbi);
-var blobStoreAddress = '0xd2fb51f4049b79677812c8deef6740c6b31af338';
+var blobStoreAddress = '0x6feab968708c8c3de09229ca80d251481d03c0ef';
 var blobStore = blobStoreContract.at(blobStoreAddress);
 
-// solc version: 0.2.0-0/Release-Linux/g++/int linked to libethereum-1.1.0-0/Release-Linux/g++/int
+// solc version: 0.2.0-0/Release-Linux/g++/int linked to libethereum-1.1.1-0/Release-Linux/g++/int
 
 var getBlobHash = function(blob) {
-  // Calculate the hash and zero-out the first six bytes.
-  return '0x000000000000' + web3.sha3(blob.toString('hex'), {encoding: 'hex'}).substr(12);
+  // Calculate the hash and zero-out the last six bytes.
+  return '0x' + web3.sha3(blob.toString('hex'), {encoding: 'hex'}).substr(0, 52) + '000000000000';
 }
 
 function getBlobTx(blob) {
@@ -59,8 +59,8 @@ var storeBlob = function(blob, callback) {
 
 var getBlob = function(id, callback) {
   // Break up the blob id into block number and hash.
-  var blockNumber = parseInt(id.substr(2, 12), 16);
-  var hash = '0x000000000000' + id.substr(14);
+  var blockNumber = parseInt(id.substr(54, 12), 16);
+  var hash = '0x' + id.substr(2, 52) + '000000000000';
   if (blockNumber == 0 || blockNumber > web3.eth.blockNumber) {
     // We don't know which block the blob is in, or it isn't in a block yet. See
     // if it is in a pending transaction. This will only work if the blob was
@@ -86,7 +86,7 @@ var getBlob = function(id, callback) {
   var fromBlock, toBlock;
   // If we don't know the block number, search the whole log index.
   if (blockNumber == 0) {
-    fromBlock = 760000;
+    fromBlock = 782352;
     toBlock = 'latest';
   }
   // If the blob is in a block that occured within the past hour, search from an
