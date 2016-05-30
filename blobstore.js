@@ -13,14 +13,14 @@ else {
 
 var blobStoreAbi = require('./blobstore.abi.json');
 var blobStoreContract = web3.eth.contract(blobStoreAbi);
-var blobStoreAddress = '0x6feab968708c8c3de09229ca80d251481d03c0ef';
+var blobStoreAddress = '0x3ef3867bd76f0640cff6fba4e88ff0e9ff65ff04';
 var blobStore = blobStoreContract.at(blobStoreAddress);
 
-// solc version: 0.2.0-0/Release-Linux/g++/int linked to libethereum-1.1.1-0/Release-Linux/g++/int
+// solc version: 0.3.3-0/RelWithDebInfo-Linux/g++/Interpreter
 
 var getBlobHash = function(blob) {
   // Calculate the hash and zero-out the last six bytes.
-  return '0x' + web3.sha3(blob.toString('hex'), {encoding: 'hex'}).substr(0, 52) + '000000000000';
+  return web3.sha3(blob.toString('hex'), {encoding: 'hex'});
 }
 
 function getBlobTx(blob) {
@@ -57,51 +57,28 @@ var storeBlob = function(blob, callback) {
   return hash;
 }
 
-var getBlob = function(id, callback) {
-  // Break up the blob id into block number and hash.
-  var blockNumber = parseInt(id.substr(54, 12), 16);
-  var hash = '0x' + id.substr(2, 52) + '000000000000';
-  if (blockNumber == 0 || blockNumber > web3.eth.blockNumber) {
-    // We don't know which block the blob is in, or it isn't in a block yet. See
-    // if it is in a pending transaction. This will only work if the blob was
-    // stored directly by a transaction.
-    web3.eth.getBlock('pending', true, function(error, result) {
-      if (error) { callback(error); return; }
-      for (var i in result.transactions) {
-        var tx = result.transactions[i];
-        if (tx.to != blobStoreAddress) {
-          continue;
-        }
-        // Extract the blob from the transaction.
-        var length = parseInt(tx.input.substr(74, 64), 16);
-        var blob = new Buffer(tx.input.substr(138, length * 2), 'hex');
-        // Does it have the correct hash?
-        if (getBlobHash(blob) == hash) {
-          callback(null, blob);
-          return;
-        }
+var getBlob = function(hash, callback) {
+  // Check if the blob is in a pending transaction. This will only work if the blob was stored
+  // directly by a transaction.
+  web3.eth.getBlock('pending', true, function(error, result) {
+    if (error) { callback(error); return; }
+    for (var i in result.transactions) {
+      var tx = result.transactions[i];
+      if (tx.to != blobStoreAddress) {
+        continue;
       }
-    });
-  }
-  var fromBlock, toBlock;
-  // If we don't know the block number, search the whole log index.
-  if (blockNumber == 0) {
-    fromBlock = 782352;
-    toBlock = 'latest';
-  }
-  // If the blob is in a block that occured within the past hour, search from an
-  // hour ago until the latest block in case there has been a re-arragement
-  // since we got the block number (very conservative).
-  else if (blockNumber > web3.eth.blockNumber - 200) {
-    fromBlock = web3.eth.blockNumber - 200;
-    toBlock = 'latest';
-  }
-  else {
-    // We know exactly which block the blob is in.
-    fromBlock = toBlock = blockNumber;
-  }
-  // Perform the search.
-  web3.eth.filter({fromBlock: fromBlock, toBlock: toBlock, address: blobStoreAddress, topics: [hash]}).get(function(error, result) {
+      // Extract the blob from the transaction.
+      var length = parseInt(tx.input.substr(74, 64), 16);
+      var blob = new Buffer(tx.input.substr(138, length * 2), 'hex');
+      // Does it have the correct hash?
+      if (getBlobHash(blob) == hash) {
+        callback(null, blob);
+        return;
+      }
+    }
+  });
+  // Search the logs.
+  web3.eth.filter({fromBlock: 1613278, toBlock: 'pending', address: blobStoreAddress, topics: [hash]}).get(function(error, result) {
     if (error) { callback(error); return; }
     if (result.length != 0) {
       var length = parseInt(result[0].data.substr(66, 64), 16);
