@@ -12,7 +12,7 @@ contract BlobStore {
      * @return id Hash of blob.
      */
     function storeBlob(bytes blob) external returns (bytes32 id) {
-        // Calculate the hash
+        // Calculate the hash.
         id = sha3(blob);
         // Store the blob in a log in the current block.
         logBlob(id, blob);
