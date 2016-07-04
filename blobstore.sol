@@ -9,13 +9,17 @@ contract BlobStore {
     /**
      * @dev Stores a blob in the transaction log.
      * @param blob Blob that should be stored.
-     * @return hash Hash of the blob.
+     * @return hash Hash of blob.
      */
     function storeBlob(bytes blob) external returns (bytes32 hash) {
         // Calculate the hash.
         hash = sha3(blob);
         // Store the blob in a log in the current block.
         logBlob(hash, blob);
+    }
+
+    function() {
+        throw;      // Do not maintain an ether balance.
     }
 
 }
