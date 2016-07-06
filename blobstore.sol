@@ -9,16 +9,13 @@ contract BlobStore {
     /**
      * @dev Stores a blob in the transaction log. It is guaranteed that each user will get a different hash when storing the same blob.
      * @param blob Blob that should be stored.
-     * @return id 26 bytes hash of sender and blob, 6 bytes block number.
+     * @return hash Hash of sender and blob.
      */
-    function storeBlob(bytes blob) external returns (bytes32 id) {
-        // Calculate the hash and zero out the last six bytes.
-        // Casting to bytes32 before the ~ saves 8 gas.
-        id = sha3(msg.sender, blob) & ~bytes32((2 ** 48) - 1);
+    function storeBlob(bytes blob) external returns (bytes32 hash) {
+        // Calculate the hash.
+        hash = sha3(msg.sender, blob);
         // Store the blob in a log in the current block.
-        logBlob(id, blob);
-        // Populate the last six bytes with the current block number.
-        id |= bytes32(block.number);
+        logBlob(hash, blob);
     }
 
     function() {
