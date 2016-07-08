@@ -53,9 +53,24 @@ contract BlobStore {
         logRetraction(hash);
     }
 
-    function getBlobInfo(bytes32 hash) constant external returns (address owner, uint256 blockNumber) {
+    function getBlobInfo(bytes32 hash) constant external returns (address owner, uint256 revisions, uint256 blockNumber) {
         owner = blobInfo[hash].owner;
-        blockNumber = blobInfo[hash].blockNumber;
+        revisions = revisionBlockNumbers[hash].length;
+        if (revisions == 0) {
+            blockNumber = blobInfo[hash].blockNumber;
+        }
+        else {
+            blockNumber = revisionBlockNumbers[hash][revisions - 1];
+        }
+    }
+
+    function getRevisionBlockNumber(bytes32 hash, uint256 revisionId) constant external returns (uint256 blockNumber) {
+        if (revisionId == 0) {
+            blockNumber = blobInfo[hash].blockNumber;
+        }
+        else {
+            blockNumber = revisionBlockNumbers[hash][revisionId - 1];
+        }
     }
 
     function() {
