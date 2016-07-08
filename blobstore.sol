@@ -17,9 +17,8 @@ contract BlobStore {
 
     modifier isOwner(bytes32 hash) {
         if (blobInfo[hash].owner == msg.sender) {
-            throw;
+            _
         }
-        _
     }
 
     /**
@@ -27,13 +26,13 @@ contract BlobStore {
      * @param blob Blob that should be stored.
      * @return hash Hash of sender and blob.
      */
-    function storeBlob(bytes blob) external returns (bytes32 hash) {
+    function storeBlob(bytes blob, bool revisionable) external returns (bytes32 hash) {
         // Calculate the hash.
         hash = sha3(msg.sender, blob);
         // Store block number and owner in state.
         blobInfo[hash] = BlobInfo({
-            blockNumber: uint96(block.number),
-            owner: msg.sender,
+            blockNumber: uint80(block.number),
+            owner: revisionable ? msg.sender : 0,
         });
         // Store the blob in a log in the current block.
         logBlob(hash, 0, blob);
