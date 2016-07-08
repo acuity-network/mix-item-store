@@ -16,9 +16,10 @@ contract BlobStore {
     event logRetraction(bytes32 indexed hash) anonymous;
 
     modifier isOwner(bytes32 hash) {
-        if (blobInfo[hash].owner == msg.sender) {
-            _
+        if (blobInfo[hash].owner != msg.sender) {
+            throw;
         }
+        _
     }
 
     /**
