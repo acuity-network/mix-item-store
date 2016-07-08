@@ -31,7 +31,7 @@ contract BlobStore {
         hash = sha3(msg.sender, blob);
         // Store block number and owner in state.
         blobInfo[hash] = BlobInfo({
-            blockNumber: uint80(block.number),
+            blockNumber: uint96(block.number),
             owner: revisionable ? msg.sender : 0,
         });
         // Store the blob in a log in the current block.
