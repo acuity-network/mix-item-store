@@ -39,10 +39,11 @@ contract BlobStore {
         logBlob(hash, 0, blob);
     }
 
-    function updateBlob(bytes32 hash, bytes blob) isOwner(hash) external {
+    function updateBlob(bytes32 hash, bytes blob) isOwner(hash) external returns (uint256 revisionId) {
         revisionBlockNumbers[hash].push(block.number);
+        revisionId = revisionBlockNumbers[hash].length;
         // Store the new blob in a log in the current block.
-        logBlob(hash, revisionBlockNumbers[hash].length, blob);
+        logBlob(hash, revisionId, blob);
     }
 
     function retractBlob(bytes32 hash) isOwner(hash) external {
@@ -55,8 +56,8 @@ contract BlobStore {
 
     function getBlobInfo(bytes32 hash) constant external returns (address owner, uint256 originalBlockNumber, uint256 latestRevisionId, uint256 latestBlockNumber) {
         owner = blobInfo[hash].owner;
-        latestRevisionId = revisionBlockNumbers[hash].length;
         originalBlockNumber = blobInfo[hash].blockNumber;
+        latestRevisionId = revisionBlockNumbers[hash].length;
         if (latestRevisionId == 0) {
             latestBlockNumber = originalBlockNumber;
         }
