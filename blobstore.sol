@@ -15,7 +15,7 @@ contract BlobStore {
     }
 
     mapping (bytes32 => BlobInfo) idBlobInfo;
-    mapping (bytes32 => mapping (uint => uint32[8])) idPackedRevisionBlockNumbers;
+    mapping (bytes32 => mapping (uint => bytes32)) idPackedRevisionBlockNumbers;
 
     event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);
     event logRetract(bytes32 indexed id);
@@ -64,6 +64,20 @@ contract BlobStore {
         _
     }
 
+    function setPackedRevisionBlockNumber(bytes32 id, uint revisionId) internal {
+        bytes32 slot = idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8];
+        uint multiplier = 2 ** (((revisionId - 1) % 8) * 32);
+        slot &= ~bytes32(uint32(-1) * multiplier);
+        slot |= bytes32(uint32(block.number) * multiplier);
+        idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8] = slot;
+    }
+
+    function getPackedRevisionBlockNumber(bytes32 id, uint revisionId) internal returns (uint blockNumber) {
+        bytes32 slot = idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8];
+        uint offset = ((revisionId - 1) % 8) * 32;
+        blockNumber = uint32(uint256(slot) / 2 ** offset);
+    }
+
     /**
      * @dev Stores a blob in the transaction log. It is guaranteed that each user will get a different id from the same nonce.
      * @param blob Blob that should be stored.
@@ -88,10 +102,6 @@ contract BlobStore {
         });
         // Store the blob in a log in the current block.
         logBlob(id, 0, blob);
-    }
-
-    function setPackedRevisionBlockNumber(bytes32 id, uint revisionId) internal {
-        idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8][(revisionId - 1) % 8] = uint32(block.number);
     }
 
     function update(bytes32 id, bytes blob, bool newRevision) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
@@ -206,7 +216,7 @@ contract BlobStore {
             blockNumber = idBlobInfo[id].blockNumber;
         }
         else {
-            blockNumber = idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8][(revisionId - 1) % 8];
+            blockNumber = getPackedRevisionBlockNumber(id, revisionId);
         }
     }
 
