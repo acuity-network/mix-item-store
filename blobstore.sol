@@ -65,10 +65,16 @@ contract BlobStore {
     }
 
     function setPackedRevisionBlockNumber(bytes32 id, uint offset) internal {
-        bytes32 slot = idPackedRevisionBlockNumbers[id][offset / 8];
-        uint multiplier = 2 ** ((offset % 8) * 32);
-        slot &= ~bytes32(uint32(-1) * multiplier);
-        slot |= bytes32(uint32(block.number) * multiplier);
+        bytes32 slot;
+        if (offset % 8 > 0) {
+            uint multiplier = 2 ** ((offset % 8) * 32);
+            slot = idPackedRevisionBlockNumbers[id][offset / 8];
+            slot &= ~bytes32(uint32(-1) * multiplier);
+            slot |= bytes32(uint32(block.number) * multiplier);
+        }
+        else {
+            slot = bytes32(uint32(block.number));
+        }
         idPackedRevisionBlockNumbers[id][offset / 8] = slot;
     }
 
