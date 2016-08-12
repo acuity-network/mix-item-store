@@ -90,20 +90,18 @@ contract BlobStore {
         logBlob(id, 0, blob);
     }
 
-    function setPackedRevisionBlockNumber(bytes32 id, uint offset, bool update)  internal {
-        bytes32 slot;
+    function setPackedRevisionBlockNumber(bytes32 id, uint offset, bool update) internal {
         if (offset % 8 > 0) {
-            uint multiplier = 2 ** ((offset % 8) * 32);
-            slot = idPackedRevisionBlockNumbers[id][offset / 8];
+            bytes32 slot = idPackedRevisionBlockNumbers[id][offset / 8];
             if (update) {
-                slot &= ~bytes32(uint32(-1) * multiplier);
+                slot &= ~bytes32(uint32(-1) * (2 ** ((offset % 8) * 32)));
             }
-            slot |= bytes32(uint32(block.number) * multiplier);
+            slot |= bytes32(uint32(block.number) * (2 ** ((offset % 8) * 32)));
+            idPackedRevisionBlockNumbers[id][offset / 8] = slot;
         }
         else {
-            slot = bytes32(uint32(block.number));
+            idPackedRevisionBlockNumbers[id][offset / 8] = bytes32(uint32(block.number));
         }
-        idPackedRevisionBlockNumbers[id][offset / 8] = slot;
     }
 
     function update(bytes32 id, bytes blob, bool newRevision) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
