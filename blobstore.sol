@@ -64,12 +64,14 @@ contract BlobStore {
         _
     }
 
-    function setPackedRevisionBlockNumber(bytes32 id, uint offset) internal {
+    function setPackedRevisionBlockNumber(bytes32 id, uint offset, bool update)  internal {
         bytes32 slot;
         if (offset % 8 > 0) {
             uint multiplier = 2 ** ((offset % 8) * 32);
             slot = idPackedRevisionBlockNumbers[id][offset / 8];
-            slot &= ~bytes32(uint32(-1) * multiplier);
+            if (update) {
+                slot &= ~bytes32(uint32(-1) * multiplier);
+            }
             slot |= bytes32(uint32(block.number) * multiplier);
         }
         else {
@@ -112,14 +114,14 @@ contract BlobStore {
     function update(bytes32 id, bytes blob, bool newRevision) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
         BlobInfo blobInfo = idBlobInfo[id];
         if (newRevision || blobInfo.forceNewRevisions) {
-            setPackedRevisionBlockNumber(id, blobInfo.numRevisions++);
+            setPackedRevisionBlockNumber(id, blobInfo.numRevisions++, true);
         }
         else {
             if (blobInfo.numRevisions == 0) {
                 blobInfo.blockNumber = uint32(block.number);
             }
             else {
-                setPackedRevisionBlockNumber(id, blobInfo.numRevisions - 1);
+                setPackedRevisionBlockNumber(id, blobInfo.numRevisions - 1, false);
             }
         }
         revisionId = blobInfo.numRevisions;
