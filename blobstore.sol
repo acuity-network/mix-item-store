@@ -92,14 +92,20 @@ contract BlobStore {
 
     function setPackedRevisionBlockNumber(bytes32 id, uint offset, bool update) internal {
         if (offset % 8 > 0) {
-            bytes32 slot = idPackedRevisionBlockNumbers[id][offset / 8];
             if (update) {
+                bytes32 slot = idPackedRevisionBlockNumbers[id][offset / 8];
+                // Wipe the previous block number.
                 slot &= ~bytes32(uint32(-1) * (2 ** ((offset % 8) * 32)));
+                // Insert the new block number.
+                idPackedRevisionBlockNumbers[id][offset / 8] = slot | bytes32(uint32(block.number) * (2 ** ((offset % 8) * 32)));
             }
-            slot |= bytes32(uint32(block.number) * (2 ** ((offset % 8) * 32)));
-            idPackedRevisionBlockNumbers[id][offset / 8] = slot;
+            else {
+                // Store in the state.
+                idPackedRevisionBlockNumbers[id][offset / 8] |= bytes32(uint32(block.number) * (2 ** ((offset % 8) * 32)));
+            }
         }
         else {
+            // Store the new block number directly in the slot.
             idPackedRevisionBlockNumbers[id][offset / 8] = bytes32(uint32(block.number));
         }
     }
