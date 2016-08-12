@@ -15,7 +15,7 @@ contract BlobStore {
     }
 
     mapping (bytes32 => BlobInfo) idBlobInfo;
-    mapping (bytes32 => mapping (uint => uint32)) idRevisionIdBlockNumber;  // Not packed - need better compiler / evm.
+    mapping (bytes32 => mapping (uint => bytes32)) idPackedRevisionBlockNumbers;
 
     event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);
     event logRetract(bytes32 indexed id);
@@ -64,6 +64,20 @@ contract BlobStore {
         _
     }
 
+    function setPackedRevisionBlockNumber(bytes32 id, uint revisionId) {
+        bytes32 slot = idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8];
+        uint multiplier = 2 ** (((revisionId - 1) % 8) * 32);
+        slot &= ~bytes32(uint32(-1) * multiplier);
+        slot |= bytes32(uint32(block.number) * multiplier);
+        idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8] = slot;
+    }
+
+    function getPackedRevisionBlockNumber(bytes32 id, uint revisionId) returns (uint blockNumber) {
+        bytes32 slot = idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8];
+        uint offset = ((revisionId - 1) % 8) * 32;
+        blockNumber = uint32(uint256(slot) / 2 ** offset);
+    }
+
     /**
      * @dev Stores a blob in the transaction log. It is guaranteed that each user will get a different id from the same nonce.
      * @param blob Blob that should be stored.
@@ -93,14 +107,14 @@ contract BlobStore {
     function update(bytes32 id, bytes blob, bool newRevision) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
         BlobInfo blobInfo = idBlobInfo[id];
         if (newRevision || blobInfo.forceNewRevisions) {
-            idRevisionIdBlockNumber[id][++blobInfo.numRevisions] = uint32(block.number);
+            setPackedRevisionBlockNumber(id, ++blobInfo.numRevisions);
         }
         else {
             if (blobInfo.numRevisions == 0) {
                 blobInfo.blockNumber = uint32(block.number);
             }
             else {
-                idRevisionIdBlockNumber[id][blobInfo.numRevisions] = uint32(block.number);
+                setPackedRevisionBlockNumber(id, blobInfo.numRevisions);
             }
         }
         revisionId = blobInfo.numRevisions;
@@ -109,10 +123,10 @@ contract BlobStore {
     }
 
     function retract(bytes32 id) noValue isOwner(id) isRetractable(id) external {
-        // Delete the revision block numbers.
-        uint numRevisions = idBlobInfo[id].numRevisions;
-        for (uint i = 1; i <= numRevisions; i++) {
-            delete idRevisionIdBlockNumber[id][i];
+        // Delete the packed revision block numbers.
+        uint numSlots = (idBlobInfo[id].numRevisions + 7) / 8;
+        for (uint i = 0; i < numSlots; i++) {
+            delete idPackedRevisionBlockNumbers[id][i];
         }
         // Mark this blob as retracted.
         idBlobInfo[id] = BlobInfo({
@@ -202,7 +216,7 @@ contract BlobStore {
             blockNumber = idBlobInfo[id].blockNumber;
         }
         else {
-            blockNumber = idRevisionIdBlockNumber[id][revisionId];
+            blockNumber = getPackedRevisionBlockNumber(id, revisionId);
         }
     }
 
