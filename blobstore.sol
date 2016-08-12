@@ -5,24 +5,27 @@
 contract BlobStore {
 
     struct BlobInfo {               // Single slot.
-        bool immutable;             // Any update to this blob will be a new revision. Cannot be retracted.
-        bool updatable;             // Is it possible to update this blob?
+        bool updatable;             // Can the blob be updated? Cannot be enabled after creation.
+        bool forceNewRevisions;     // When updating always make a new revision. Cannot be disabled after creation.
+        bool retractable;           // Can the blob be retracted? Cannot be enabled after creation.
+        bool disownable;            // Can the blob be disowned? Cannot be enabled after creation.
         uint32 blockNumber;         // Which block has revision 0 of this blob.
         uint32 numRevisions;        // Number of additional revisions.
-        address owner;              // Who created this blob. Owner can always disown.
+        address owner;              // Who created this blob.
     }
 
     mapping (bytes32 => BlobInfo) idBlobInfo;
     mapping (bytes32 => mapping (uint => uint32)) idRevisionIdBlockNumber;  // Not packed - need better compiler / evm.
 
-    event logBlob(bytes32 indexed id, bytes blob);
-    event logBlobRevision(bytes32 indexed id, uint indexed revisionId, bytes blob);
-    event logBlobRetract(bytes32 indexed id);
-    event logSetImmutable(bytes32 indexed id);
-    event logSetNotUpdatable(bytes32 indexed id);
+    event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);
+    event logRetract(bytes32 indexed id);
     event logDisown(bytes32 indexed id);
+    event logSetNotUpdatable(bytes32 indexed id);
+    event logSetForceNewRevisions(bytes32 indexed id);
+    event logSetNotRetractable(bytes32 indexed id);
+    event logSetNotDisownable(bytes32 indexed id);
 
-    // Create a 96-bit id for this contract. This needs to be unique across all blockchains.
+    // Create a 96-bit id for this contract. This is unique across all blockchains.
     // Wait a few minutes after deploying for this id to settle.
     bytes12 constant public contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
 
@@ -40,15 +43,22 @@ contract BlobStore {
         _
     }
 
-    modifier isNotImmutable(bytes32 id) {
-        if (idBlobInfo[id].immutable) {
+    modifier isUpdatable(bytes32 id) {
+        if (!idBlobInfo[id].updatable) {
             throw;
         }
         _
     }
 
-    modifier isUpdatable(bytes32 id) {
-        if (!idBlobInfo[id].updatable) {
+    modifier isRetractable(bytes32 id) {
+        if (!idBlobInfo[id].retractable) {
+            throw;
+        }
+        _
+    }
+
+    modifier isDisownable(bytes32 id) {
+        if (!idBlobInfo[id].disownable) {
             throw;
         }
         _
@@ -59,28 +69,30 @@ contract BlobStore {
      * @param blob Blob that should be stored.
      * @return hash Hash of sender and blob.
      */
-    function store(bytes blob, bytes32 nonce, bool immutable, bool updatable, bool anon) noValue external returns (bytes32 id) {
+    function store(bytes blob, bytes32 nonce, bool updatable, bool forceNewRevisions, bool retractable, bool disownable, bool anon) noValue external returns (bytes32 id) {
         // Determine the id.
-        id = contractId | (sha3(contractId, msg.sender, nonce) & (2 ** 160 - 1));
+        id = contractId | (sha3(msg.sender, nonce) & (2 ** 160 - 1));
         // Make sure this id has not been used before.
         if (idBlobInfo[id].blockNumber != 0) {
             throw;
         }
         // Store blob info in state.
         idBlobInfo[id] = BlobInfo({
-            immutable: immutable,
             updatable: updatable,
+            forceNewRevisions: forceNewRevisions,
+            retractable: retractable,
+            disownable: disownable,
             numRevisions: 0,
             blockNumber: uint32(block.number),
             owner: anon ? 0 : msg.sender,
         });
         // Store the blob in a log in the current block.
-        logBlob(id, blob);
+        logBlob(id, 0, blob);
     }
 
     function update(bytes32 id, bytes blob, bool newRevision) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
         BlobInfo blobInfo = idBlobInfo[id];
-        if (newRevision || blobInfo.immutable) {
+        if (newRevision || blobInfo.forceNewRevisions) {
             idRevisionIdBlockNumber[id][++blobInfo.numRevisions] = uint32(block.number);
         }
         else {
@@ -93,10 +105,10 @@ contract BlobStore {
         }
         revisionId = blobInfo.numRevisions;
         // Store the new blob in a log in the current block.
-        logBlobRevision(id, revisionId, blob);
+        logBlob(id, revisionId, blob);
     }
 
-    function retract(bytes32 id) noValue isOwner(id) isNotImmutable(id) external {
+    function retract(bytes32 id) noValue isOwner(id) isRetractable(id) external {
         // Delete the revision block numbers.
         uint numRevisions = idBlobInfo[id].numRevisions;
         for (uint i = 1; i <= numRevisions; i++) {
@@ -104,21 +116,23 @@ contract BlobStore {
         }
         // Mark this blob as retracted.
         idBlobInfo[id] = BlobInfo({
-            immutable: true,
             updatable: false,
+            forceNewRevisions: false,
+            retractable: false,
+            disownable: false,
             numRevisions: 0,
             blockNumber: uint32(-1),
             owner: 0,
         });
         // Log that the blob has been retracted.
-        logBlobRetract(id);
+        logRetract(id);
     }
 
-    function setImmutable(bytes32 id) noValue isOwner(id) {
-        // Record in state that the blob is immutable.
-        idBlobInfo[id].immutable = true;
-        // Log that the blob is immutable.
-        logSetImmutable(id);
+    function disown(bytes32 id) noValue isOwner(id) isDisownable(id) external {
+        // Remove the owner from the blob's state.
+        delete idBlobInfo[id].owner;
+        // Log as blob as disowned.
+        logDisown(id);
     }
 
     function setNotUpdatable(bytes32 id) noValue isOwner(id) {
@@ -128,24 +142,33 @@ contract BlobStore {
         logSetNotUpdatable(id);
     }
 
-    function lock(bytes32 id) noValue isOwner(id) external {
-        // Set the blob as immutable.
-        setImmutable(id);
-        // Set the blob as not updatable.
-        setNotUpdatable(id);
+    function setForceNewTransactions(bytes32 id) noValue isOwner(id) {
+        // Record in state that all changes to this blob must be new revisions.
+        idBlobInfo[id].forceNewRevisions = true;
+        // Log that the blob now forces new revisions.
+        logSetForceNewRevisions(id);
     }
 
-    function disown(bytes32 id) noValue isOwner(id) external {
-        // Remove the owner from the blob's state.
-        delete idBlobInfo[id].owner;
-        // Log as blob as disowned.
-        logDisown(id);
+    function setNotRetractable(bytes32 id) noValue isOwner(id) {
+        // Record in state that the blob is not retractable.
+        idBlobInfo[id].retractable = false;
+        // Log that the blob is not retractable.
+        logSetNotRetractable(id);
     }
 
-    function getBlobInfo(bytes32 id) noValue constant external returns (address owner, bool immutable, bool updatable, uint numRevisions, uint latestBlockNumber) {
+    function setNotDisownable(bytes32 id) noValue isOwner(id) {
+        // Record in state that the blob is not disownable.
+        idBlobInfo[id].disownable = false;
+        // Log that the blob is not disownable.
+        logSetNotDisownable(id);
+    }
+
+    function getInfo(bytes32 id) noValue constant external returns (address owner, bool updatable, bool forceNewRevisions, bool retractable, bool disownable, uint numRevisions, uint latestBlockNumber) {
         owner = idBlobInfo[id].owner;
-        immutable = idBlobInfo[id].immutable;
         updatable = idBlobInfo[id].updatable;
+        forceNewRevisions = idBlobInfo[id].forceNewRevisions;
+        retractable = idBlobInfo[id].retractable;
+        disownable = idBlobInfo[id].disownable;
         numRevisions = idBlobInfo[id].numRevisions;
         latestBlockNumber = getRevisionBlockNumber(id, numRevisions);
     }
@@ -154,12 +177,20 @@ contract BlobStore {
         owner = idBlobInfo[id].owner;
     }
 
-    function getImmutable(bytes32 id) noValue constant external returns (bool immutable) {
-        immutable = idBlobInfo[id].immutable;
+    function getUpdatable(bytes32 id) noValue constant external returns (bool updatable) {
+        updatable = idBlobInfo[id].updatable;
     }
 
-    function getUpdateable(bytes32 id) noValue constant external returns (bool updatable) {
-        updatable = idBlobInfo[id].updatable;
+    function getForceNewRevisions(bytes32 id) noValue constant external returns (bool forceNewRevisions) {
+        forceNewRevisions = idBlobInfo[id].forceNewRevisions;
+    }
+
+    function getRetractable(bytes32 id) noValue constant external returns (bool retractable) {
+        retractable = idBlobInfo[id].retractable;
+    }
+
+    function getDisownable(bytes32 id) noValue constant external returns (bool disownable) {
+        disownable = idBlobInfo[id].disownable;
     }
 
     function numRevisions(bytes32 id) noValue constant external returns (uint32 numRevisions) {
