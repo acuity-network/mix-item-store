@@ -64,18 +64,17 @@ contract BlobStore {
         _
     }
 
-    function setPackedRevisionBlockNumber(bytes32 id, uint revisionId) internal {
-        bytes32 slot = idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8];
-        uint multiplier = 2 ** (((revisionId - 1) % 8) * 32);
+    function setPackedRevisionBlockNumber(bytes32 id, uint offset) internal {
+        bytes32 slot = idPackedRevisionBlockNumbers[id][offset / 8];
+        uint multiplier = 2 ** ((offset % 8) * 32);
         slot &= ~bytes32(uint32(-1) * multiplier);
         slot |= bytes32(uint32(block.number) * multiplier);
-        idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8] = slot;
+        idPackedRevisionBlockNumbers[id][offset / 8] = slot;
     }
 
-    function getPackedRevisionBlockNumber(bytes32 id, uint revisionId) internal returns (uint blockNumber) {
-        bytes32 slot = idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8];
-        uint offset = ((revisionId - 1) % 8) * 32;
-        blockNumber = uint32(uint256(slot) / 2 ** offset);
+    function getPackedRevisionBlockNumber(bytes32 id, uint offset) internal returns (uint blockNumber) {
+        bytes32 slot = idPackedRevisionBlockNumbers[id][offset / 8];
+        blockNumber = uint32(uint256(slot) / 2 ** ((offset % 8) * 32));
     }
 
     /**
@@ -107,14 +106,14 @@ contract BlobStore {
     function update(bytes32 id, bytes blob, bool newRevision) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
         BlobInfo blobInfo = idBlobInfo[id];
         if (newRevision || blobInfo.forceNewRevisions) {
-            setPackedRevisionBlockNumber(id, ++blobInfo.numRevisions);
+            setPackedRevisionBlockNumber(id, blobInfo.numRevisions++);
         }
         else {
             if (blobInfo.numRevisions == 0) {
                 blobInfo.blockNumber = uint32(block.number);
             }
             else {
-                setPackedRevisionBlockNumber(id, blobInfo.numRevisions);
+                setPackedRevisionBlockNumber(id, blobInfo.numRevisions - 1);
             }
         }
         revisionId = blobInfo.numRevisions;
@@ -216,7 +215,7 @@ contract BlobStore {
             blockNumber = idBlobInfo[id].blockNumber;
         }
         else {
-            blockNumber = getPackedRevisionBlockNumber(id, revisionId);
+            blockNumber = getPackedRevisionBlockNumber(id, revisionId - 1);
         }
     }
 
