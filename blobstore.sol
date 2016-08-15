@@ -6,7 +6,7 @@ contract BlobStore {
 
     struct BlobInfo {               // Single slot.
         bool updatable;             // Can the blob be updated? Cannot be enabled after creation.
-        bool forceNewRevisions;     // When updating always make a new revision. Cannot be disabled after creation.
+        bool enforceRevisions;      // When updating always make a new revision. Cannot be disabled after creation.
         bool retractable;           // Can the blob be retracted? Cannot be enabled after creation.
         bool disownable;            // Can the blob be disowned? Cannot be enabled after creation.
         uint32 blockNumber;         // Which block has revision 0 of this blob.
@@ -18,10 +18,11 @@ contract BlobStore {
     mapping (bytes32 => mapping (uint => bytes32)) idPackedRevisionBlockNumbers;
 
     event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);
+    event logRetractRevision(bytes32 indexed id, uint indexed revisionId);
     event logRetract(bytes32 indexed id);
     event logDisown(bytes32 indexed id);
     event logSetNotUpdatable(bytes32 indexed id);
-    event logSetForceNewRevisions(bytes32 indexed id);
+    event logSetEnforceRevisions(bytes32 indexed id);
     event logSetNotRetractable(bytes32 indexed id);
     event logSetNotDisownable(bytes32 indexed id);
 
@@ -36,6 +37,13 @@ contract BlobStore {
         _
     }
 
+    modifier exists(bytes32 id) {
+        if (idBlobInfo[id].blockNumber == 0 || idBlobInfo[id].blockNumber == uint32(-1)) {
+            throw;
+        }
+        _
+    }
+
     modifier isOwner(bytes32 id) {
         if (idBlobInfo[id].owner != msg.sender) {
             throw;
@@ -45,6 +53,13 @@ contract BlobStore {
 
     modifier isUpdatable(bytes32 id) {
         if (!idBlobInfo[id].updatable) {
+            throw;
+        }
+        _
+    }
+
+    modifier isNotEnforceRevisions(bytes32 id) {
+        if (idBlobInfo[id].enforceRevisions) {
             throw;
         }
         _
@@ -64,12 +79,26 @@ contract BlobStore {
         _
     }
 
+    modifier hasRevisions(bytes32 id) {
+        if (idBlobInfo[id].numRevisions == 0) {
+            throw;
+        }
+        _
+    }
+
+    modifier revisionExists(bytes32 id, uint revisionId) {
+        if (revisionId > idBlobInfo[id].numRevisions) {
+            throw;
+        }
+        _
+    }
+
     /**
      * @dev Stores a blob in the transaction log. It is guaranteed that each user will get a different id from the same nonce.
      * @param blob Blob that should be stored.
      * @return hash Hash of sender and blob.
      */
-    function store(bytes blob, bytes32 nonce, bool updatable, bool forceNewRevisions, bool retractable, bool disownable, bool anon) noValue external returns (bytes32 id) {
+    function create(bytes blob, bytes32 nonce, bool updatable, bool enforceRevisions, bool retractable, bool disownable, bool anon) noValue external returns (bytes32 id) {
         // Determine the id.
         id = contractId | (sha3(msg.sender, nonce) & (2 ** 160 - 1));
         // Make sure this id has not been used before.
@@ -79,7 +108,7 @@ contract BlobStore {
         // Store blob info in state.
         idBlobInfo[id] = BlobInfo({
             updatable: updatable,
-            forceNewRevisions: forceNewRevisions,
+            enforceRevisions: enforceRevisions,
             retractable: retractable,
             disownable: disownable,
             numRevisions: 0,
@@ -90,53 +119,65 @@ contract BlobStore {
         logBlob(id, 0, blob);
     }
 
-    function setPackedRevisionBlockNumber(bytes32 id, uint offset, bool update) internal {
-        if (offset % 8 > 0) {
-            if (update) {
-                // Wipe the previous block number.
-                idPackedRevisionBlockNumbers[id][offset / 8] &= ~bytes32(uint32(-1) * (2 ** ((offset % 8) * 32)));
-                // Insert the new block number.
-                idPackedRevisionBlockNumbers[id][offset / 8] |= bytes32(uint32(block.number) * (2 ** ((offset % 8) * 32)));
-            }
-            else {
-                // Store in the state.
-                idPackedRevisionBlockNumbers[id][offset / 8] |= bytes32(uint32(block.number) * (2 ** ((offset % 8) * 32)));
-            }
-        }
-        else {
-            // Store the new block number directly in the slot.
-            idPackedRevisionBlockNumbers[id][offset / 8] = bytes32(uint32(block.number));
-        }
+    function setPackedRevisionBlockNumber(bytes32 id, uint offset) internal {
+        // Get the slot.
+        bytes32 slot = idPackedRevisionBlockNumbers[id][offset / 8];
+        // Wipe the previous block number.
+        slot &= ~bytes32(uint32(-1) * 2 ** ((offset % 8) * 32));
+        // Insert the current block number.
+        slot |= bytes32(uint32(block.number) * 2 ** ((offset % 8) * 32));
+        // Store the slot.
+        idPackedRevisionBlockNumbers[id][offset / 8] = slot;
     }
 
-    function update(bytes32 id, bytes blob, bool newRevision) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
-        BlobInfo blobInfo = idBlobInfo[id];
-        if (newRevision || blobInfo.forceNewRevisions) {
-            setPackedRevisionBlockNumber(id, blobInfo.numRevisions++, false);
-        }
-        else {
-            if (blobInfo.numRevisions == 0) {
-                blobInfo.blockNumber = uint32(block.number);
-            }
-            else {
-                setPackedRevisionBlockNumber(id, blobInfo.numRevisions - 1, true);
-            }
-        }
-        revisionId = blobInfo.numRevisions;
+    function createRevision(bytes32 id, bytes blob) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
+        // Increment the number of revisions.
+        revisionId = ++idBlobInfo[id].numRevisions;
+        // Store the block number.
+        setPackedRevisionBlockNumber(id, revisionId - 1);
         // Store the new blob in a log in the current block.
         logBlob(id, revisionId, blob);
     }
 
-    function retract(bytes32 id) noValue isOwner(id) isRetractable(id) external {
-        // Delete the packed revision block numbers.
+    function updateRevision(bytes32 id, uint revisionId, bytes blob) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) revisionExists(id, revisionId) external {
+        if (revisionId == 0) {
+            idBlobInfo[id].blockNumber = uint32(block.number);
+        }
+        else {
+            setPackedRevisionBlockNumber(id, revisionId - 1);
+        }
+        // Store the new blob in a log in the current block.
+        logBlob(id, revisionId, blob);
+    }
+
+    function retractLatestRevision(bytes32 id) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) hasRevisions(id) external {
+        logRetractRevision(id, idBlobInfo[id].numRevisions--);
+    }
+
+    function deleteAllRevisionBlockNumbers(bytes32 id) internal {
         uint numSlots = (idBlobInfo[id].numRevisions + 7) / 8;
         for (uint i = 0; i < numSlots; i++) {
             delete idPackedRevisionBlockNumbers[id][i];
         }
+    }
+
+    function restart(bytes32 id, bytes blob) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) external {
+        // Try to get some gas refunds.
+        deleteAllRevisionBlockNumbers(id);
+        // Update the blob state info.
+        idBlobInfo[id].blockNumber = uint32(block.number);
+        idBlobInfo[id].numRevisions = 0;
+        // Store the blob in a log in the current block.
+        logBlob(id, 0, blob);
+    }
+
+    function retract(bytes32 id) noValue isOwner(id) isRetractable(id) external {
+        // Delete the packed revision block numbers.
+        deleteAllRevisionBlockNumbers(id);
         // Mark this blob as retracted.
         idBlobInfo[id] = BlobInfo({
             updatable: false,
-            forceNewRevisions: false,
+            enforceRevisions: false,
             retractable: false,
             disownable: false,
             numRevisions: 0,
@@ -161,11 +202,11 @@ contract BlobStore {
         logSetNotUpdatable(id);
     }
 
-    function setForceNewTransactions(bytes32 id) noValue isOwner(id) {
+    function setEnforceRevisions(bytes32 id) noValue isOwner(id) {
         // Record in state that all changes to this blob must be new revisions.
-        idBlobInfo[id].forceNewRevisions = true;
+        idBlobInfo[id].enforceRevisions = true;
         // Log that the blob now forces new revisions.
-        logSetForceNewRevisions(id);
+        logSetEnforceRevisions(id);
     }
 
     function setNotRetractable(bytes32 id) noValue isOwner(id) {
@@ -182,41 +223,41 @@ contract BlobStore {
         logSetNotDisownable(id);
     }
 
-    function getInfo(bytes32 id) noValue constant external returns (address owner, bool updatable, bool forceNewRevisions, bool retractable, bool disownable, uint numRevisions, uint latestBlockNumber) {
+    function getInfo(bytes32 id) noValue exists(id) constant external returns (address owner, bool updatable, bool enforceRevisions, bool retractable, bool disownable, uint numRevisions, uint latestBlockNumber) {
         owner = idBlobInfo[id].owner;
         updatable = idBlobInfo[id].updatable;
-        forceNewRevisions = idBlobInfo[id].forceNewRevisions;
+        enforceRevisions = idBlobInfo[id].enforceRevisions;
         retractable = idBlobInfo[id].retractable;
         disownable = idBlobInfo[id].disownable;
         numRevisions = idBlobInfo[id].numRevisions;
         latestBlockNumber = getRevisionBlockNumber(id, numRevisions);
     }
 
-    function getOwner(bytes32 id) noValue constant external returns (address owner) {
+    function getOwner(bytes32 id) noValue exists(id) constant external returns (address owner) {
         owner = idBlobInfo[id].owner;
     }
 
-    function getUpdatable(bytes32 id) noValue constant external returns (bool updatable) {
+    function getUpdatable(bytes32 id) noValue exists(id) constant external returns (bool updatable) {
         updatable = idBlobInfo[id].updatable;
     }
 
-    function getForceNewRevisions(bytes32 id) noValue constant external returns (bool forceNewRevisions) {
-        forceNewRevisions = idBlobInfo[id].forceNewRevisions;
+    function getEnforceRevisions(bytes32 id) noValue exists(id) constant external returns (bool enforceRevisions) {
+        enforceRevisions = idBlobInfo[id].enforceRevisions;
     }
 
-    function getRetractable(bytes32 id) noValue constant external returns (bool retractable) {
+    function getRetractable(bytes32 id) noValue exists(id) constant external returns (bool retractable) {
         retractable = idBlobInfo[id].retractable;
     }
 
-    function getDisownable(bytes32 id) noValue constant external returns (bool disownable) {
+    function getDisownable(bytes32 id) noValue exists(id) constant external returns (bool disownable) {
         disownable = idBlobInfo[id].disownable;
     }
 
-    function numRevisions(bytes32 id) noValue constant external returns (uint32 numRevisions) {
+    function getNumRevisions(bytes32 id) noValue exists(id) constant external returns (uint32 numRevisions) {
         numRevisions = idBlobInfo[id].numRevisions;
     }
 
-    function getRevisionBlockNumber(bytes32 id, uint revisionId) noValue constant returns (uint blockNumber) {
+    function getRevisionBlockNumber(bytes32 id, uint revisionId) noValue exists(id) revisionExists(id, revisionId) constant returns (uint blockNumber) {
         if (revisionId == 0) {
             blockNumber = idBlobInfo[id].blockNumber;
         }
