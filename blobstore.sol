@@ -17,7 +17,7 @@ contract BlobStore {
     mapping (bytes32 => BlobInfo) idBlobInfo;
     mapping (bytes32 => mapping (uint => bytes32)) idPackedRevisionBlockNumbers;
 
-    event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);
+    event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);     // Greatest revision for the blob at time of logging.
     event logRetractRevision(bytes32 indexed id, uint indexed revisionId);
     event logRetract(bytes32 indexed id);
     event logDisown(bytes32 indexed id);
@@ -139,15 +139,15 @@ contract BlobStore {
         logBlob(id, revisionId, blob);
     }
 
-    function updateRevision(bytes32 id, uint revisionId, bytes blob) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) revisionExists(id, revisionId) external {
-        if (revisionId == 0) {
+    function updateLatestRevision(bytes32 id,  bytes blob) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) external {
+        if (idBlobInfo[id].numRevisions == 0) {
             idBlobInfo[id].blockNumber = uint32(block.number);
         }
         else {
-            setPackedRevisionBlockNumber(id, revisionId - 1);
+            setPackedRevisionBlockNumber(id, idBlobInfo[id].numRevisions - 1);
         }
         // Store the new blob in a log in the current block.
-        logBlob(id, revisionId, blob);
+        logBlob(id, idBlobInfo[id].numRevisions, blob);
     }
 
     function retractLatestRevision(bytes32 id) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) hasRevisions(id) external {
@@ -195,28 +195,28 @@ contract BlobStore {
         logDisown(id);
     }
 
-    function setNotUpdatable(bytes32 id) noValue isOwner(id) {
+    function setNotUpdatable(bytes32 id) noValue isOwner(id) external {
         // Record in state that the blob is not updatable.
         idBlobInfo[id].updatable = false;
         // Log that the blob is not updatable.
         logSetNotUpdatable(id);
     }
 
-    function setEnforceRevisions(bytes32 id) noValue isOwner(id) {
+    function setEnforceRevisions(bytes32 id) noValue isOwner(id) external {
         // Record in state that all changes to this blob must be new revisions.
         idBlobInfo[id].enforceRevisions = true;
         // Log that the blob now forces new revisions.
         logSetEnforceRevisions(id);
     }
 
-    function setNotRetractable(bytes32 id) noValue isOwner(id) {
+    function setNotRetractable(bytes32 id) noValue isOwner(id) external {
         // Record in state that the blob is not retractable.
         idBlobInfo[id].retractable = false;
         // Log that the blob is not retractable.
         logSetNotRetractable(id);
     }
 
-    function setNotDisownable(bytes32 id) noValue isOwner(id) {
+    function setNotDisownable(bytes32 id) noValue isOwner(id) external {
         // Record in state that the blob is not disownable.
         idBlobInfo[id].disownable = false;
         // Log that the blob is not disownable.
@@ -253,7 +253,7 @@ contract BlobStore {
         disownable = idBlobInfo[id].disownable;
     }
 
-    function getNumRevisions(bytes32 id) noValue exists(id) constant external returns (uint32 numRevisions) {
+    function getNumRevisions(bytes32 id) noValue exists(id) constant external returns (uint numRevisions) {
         numRevisions = idBlobInfo[id].numRevisions;
     }
 
