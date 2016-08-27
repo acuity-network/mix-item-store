@@ -8,23 +8,25 @@ contract BlobStore {
         bool updatable;             // Can the blob be updated? Can be disabled.
         bool enforceRevisions;      // When updating, always make a new revision. Can be enabled.
         bool retractable;           // Can the blob be retracted? Can be disabled.
-        bool disownable;            // Can the blob be disowned? Can be disabled.
+        bool transferable;          // Can the blob be transfered to another user or disowned? Can be disabled.
         uint32 blockNumber;         // Which block has revision 0 of this blob.
         uint32 numRevisions;        // Number of additional revisions.
-        address owner;              // Who created this blob. Non-transferable.
+        address owner;              // Who owns this blob.
     }
 
     mapping (bytes32 => BlobInfo) idBlobInfo;
     mapping (bytes32 => mapping (uint => bytes32)) idPackedRevisionBlockNumbers;
+    mapping (bytes32 => mapping (address => bool)) enabledTransfers;
 
     event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);     // Greatest revisionId for the blob at time of logging.
     event logRetractRevision(bytes32 indexed id, uint indexed revisionId);
     event logRetract(bytes32 indexed id);
+    event logTransfer(bytes32 indexed id, address indexed sender, address indexed recipient);
     event logDisown(bytes32 indexed id);
     event logSetNotUpdatable(bytes32 indexed id);
     event logSetEnforceRevisions(bytes32 indexed id);
     event logSetNotRetractable(bytes32 indexed id);
-    event logSetNotDisownable(bytes32 indexed id);
+    event logSetNotTransferable(bytes32 indexed id);
 
     // Create a 96-bit id for this contract. This is unique across all blockchains.
     // Wait a few minutes after deploying for this id to settle.
@@ -96,11 +98,23 @@ contract BlobStore {
     }
 
     /**
-     * @dev Throw if the blob is not disownable.
+     * @dev Throw if the blob is not transferable.
      * @param id Id of the blob.
      */
-    modifier isDisownable(bytes32 id) {
-        if (!idBlobInfo[id].disownable) {
+    modifier isTransferable(bytes32 id) {
+        if (!idBlobInfo[id].transferable) {
+            throw;
+        }
+        _
+    }
+
+    /**
+     * @dev Throw if the blob is not transferable to a specific user.
+     * @param id Id of the blob.
+     * @param recipient Address of the user.
+     */
+    modifier transferEnabled(bytes32 id, address recipient) {
+        if (!enabledTransfers[id][recipient]) {
             throw;
         }
         _
@@ -136,11 +150,11 @@ contract BlobStore {
      * @param updatable Should the blob be updatable?
      * @param enforceRevisions Should the blob enforce revisions when updating?
      * @param retractable Should the blob be retractable?
-     * @param disownable Should the blob be disownable?
+     * @param transferable Should the blob be transferable?
      * @param anon Should the blob be anonymous?
      * @return id Id of the blob.
      */
-    function create(bytes blob, bytes32 nonce, bool updatable, bool enforceRevisions, bool retractable, bool disownable, bool anon) noValue external returns (bytes32 id) {
+    function create(bytes blob, bytes32 nonce, bool updatable, bool enforceRevisions, bool retractable, bool transferable, bool anon) noValue external returns (bytes32 id) {
         // Determine the id.
         id = contractId | (sha3(msg.sender, nonce) & (2 ** 160 - 1));
         // Make sure this id has not been used before.
@@ -152,7 +166,7 @@ contract BlobStore {
             updatable: updatable,
             enforceRevisions: enforceRevisions,
             retractable: retractable,
-            disownable: disownable,
+            transferable: transferable,
             numRevisions: 0,
             blockNumber: uint32(block.number),
             owner: anon ? 0 : msg.sender,
@@ -259,7 +273,7 @@ contract BlobStore {
             updatable: false,
             enforceRevisions: false,
             retractable: false,
-            disownable: false,
+            transferable: false,
             numRevisions: 0,
             blockNumber: uint32(-1),
             owner: 0,
@@ -269,10 +283,42 @@ contract BlobStore {
     }
 
     /**
+     * @dev Enable transfer of the blob to the current user.
+     * @param id Id of the blob.
+     */
+    function transferEnable(bytes32 id) noValue isTransferable(id) external {
+        // Record in state that the current user will accept this blob.
+        enabledTransfers[id][msg.sender] = true;
+    }
+
+    /**
+     * @dev Disable transfer of the blob to the current user.
+     * @param id Id of the blob.
+     */
+    function transferDisable(bytes32 id) noValue external {
+        // Record in state that the current user will not accept this blob.
+        enabledTransfers[id][msg.sender] = false;
+    }
+
+    /**
+     * @dev Transfer a blob to a new user.
+     * @param id Id of the blob.
+     * @param recipient Address of the user to transfer to blob to.
+     */
+    function transfer(bytes32 id, address recipient) noValue isOwner(id) isTransferable(id) transferEnabled(id, recipient) external {
+        // Update ownership of the blob.
+        idBlobInfo[id].owner = recipient;
+        // Disable this transfer and free up the slot.
+        enabledTransfers[id][recipient] = false;
+        // Log the transfer.
+        logTransfer(id, msg.sender, recipient);
+    }
+
+    /**
      * @dev Disown a blob.
      * @param id Id of the blob.
      */
-    function disown(bytes32 id) noValue isOwner(id) isDisownable(id) external {
+    function disown(bytes32 id) noValue isOwner(id) isTransferable(id) external {
         // Remove the owner from the blob's state.
         delete idBlobInfo[id].owner;
         // Log as blob as disowned.
@@ -313,14 +359,14 @@ contract BlobStore {
     }
 
     /**
-     * @dev Set a blob to not be disownable.
+     * @dev Set a blob to not be transferable.
      * @param id Id of the blob.
      */
-    function setNotDisownable(bytes32 id) noValue isOwner(id) external {
-        // Record in state that the blob is not disownable.
-        idBlobInfo[id].disownable = false;
-        // Log that the blob is not disownable.
-        logSetNotDisownable(id);
+    function setNotTransferable(bytes32 id) noValue isOwner(id) external {
+        // Record in state that the blob is not transferable.
+        idBlobInfo[id].transferable = false;
+        // Log that the blob is not transferable.
+        logSetNotTransferable(id);
     }
 
     function getContractId() noValue constant external returns (bytes12 _contractId) {
@@ -334,16 +380,16 @@ contract BlobStore {
      * @return updatable Is the blob updatable?
      * @return enforceRevisions Does the blob enforce revisions?
      * @return retractable Is the blob retractable?
-     * @return disownable Is the blob disownable?
+     * @return transferable Is the blob transferable?
      * @return numRevisions How many revisions the blob has.
      * @return latestBlockNumber The block number of the latest revision.
      */
-    function getInfo(bytes32 id) noValue exists(id) constant external returns (address owner, bool updatable, bool enforceRevisions, bool retractable, bool disownable, uint numRevisions, uint latestBlockNumber) {
+    function getInfo(bytes32 id) noValue exists(id) constant external returns (address owner, bool updatable, bool enforceRevisions, bool retractable, bool transferable, uint numRevisions, uint latestBlockNumber) {
         owner = idBlobInfo[id].owner;
         updatable = idBlobInfo[id].updatable;
         enforceRevisions = idBlobInfo[id].enforceRevisions;
         retractable = idBlobInfo[id].retractable;
-        disownable = idBlobInfo[id].disownable;
+        transferable = idBlobInfo[id].transferable;
         numRevisions = idBlobInfo[id].numRevisions;
         latestBlockNumber = getRevisionBlockNumber(id, numRevisions);
     }
@@ -385,12 +431,12 @@ contract BlobStore {
     }
 
     /**
-     * @dev Is a blob disownable.
+     * @dev Is a blob transferable.
      * @param id Id of the blob.
-     * @return disownable Is the blob disownable?
+     * @return transferable Is the blob transferable?
      */
-    function getDisownable(bytes32 id) noValue exists(id) constant external returns (bool disownable) {
-        disownable = idBlobInfo[id].disownable;
+    function getTransferable(bytes32 id) noValue exists(id) constant external returns (bool transferable) {
+        transferable = idBlobInfo[id].transferable;
     }
 
     /**
