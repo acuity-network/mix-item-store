@@ -28,7 +28,7 @@ contract BlobStore {
 
     // Create a 96-bit id for this contract. This is unique across all blockchains.
     // Wait a few minutes after deploying for this id to settle.
-    bytes12 constant public contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
+    bytes12 constant contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
 
     /**
      * @dev Throw if the current message is sending a payment.
@@ -316,6 +316,10 @@ contract BlobStore {
         idBlobInfo[id].disownable = false;
         // Log that the blob is not disownable.
         logSetNotDisownable(id);
+    }
+
+    function getContractId() noValue constant external returns (bytes12 _contractId) {
+        _contractId = contractId;
     }
 
     /**
