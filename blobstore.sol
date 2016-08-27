@@ -213,6 +213,11 @@ contract BlobStore {
      * @param id Id of the blob.
      */
     function retractLatestRevision(bytes32 id) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) hasRevisions(id) external {
+        // Delete slot if empty
+        if (idBlobInfo[id].numRevisions % 8 == 1) {
+            delete idPackedRevisionBlockNumbers[id][idBlobInfo[id].numRevisions / 8];
+        }
+        // Log the retraction.
         logRetractRevision(id, idBlobInfo[id].numRevisions--);
     }
 
