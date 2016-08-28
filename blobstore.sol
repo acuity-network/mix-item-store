@@ -113,7 +113,7 @@ contract BlobStore {
      * @param id Id of the blob.
      * @param recipient Address of the user.
      */
-    modifier transferEnabled(bytes32 id, address recipient) {
+    modifier isTransferEnabled(bytes32 id, address recipient) {
         if (!enabledTransfers[id][recipient]) {
             throw;
         }
@@ -305,7 +305,7 @@ contract BlobStore {
      * @param id Id of the blob.
      * @param recipient Address of the user to transfer to blob to.
      */
-    function transfer(bytes32 id, address recipient) noValue isOwner(id) isTransferable(id) transferEnabled(id, recipient) external {
+    function transfer(bytes32 id, address recipient) noValue isOwner(id) isTransferable(id) isTransferEnabled(id, recipient) external {
         // Update ownership of the blob.
         idBlobInfo[id].owner = recipient;
         // Disable this transfer and free up the slot.
