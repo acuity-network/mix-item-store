@@ -370,8 +370,8 @@ contract BlobStore {
     }
 
     /**
-     * @dev Get the ID for this BlobStore contract.
-     * @return _contractId ID of the contract.
+     * @dev Get the id for this BlobStore contract.
+     * @return _contractId Id of the contract.
      */
     function getContractId() noValue constant external returns (bytes12 _contractId) {
         _contractId = contractId;
