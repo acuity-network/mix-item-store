@@ -15,7 +15,7 @@ contract BlobStore {
     }
 
     mapping (bytes32 => BlobInfo) blobInfo;
-    mapping (bytes32 => mapping (uint => bytes32)) idPackedRevisionBlockNumbers;
+    mapping (bytes32 => mapping (uint => bytes32)) packedRevisionBlockNumbers;
     mapping (bytes32 => mapping (address => bool)) enabledTransfers;
 
     event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);     // Greatest revisionId for the blob at time of logging.
@@ -182,13 +182,13 @@ contract BlobStore {
      */
     function setPackedRevisionBlockNumber(bytes32 id, uint offset) internal {
         // Get the slot.
-        bytes32 slot = idPackedRevisionBlockNumbers[id][offset / 8];
+        bytes32 slot = packedRevisionBlockNumbers[id][offset / 8];
         // Wipe the previous block number.
         slot &= ~bytes32(uint32(-1) * 2 ** ((offset % 8) * 32));
         // Insert the current block number.
         slot |= bytes32(uint32(block.number) * 2 ** ((offset % 8) * 32));
         // Store the slot.
-        idPackedRevisionBlockNumbers[id][offset / 8] = slot;
+        packedRevisionBlockNumbers[id][offset / 8] = slot;
     }
 
     /**
@@ -229,7 +229,7 @@ contract BlobStore {
     function retractLatestRevision(bytes32 id) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) hasRevisions(id) external {
         // Delete slot if empty
         if (blobInfo[id].numRevisions % 8 == 1) {
-            delete idPackedRevisionBlockNumbers[id][blobInfo[id].numRevisions / 8];
+            delete packedRevisionBlockNumbers[id][blobInfo[id].numRevisions / 8];
         }
         // Log the retraction.
         logRetractRevision(id, blobInfo[id].numRevisions--);
@@ -242,7 +242,7 @@ contract BlobStore {
     function deleteAllRevisionBlockNumbers(bytes32 id) internal {
         uint numSlots = (blobInfo[id].numRevisions + 7) / 8;
         for (uint i = 0; i < numSlots; i++) {
-            delete idPackedRevisionBlockNumbers[id][i];
+            delete packedRevisionBlockNumbers[id][i];
         }
     }
 
@@ -459,7 +459,7 @@ contract BlobStore {
             blockNumber = blobInfo[id].blockNumber;
         }
         else {
-            bytes32 slot = idPackedRevisionBlockNumbers[id][(revisionId - 1) / 8];
+            bytes32 slot = packedRevisionBlockNumbers[id][(revisionId - 1) / 8];
             blockNumber = uint32(uint256(slot) / 2 ** (((revisionId - 1) % 8) * 32));
         }
     }
