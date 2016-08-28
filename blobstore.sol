@@ -197,7 +197,7 @@ contract BlobStore {
      * @param blob Blob that should be stored as the new revision.
      * @return revisionId The new revisionId.
      */
-    function createRevision(bytes32 id, bytes blob) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
+    function createNewRevision(bytes32 id, bytes blob) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
         // Increment the number of revisions.
         revisionId = ++blobInfo[id].numRevisions;
         // Store the block number.
@@ -377,21 +377,21 @@ contract BlobStore {
      * @dev Get info about a blob.
      * @param id Id of the blob.
      * @return owner Owner of the blob.
+     * @return numRevisions How many revisions the blob has.
+     * @return latestBlockNumber The block number of the latest revision.
      * @return updatable Is the blob updatable?
      * @return enforceRevisions Does the blob enforce revisions?
      * @return retractable Is the blob retractable?
      * @return transferable Is the blob transferable?
-     * @return numRevisions How many revisions the blob has.
-     * @return latestBlockNumber The block number of the latest revision.
      */
-    function getInfo(bytes32 id) noValue exists(id) constant external returns (address owner, bool updatable, bool enforceRevisions, bool retractable, bool transferable, uint numRevisions, uint latestBlockNumber) {
+    function getInfo(bytes32 id) noValue exists(id) constant external returns (address owner, uint numRevisions, uint latestBlockNumber, bool updatable, bool enforceRevisions, bool retractable, bool transferable) {
         owner = blobInfo[id].owner;
+        numRevisions = blobInfo[id].numRevisions;
+        latestBlockNumber = getRevisionBlockNumber(id, numRevisions);
         updatable = blobInfo[id].updatable;
         enforceRevisions = blobInfo[id].enforceRevisions;
         retractable = blobInfo[id].retractable;
         transferable = blobInfo[id].transferable;
-        numRevisions = blobInfo[id].numRevisions;
-        latestBlockNumber = getRevisionBlockNumber(id, numRevisions);
     }
 
     /**
