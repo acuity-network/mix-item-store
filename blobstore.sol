@@ -295,7 +295,7 @@ contract BlobStore {
      * @dev Disable transfer of the blob to the current user.
      * @param id Id of the blob.
      */
-    function transferDisable(bytes32 id) noValue external {
+    function transferDisable(bytes32 id) noValue isTransferEnabled(id, msg.sender) external {
         // Record in state that the current user will not accept this blob.
         enabledTransfers[id][msg.sender] = false;
     }
@@ -308,7 +308,7 @@ contract BlobStore {
     function transfer(bytes32 id, address recipient) noValue isOwner(id) isTransferable(id) isTransferEnabled(id, recipient) external {
         // Update ownership of the blob.
         blobInfo[id].owner = recipient;
-        // Disable this transfer and free up the slot.
+        // Disable this transfer in future and free up the slot.
         enabledTransfers[id][recipient] = false;
         // Log the transfer.
         logTransfer(id, msg.sender, recipient);
