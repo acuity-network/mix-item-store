@@ -180,7 +180,7 @@ contract BlobStore {
      * @param id Id of the blob.
      * @param offset The offset of the block number should be retreived.
      */
-    function setPackedRevisionBlockNumber(bytes32 id, uint offset) internal {
+    function _setPackedRevisionBlockNumber(bytes32 id, uint offset) internal {
         // Get the slot.
         bytes32 slot = packedRevisionBlockNumbers[id][offset / 8];
         // Wipe the previous block number.
@@ -201,7 +201,7 @@ contract BlobStore {
         // Increment the number of revisions.
         revisionId = ++blobInfo[id].numRevisions;
         // Store the block number.
-        setPackedRevisionBlockNumber(id, revisionId - 1);
+        _setPackedRevisionBlockNumber(id, revisionId - 1);
         // Store the new blob in a log in the current block.
         logBlob(id, revisionId, blob);
     }
@@ -216,7 +216,7 @@ contract BlobStore {
             blobInfo[id].blockNumber = uint32(block.number);
         }
         else {
-            setPackedRevisionBlockNumber(id, blobInfo[id].numRevisions - 1);
+            _setPackedRevisionBlockNumber(id, blobInfo[id].numRevisions - 1);
         }
         // Store the new blob in a log in the current block.
         logBlob(id, blobInfo[id].numRevisions, blob);
@@ -239,7 +239,7 @@ contract BlobStore {
      * @dev Delete all of a blob's packed revision block numbers.
      * @param id Id of the blob.
      */
-    function deleteAllRevisionBlockNumbers(bytes32 id) internal {
+    function _deleteAllRevisionBlockNumbers(bytes32 id) internal {
         uint numSlots = (blobInfo[id].numRevisions + 7) / 8;
         for (uint i = 0; i < numSlots; i++) {
             delete packedRevisionBlockNumbers[id][i];
@@ -253,7 +253,7 @@ contract BlobStore {
      */
     function restart(bytes32 id, bytes blob) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) external {
         // Try to get some gas refunds.
-        deleteAllRevisionBlockNumbers(id);
+        _deleteAllRevisionBlockNumbers(id);
         // Update the blob state info.
         blobInfo[id].blockNumber = uint32(block.number);
         blobInfo[id].numRevisions = 0;
@@ -267,7 +267,7 @@ contract BlobStore {
      */
     function retract(bytes32 id) noValue isOwner(id) isRetractable(id) external {
         // Delete the packed revision block numbers.
-        deleteAllRevisionBlockNumbers(id);
+        _deleteAllRevisionBlockNumbers(id);
         // Mark this blob as retracted.
         blobInfo[id] = BlobInfo({
             updatable: false,
@@ -374,6 +374,22 @@ contract BlobStore {
     }
 
     /**
+     * @dev Get the block number for a specific blob revision.
+     * @param id Id of the blob.
+     * @param revisionId Id of the revision.
+     * @return blockNumber Block number of the specified revision.
+     */
+    function _getRevisionBlockNumber(bytes32 id, uint revisionId) internal returns (uint blockNumber) {
+        if (revisionId == 0) {
+            blockNumber = blobInfo[id].blockNumber;
+        }
+        else {
+            bytes32 slot = packedRevisionBlockNumbers[id][(revisionId - 1) / 8];
+            blockNumber = uint32(uint256(slot) / 2 ** (((revisionId - 1) % 8) * 32));
+        }
+    }
+
+    /**
      * @dev Get info about a blob.
      * @param id Id of the blob.
      * @return owner Owner of the blob.
@@ -387,7 +403,7 @@ contract BlobStore {
     function getInfo(bytes32 id) noValue exists(id) constant external returns (address owner, uint numRevisions, uint latestBlockNumber, bool updatable, bool enforceRevisions, bool retractable, bool transferable) {
         owner = blobInfo[id].owner;
         numRevisions = blobInfo[id].numRevisions;
-        latestBlockNumber = getRevisionBlockNumber(id, numRevisions);
+        latestBlockNumber = _getRevisionBlockNumber(id, numRevisions);
         updatable = blobInfo[id].updatable;
         enforceRevisions = blobInfo[id].enforceRevisions;
         retractable = blobInfo[id].retractable;
@@ -455,13 +471,7 @@ contract BlobStore {
      * @return blockNumber Block number of the specified revision.
      */
     function getRevisionBlockNumber(bytes32 id, uint revisionId) noValue exists(id) revisionExists(id, revisionId) constant returns (uint blockNumber) {
-        if (revisionId == 0) {
-            blockNumber = blobInfo[id].blockNumber;
-        }
-        else {
-            bytes32 slot = packedRevisionBlockNumbers[id][(revisionId - 1) / 8];
-            blockNumber = uint32(uint256(slot) / 2 ** (((revisionId - 1) % 8) * 32));
-        }
+        blockNumber = _getRevisionBlockNumber(id, revisionId);
     }
 
     /**
