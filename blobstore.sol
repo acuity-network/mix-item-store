@@ -19,9 +19,9 @@ contract BlobStore {
     mapping (bytes32 => mapping (address => bool)) enabledTransfers;
 
     event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);     // Greatest revisionId for the blob at time of logging.
-    event logRetractRevision(bytes32 indexed id, uint indexed revisionId);
+    event logRetractRevision(bytes32 indexed id, uint revisionId);
     event logRetract(bytes32 indexed id);
-    event logTransfer(bytes32 indexed id, address indexed sender, address indexed recipient);
+    event logTransfer(bytes32 indexed id, address recipient);
     event logDisown(bytes32 indexed id);
     event logSetNotUpdatable(bytes32 indexed id);
     event logSetEnforceRevisions(bytes32 indexed id);
@@ -311,7 +311,7 @@ contract BlobStore {
         // Disable this transfer in future and free up the slot.
         enabledTransfers[id][recipient] = false;
         // Log the transfer.
-        logTransfer(id, msg.sender, recipient);
+        logTransfer(id, recipient);
     }
 
     /**
