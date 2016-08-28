@@ -369,6 +369,10 @@ contract BlobStore {
         logSetNotTransferable(id);
     }
 
+    /**
+     * @dev Get the ID for this BlobStore contract.
+     * @return _contractId ID of the contract.
+     */
     function getContractId() noValue constant external returns (bytes12 _contractId) {
         _contractId = contractId;
     }
