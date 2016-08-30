@@ -1,1 +1,386 @@
-[{"constant":false,"inputs":[{"name":"blob","type":"bytes"}],"name":"storeBlob","outputs":[{"name":"hash","type":"bytes32"}],"type":"function"},{"anonymous":true,"inputs":[{"indexed":true,"name":"hash","type":"bytes32"},{"indexed":false,"name":"blob","type":"bytes"}],"name":"logBlob","type":"event"}]
+[{
+	"constant": true,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "getEnforceRevisions",
+	"outputs": [{
+		"name": "enforceRevisions",
+		"type": "bool"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "setNotRetractable",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "transferEnable",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "retract",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}, {
+		"name": "blob",
+		"type": "bytes"
+	}],
+	"name": "restart",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "getRetractable",
+	"outputs": [{
+		"name": "retractable",
+		"type": "bool"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "retractLatestRevision",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [],
+	"name": "getContractId",
+	"outputs": [{
+		"name": "_contractId",
+		"type": "bytes12"
+	}],
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "getUpdatable",
+	"outputs": [{
+		"name": "updatable",
+		"type": "bool"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}, {
+		"name": "recipient",
+		"type": "address"
+	}],
+	"name": "transfer",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "getInfo",
+	"outputs": [{
+		"name": "owner",
+		"type": "address"
+	}, {
+		"name": "numRevisions",
+		"type": "uint256"
+	}, {
+		"name": "latestBlockNumber",
+		"type": "uint256"
+	}, {
+		"name": "updatable",
+		"type": "bool"
+	}, {
+		"name": "enforceRevisions",
+		"type": "bool"
+	}, {
+		"name": "retractable",
+		"type": "bool"
+	}, {
+		"name": "transferable",
+		"type": "bool"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "setNotUpdatable",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}, {
+		"name": "revisionId",
+		"type": "uint256"
+	}],
+	"name": "getRevisionBlockNumber",
+	"outputs": [{
+		"name": "blockNumber",
+		"type": "uint256"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "transferDisable",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "setNotTransferable",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "getNumRevisions",
+	"outputs": [{
+		"name": "numRevisions",
+		"type": "uint256"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "disown",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "getOwner",
+	"outputs": [{
+		"name": "owner",
+		"type": "address"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "blob",
+		"type": "bytes"
+	}, {
+		"name": "nonce",
+		"type": "bytes32"
+	}, {
+		"name": "updatable",
+		"type": "bool"
+	}, {
+		"name": "enforceRevisions",
+		"type": "bool"
+	}, {
+		"name": "retractable",
+		"type": "bool"
+	}, {
+		"name": "transferable",
+		"type": "bool"
+	}, {
+		"name": "anon",
+		"type": "bool"
+	}],
+	"name": "create",
+	"outputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}, {
+		"name": "blob",
+		"type": "bytes"
+	}],
+	"name": "updateLatestRevision",
+	"outputs": [],
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "getTransferable",
+	"outputs": [{
+		"name": "transferable",
+		"type": "bool"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}, {
+		"name": "blob",
+		"type": "bytes"
+	}],
+	"name": "createNewRevision",
+	"outputs": [{
+		"name": "revisionId",
+		"type": "uint256"
+	}],
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "setEnforceRevisions",
+	"outputs": [],
+	"type": "function"
+}, {
+	"anonymous": false,
+	"inputs": [{
+		"indexed": true,
+		"name": "id",
+		"type": "bytes32"
+	}, {
+		"indexed": true,
+		"name": "revisionId",
+		"type": "uint256"
+	}, {
+		"indexed": false,
+		"name": "blob",
+		"type": "bytes"
+	}],
+	"name": "logBlob",
+	"type": "event"
+}, {
+	"anonymous": false,
+	"inputs": [{
+		"indexed": true,
+		"name": "id",
+		"type": "bytes32"
+	}, {
+		"indexed": false,
+		"name": "revisionId",
+		"type": "uint256"
+	}],
+	"name": "logRetractRevision",
+	"type": "event"
+}, {
+	"anonymous": false,
+	"inputs": [{
+		"indexed": true,
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "logRetract",
+	"type": "event"
+}, {
+	"anonymous": false,
+	"inputs": [{
+		"indexed": true,
+		"name": "id",
+		"type": "bytes32"
+	}, {
+		"indexed": false,
+		"name": "recipient",
+		"type": "address"
+	}],
+	"name": "logTransfer",
+	"type": "event"
+}, {
+	"anonymous": false,
+	"inputs": [{
+		"indexed": true,
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "logDisown",
+	"type": "event"
+}, {
+	"anonymous": false,
+	"inputs": [{
+		"indexed": true,
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "logSetNotUpdatable",
+	"type": "event"
+}, {
+	"anonymous": false,
+	"inputs": [{
+		"indexed": true,
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "logSetEnforceRevisions",
+	"type": "event"
+}, {
+	"anonymous": false,
+	"inputs": [{
+		"indexed": true,
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "logSetNotRetractable",
+	"type": "event"
+}, {
+	"anonymous": false,
+	"inputs": [{
+		"indexed": true,
+		"name": "id",
+		"type": "bytes32"
+	}],
+	"name": "logSetNotTransferable",
+	"type": "event"
+}]
