@@ -207,7 +207,7 @@ contract BlobStore {
     }
 
     /**
-     * @dev Update a specific revsion.
+     * @dev Update a specific revision.
      * @param id Id of the blob.
      * @param revisionId Id of the revision.
      * @param blob Blob that should replace the revision.
