@@ -207,19 +207,20 @@ contract BlobStore {
     }
 
     /**
-     * @dev Update a blob's latest revsion.
+     * @dev Update a specific revsion.
      * @param id Id of the blob.
-     * @param blob Blob that should be stored as the latest revision.
+     * @param revisionId Id of the revision.
+     * @param blob Blob that should replace the revision.
      */
-    function updateLatestRevision(bytes32 id,  bytes blob) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) external {
-        if (blobInfo[id].numRevisions == 0) {
+    function updateRevision(bytes32 id, uint revisionId, bytes blob) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) revisionExists(id, revisionId) external {
+        if (revisionId == 0) {
             blobInfo[id].blockNumber = uint32(block.number);
         }
         else {
-            _setPackedRevisionBlockNumber(id, blobInfo[id].numRevisions - 1);
+            _setPackedRevisionBlockNumber(id, revisionId - 1);
         }
         // Store the new blob in a log in the current block.
-        logBlob(id, blobInfo[id].numRevisions, blob);
+        logBlob(id, revisionId, blob);
     }
 
     /**
