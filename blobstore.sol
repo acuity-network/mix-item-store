@@ -18,7 +18,7 @@ contract BlobStore {
     mapping (bytes32 => mapping (uint => bytes32)) packedRevisionBlockNumbers;
     mapping (bytes32 => mapping (address => bool)) enabledTransfers;
 
-    event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);     // Greatest revisionId for the blob at time of logging.
+    event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);
     event logRetractRevision(bytes32 indexed id, uint revisionId);
     event logRetract(bytes32 indexed id);
     event logTransfer(bytes32 indexed id, address recipient);
