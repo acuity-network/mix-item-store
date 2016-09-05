@@ -21,7 +21,7 @@ contract BlobStore {
     /**
      * @dev A blob revision has been published.
      * @param id Id of the blob.
-     * @param revisionId Id of the revision.
+     * @param revisionId Id of the revision (the highest at the time of logging).
      * @param blob Contents of the blob.
      */
     event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);
@@ -241,7 +241,7 @@ contract BlobStore {
     /**
      * @dev Create a new blob revision.
      * @param id Id of the blob.
-     * @param blob Blob that should be stored as the new revision.
+     * @param blob Blob that should be stored as the new revision. Typically a VCDIFF of an earlier revision.
      * @return revisionId The new revisionId.
      */
     function createNewRevision(bytes32 id, bytes blob) noValue isOwner(id) isUpdatable(id) external returns (uint revisionId) {
@@ -256,7 +256,7 @@ contract BlobStore {
     /**
      * @dev Update a blob's latest revision.
      * @param id Id of the blob.
-     * @param blob Blob that should replace the latest revision.
+     * @param blob Blob that should replace the latest revision. Typically a VCDIFF if there is an earlier revision.
      */
     function updateLatestRevision(bytes32 id, bytes blob) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) external {
         uint revisionId = blobInfo[id].revisionCount - 1;
@@ -272,12 +272,12 @@ contract BlobStore {
     }
 
     /**
-     * @dev Retract a blob's latest revision.
+     * @dev Retract a blob's latest revision. Revision 0 cannot be retracted.
      * @param id Id of the blob.
      */
     function retractLatestRevision(bytes32 id) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) hasAdditionalRevisions(id) external {
         uint revisionId = --blobInfo[id].revisionCount;
-        // Check if we are deleting the first block number in a slot.
+        // Delete the slot if it is no longer required.
         if (revisionId % 8 == 1) {
             delete packedBlockNumbers[id][revisionId / 8];
         }
@@ -305,7 +305,7 @@ contract BlobStore {
      * @param blob Blob that should be stored.
      */
     function restart(bytes32 id, bytes blob) noValue isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) external {
-        // Try to get some gas refunds.
+        // Delete the packed revision block numbers.
         _deleteAllPackedRevisionBlockNumbers(id);
         // Update the blob state info.
         blobInfo[id].revisionCount = 1;
@@ -452,8 +452,9 @@ contract BlobStore {
      * @return blockNumbers Revision block numbers.
      */
     function _getRevisionBlockNumbers(bytes32 id) internal returns (uint[] blockNumbers) {
-        blockNumbers = new uint[](blobInfo[id].revisionCount);
-        for (uint revisionId = 0; revisionId < blobInfo[id].revisionCount; revisionId++) {
+        uint revisionCount = blobInfo[id].revisionCount;
+        blockNumbers = new uint[](revisionCount);
+        for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
             blockNumbers[revisionId] = _getRevisionBlockNumber(id, revisionId);
         }
     }
