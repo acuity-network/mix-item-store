@@ -21,7 +21,7 @@ contract BlobStore {
     /**
      * @dev A blob revision has been published.
      * @param id Id of the blob.
-     * @param revisionId Id of the revision (the highest at the time of logging).
+     * @param revisionId Id of the revision (the highest at time of logging).
      * @param blob Contents of the blob.
      */
     event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);
