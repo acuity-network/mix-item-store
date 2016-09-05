@@ -5,10 +5,10 @@
 contract BlobStore {
 
     struct BlobInfo {               // Single slot.
-        bool updatable;             // True if the blob is updatable. Can only be disabled.
-        bool enforceRevisions;      // True if the blob is enforcing revisions. Can only be enabled.
-        bool retractable;           // True if the blob can be retracted. Can only be disabled.
-        bool transferable;          // True if the blob be transfered to another user or disowned. Can only be disabled.
+        bool updatable;             // True if the blob is updatable. After creation can only be disabled.
+        bool enforceRevisions;      // True if the blob is enforcing revisions. After creation can only be enabled.
+        bool retractable;           // True if the blob can be retracted. After creation can only be disabled.
+        bool transferable;          // True if the blob be transfered to another user or disowned. After creation can only be disabled.
         uint32 revisionCount;       // Number of revisions including revision 0.
         uint32 blockNumber;         // Block number which contains revision 0.
         address owner;              // Who owns this blob.
