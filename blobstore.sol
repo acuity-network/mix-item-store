@@ -471,13 +471,14 @@ contract BlobStore {
      * @return transferable Is the blob transferable?
      */
     function getInfo(bytes32 id) noValue exists(id) constant external returns (address owner, uint revisionCount, uint[] blockNumbers, bool updatable, bool enforceRevisions, bool retractable, bool transferable) {
-        owner = blobInfo[id].owner;
-        revisionCount = blobInfo[id].revisionCount;
+        BlobInfo info = blobInfo[id];
+        owner = info.owner;
+        revisionCount = info.revisionCount;
         blockNumbers = _getAllRevisionBlockNumbers(id);
-        updatable = blobInfo[id].updatable;
-        enforceRevisions = blobInfo[id].enforceRevisions;
-        retractable = blobInfo[id].retractable;
-        transferable = blobInfo[id].transferable;
+        updatable = info.updatable;
+        enforceRevisions = info.enforceRevisions;
+        retractable = info.retractable;
+        transferable = info.transferable;
     }
 
     /**
@@ -516,7 +517,6 @@ contract BlobStore {
     function getAllRevisionBlockNumbers(bytes32 id) noValue exists(id) constant external returns (uint[] blockNumbers) {
         blockNumbers = _getAllRevisionBlockNumbers(id);
     }
-
 
     /**
      * @dev Determine if a blob is updatable.
