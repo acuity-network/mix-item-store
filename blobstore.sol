@@ -316,7 +316,7 @@ contract BlobStore {
 
     /**
      * @dev Retract a blob.
-     * @param id Id of the blob.
+     * @param id Id of the blob. This id can never be used again.
      */
     function retract(bytes32 id) noValue isOwner(id) isRetractable(id) external {
         // Delete the packed revision block numbers.
@@ -447,11 +447,11 @@ contract BlobStore {
     }
 
     /**
-     * @dev Get the block numbers for all a blob's revisions.
+     * @dev Get the block numbers for all of a blob's revisions.
      * @param id Id of the blob.
      * @return blockNumbers Revision block numbers.
      */
-    function _getRevisionBlockNumbers(bytes32 id) internal returns (uint[] blockNumbers) {
+    function _getAllRevisionBlockNumbers(bytes32 id) internal returns (uint[] blockNumbers) {
         uint revisionCount = blobInfo[id].revisionCount;
         blockNumbers = new uint[](revisionCount);
         for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
@@ -473,7 +473,7 @@ contract BlobStore {
     function getInfo(bytes32 id) noValue exists(id) constant external returns (address owner, uint revisionCount, uint[] blockNumbers, bool updatable, bool enforceRevisions, bool retractable, bool transferable) {
         owner = blobInfo[id].owner;
         revisionCount = blobInfo[id].revisionCount;
-        blockNumbers = _getRevisionBlockNumbers(id);
+        blockNumbers = _getAllRevisionBlockNumbers(id);
         updatable = blobInfo[id].updatable;
         enforceRevisions = blobInfo[id].enforceRevisions;
         retractable = blobInfo[id].retractable;
@@ -501,11 +501,22 @@ contract BlobStore {
     /**
      * @dev Get the block number for a specific blob revision.
      * @param id Id of the blob.
-     * @return blockNumbers Block number of the specified revision.
+     * @param revisionId Id of the revision.
+     * @return blockNumber Block number of the specified revision.
      */
-    function getRevisionBlockNumbers(bytes32 id) noValue exists(id) constant external returns (uint[] blockNumbers) {
-        blockNumbers = _getRevisionBlockNumbers(id);
+    function getRevisionBlockNumber(bytes32 id, uint revisionId) constant external returns (uint blockNumber) {
+        blockNumber = _getRevisionBlockNumber(id, revisionId);
     }
+
+    /**
+     * @dev Get the block numbers for all of a blob's revisions.
+     * @param id Id of the blob.
+     * @return blockNumbers Revision block numbers.
+     */
+    function getAllRevisionBlockNumbers(bytes32 id) noValue exists(id) constant external returns (uint[] blockNumbers) {
+        blockNumbers = _getAllRevisionBlockNumbers(id);
+    }
+
 
     /**
      * @dev Determine if a blob is updatable.
