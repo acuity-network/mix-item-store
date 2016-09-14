@@ -20,6 +20,10 @@ contract BlobStore {
     mapping (bytes32 => mapping (uint => bytes32)) packedBlockNumbers;
     mapping (bytes32 => mapping (address => bool)) enabledTransfers;
 
+    // Create a 96-bit id for this contract. This is unique across all blockchains.
+    // Wait a few minutes after deploying for this id to settle.
+    bytes12 contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
+
     /**
      * @dev A blob revision has been published.
      * @param id Id of the blob.
@@ -76,10 +80,6 @@ contract BlobStore {
      * @param id Id of the blob.
      */
     event logSetNotTransferable(bytes32 indexed id);
-
-    // Create a 96-bit id for this contract. This is unique across all blockchains.
-    // Wait a few minutes after deploying for this id to settle.
-    bytes12 contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
 
     /**
      * @dev Throw if the blob has not been used before or it has been retracted.
