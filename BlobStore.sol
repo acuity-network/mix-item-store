@@ -1,10 +1,12 @@
 pragma solidity ^0.4.0;
 
+import "AbstractBlobStore.sol";
+
 /**
  * @title BlobStore
  * @author Jonathan Brown <jbrown@bluedroplet.com>
  */
-contract BlobStore {
+contract BlobStore is AbstractBlobStore {
 
     struct BlobInfo {               // Single slot.
         bool updatable;             // True if the blob is updatable. After creation can only be disabled.
