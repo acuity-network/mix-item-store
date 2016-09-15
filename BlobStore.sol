@@ -36,6 +36,7 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev A revision has been retracted.
+     * @param id Id of the blob.
      * @param revisionId Id of the revision.
      */
     event logRetractRevision(bytes32 indexed id, uint revisionId);
