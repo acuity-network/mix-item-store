@@ -25,6 +25,13 @@ contract AbstractBlobStore {
     function getContractId() constant external returns (bytes12 contractId);
 
     /**
+     * @dev Check if a blob exists.
+     * @param id Id of the blob.
+     * @return exists True if the blob exists.
+     */
+    function getExists(bytes32 id) constant external returns (bool exists);
+
+    /**
      * @dev Get the owner of a blob.
      * @param id Id of the blob.
      * @return owner Owner of the blob.

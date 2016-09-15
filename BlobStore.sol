@@ -425,6 +425,16 @@ contract BlobStore is AbstractBlobStore {
     }
 
     /**
+     * @dev Check if a blob exists.
+     * @param id Id of the blob.
+     * @return exists True if the blob exists.
+     */
+    function getExists(bytes32 id) constant external returns (bool exists) {
+        BlobInfo info = blobInfo[id];
+        exists = info.blockNumber != 0 && info.blockNumber != uint32(-1);
+    }
+
+    /**
      * @dev Get the block number for a specific blob revision.
      * @param id Id of the blob.
      * @param revisionId Id of the revision.
