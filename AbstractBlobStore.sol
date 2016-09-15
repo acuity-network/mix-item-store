@@ -13,6 +13,12 @@ contract AbstractBlobStore {
     function transferEnable(bytes32 id) external;
 
     /**
+     * @dev Disable transfer of the blob to the current user.
+     * @param id Id of the blob.
+     */
+    function transferDisable(bytes32 id) external;
+
+    /**
      * @dev Get the id for this BlobStore contract.
      * @return Id of the contract.
      */
