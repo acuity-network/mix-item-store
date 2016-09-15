@@ -1,0 +1,56 @@
+pragma solidity ^0.4.0;
+
+import "AbstractBlobStore.sol";
+
+/**
+ * @title BlobStoreRegistry
+ * @author Jonathan Brown <jbrown@bluedroplet.com>
+ */
+contract BlobStoreRegistry {
+
+    mapping (bytes12 => address) contractAddresses;
+
+    /**
+     * @dev An AbstractBlobStore contract has been registered.
+     * @param contractId Id of the contract.
+     * @param contractAddress Address of the contract.
+     */
+    event logRegistration(bytes12 indexed contractId, address indexed contractAddress);
+
+    /**
+     * @dev Throw if contract is not registered.
+     * @param contractId Id of the contract.
+     */
+    modifier isRegistered(bytes12 contractId) {
+        if (contractAddresses[contractId] == 0) {
+            throw;
+        }
+        _;
+    }
+
+    /**
+     * @dev Register the calling BlobStore contract.
+     */
+    function register() external {
+        // Get the contractId from the calling contract.
+        bytes12 contractId = AbstractBlobStore(msg.sender).getContractId();
+        // Check if this contractId has been registered before.
+        if (contractAddresses[contractId] != 0) {
+            throw;
+        }
+        // Record the calling contract address.
+        contractAddresses[contractId] = msg.sender;
+        // Log the registration.
+        logRegistration(contractId, msg.sender);
+    }
+
+    /**
+     * @dev Get an AbstractBlobStore contract.
+     * @param contractId Id of the contract.
+     * @return blobStore The AbstractBlobStore contract.
+     */
+    function getBlobStore(bytes12 contractId) isRegistered(contractId) constant external returns (AbstractBlobStore blobStore) {
+        blobStore = AbstractBlobStore(contractAddresses[contractId]);
+    }
+
+}
