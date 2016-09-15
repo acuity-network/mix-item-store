@@ -88,7 +88,8 @@ contract BlobStore is AbstractBlobStore {
      * @param id Id of the blob.
      */
     modifier exists(bytes32 id) {
-        if (blobInfo[id].blockNumber == 0 || blobInfo[id].blockNumber == uint32(-1)) {
+        BlobInfo info = blobInfo[id];
+        if (info.blockNumber == 0 || info.blockNumber == uint32(-1)) {
             throw;
         }
         _;
@@ -253,10 +254,11 @@ contract BlobStore is AbstractBlobStore {
      * @param blob Blob that should replace the latest revision. Typically a VCDIFF if there is an earlier revision.
      */
     function updateLatestRevision(bytes32 id, bytes blob) isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) external {
-        uint revisionId = blobInfo[id].revisionCount - 1;
+        BlobInfo info = blobInfo[id];
+        uint revisionId = info.revisionCount - 1;
         // Update the block number.
         if (revisionId == 0) {
-            blobInfo[id].blockNumber = uint32(block.number);
+            info.blockNumber = uint32(block.number);
         }
         else {
             _setPackedBlockNumber(id, revisionId - 1);
@@ -302,8 +304,9 @@ contract BlobStore is AbstractBlobStore {
         // Delete the packed revision block numbers.
         _deleteAllPackedRevisionBlockNumbers(id);
         // Update the blob state info.
-        blobInfo[id].revisionCount = 1;
-        blobInfo[id].blockNumber = uint32(block.number);
+        BlobInfo info = blobInfo[id];
+        info.revisionCount = 1;
+        info.blockNumber = uint32(block.number);
         // Store the blob in a log in the current block.
         logBlob(id, 0, blob);
     }
