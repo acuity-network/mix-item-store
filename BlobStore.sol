@@ -185,12 +185,16 @@ contract BlobStore is AbstractBlobStore {
         _;
     }
 
+    /**
+     * @dev Constructor.
+     * @param registry Address of BlobStoreRegistry contract to register with.
+     */
     function BlobStore(BlobStoreRegistry registry) {
         // Create a 96-bit id for this contract. This is unique across all blockchains.
         // Wait a few minutes after deploying for this id to settle.
         contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
         // Register this contract.
-        registry.register();
+        registry.register(contractId);
     }
 
     /**

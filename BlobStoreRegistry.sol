@@ -30,10 +30,9 @@ contract BlobStoreRegistry {
 
     /**
      * @dev Register the calling BlobStore contract.
+     * @param contractId Id of the BlobStore contract.
      */
-    function register() external {
-        // Get the contractId from the calling contract.
-        bytes12 contractId = AbstractBlobStore(msg.sender).getContractId();
+    function register(bytes12 contractId) external {
         // Check if this contractId has been registered before.
         if (contractAddresses[contractId] != 0) {
             throw;
