@@ -1,6 +1,7 @@
 pragma solidity ^0.4.0;
 
 import "AbstractBlobStore.sol";
+import "BlobStoreRegistry.sol";
 
 /**
  * @title BlobStore
@@ -22,9 +23,7 @@ contract BlobStore is AbstractBlobStore {
     mapping (bytes32 => mapping (uint => bytes32)) packedBlockNumbers;
     mapping (bytes32 => mapping (address => bool)) enabledTransfers;
 
-    // Create a 96-bit id for this contract. This is unique across all blockchains.
-    // Wait a few minutes after deploying for this id to settle.
-    bytes12 contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
+    bytes12 contractId;
 
     /**
      * @dev A blob revision has been published.
@@ -184,6 +183,14 @@ contract BlobStore is AbstractBlobStore {
             throw;
         }
         _;
+    }
+
+    function BlobStore(BlobStoreRegistry registry) {
+        // Create a 96-bit id for this contract. This is unique across all blockchains.
+        // Wait a few minutes after deploying for this id to settle.
+        contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
+        // Register this contract.
+        registry.register();
     }
 
     /**
