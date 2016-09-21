@@ -167,7 +167,7 @@ contract BlobStore is AbstractBlobStore {
      * @param id Id of the blob.
      */
     modifier hasAdditionalRevisions(bytes32 id) {
-        if (blobInfo[id].revisionCount < 2) {
+        if (blobInfo[id].revisionCount == 1) {
             throw;
         }
         _;
