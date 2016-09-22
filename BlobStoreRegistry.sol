@@ -8,6 +8,9 @@ import "AbstractBlobStore.sol";
  */
 contract BlobStoreRegistry {
 
+    /**
+     * @dev Mapping of contract ids to contract addresses.
+     */
     mapping (bytes12 => address) contractAddresses;
 
     /**

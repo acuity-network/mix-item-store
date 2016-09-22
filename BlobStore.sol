@@ -9,7 +9,10 @@ import "BlobStoreRegistry.sol";
  */
 contract BlobStore is AbstractBlobStore {
 
-    struct BlobInfo {               // Single slot.
+    /**
+     * @dev Single slot structure of blob info.
+     */
+    struct BlobInfo {
         bool updatable;             // True if the blob is updatable. After creation can only be disabled.
         bool enforceRevisions;      // True if the blob is enforcing revisions. After creation can only be enabled.
         bool retractable;           // True if the blob can be retracted. After creation can only be disabled.
@@ -19,10 +22,24 @@ contract BlobStore is AbstractBlobStore {
         address owner;              // Who owns this blob.
     }
 
+    /**
+     * @dev Mapping of blob ids to blob info.
+     */
     mapping (bytes32 => BlobInfo) blobInfo;
+
+    /**
+     * @dev Mapping of blob ids to mapping of packed slots of eight 32-bit block numbers.
+     */
     mapping (bytes32 => mapping (uint => bytes32)) packedBlockNumbers;
+
+    /**
+     * @dev Mapping of blob ids to mapping of transfer recipient addresses to enabled.
+     */
     mapping (bytes32 => mapping (address => bool)) enabledTransfers;
 
+    /**
+     * @dev Id of this instance of BlobStore. Unique across all blockchains.
+     */
     bytes12 contractId;
 
     /**
@@ -190,8 +207,7 @@ contract BlobStore is AbstractBlobStore {
      * @param registry Address of BlobStoreRegistry contract to register with.
      */
     function BlobStore(BlobStoreRegistry registry) {
-        // Create a 96-bit id for this contract. This is unique across all blockchains.
-        // Wait a few minutes after deploying for this id to settle.
+        // Create id for this contract.
         contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
         // Register this contract.
         registry.register(contractId);
