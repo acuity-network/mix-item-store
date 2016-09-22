@@ -146,7 +146,7 @@ contract BlobStore is AbstractBlobStore {
     }
 
     /**
-     * @dev Throw is the blob is not retractable.
+     * @dev Throw if the blob is not retractable.
      * @param id Id of the blob.
      */
     modifier isRetractable(bytes32 id) {
