@@ -1,6 +1,6 @@
 pragma solidity ^0.4.0;
 
-import "AbstractBlobStore.sol";
+import "abstract_blobstore.sol";
 
 /**
  * @title BlobStoreRegistry
