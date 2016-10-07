@@ -23,17 +23,17 @@ contract BlobStore is AbstractBlobStore {
     }
 
     /**
-     * @dev Mapping of blob ids to blob info.
+     * @dev Mapping of blob id to blob info.
      */
     mapping (bytes32 => BlobInfo) blobInfo;
 
     /**
-     * @dev Mapping of blob ids to mapping of packed slots of eight 32-bit block numbers.
+     * @dev Mapping of blob id to mapping of packed slots of eight 32-bit block numbers.
      */
     mapping (bytes32 => mapping (uint => bytes32)) packedBlockNumbers;
 
     /**
-     * @dev Mapping of blob ids to mapping of transfer recipient addresses to enabled.
+     * @dev Mapping of blob id to mapping of transfer recipient addresses to enabled.
      */
     mapping (bytes32 => mapping (address => bool)) enabledTransfers;
 
