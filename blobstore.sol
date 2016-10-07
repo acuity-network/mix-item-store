@@ -44,68 +44,68 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev A blob revision has been published.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param revisionId Id of the revision (the highest at time of logging).
      * @param blob Contents of the blob.
      */
-    event logBlob(bytes32 indexed id, uint indexed revisionId, bytes blob);
+    event logBlob(bytes32 indexed blobId, uint indexed revisionId, bytes blob);
 
     /**
      * @dev A revision has been retracted.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param revisionId Id of the revision.
      */
-    event logRetractRevision(bytes32 indexed id, uint revisionId);
+    event logRetractRevision(bytes32 indexed blobId, uint revisionId);
 
     /**
      * @dev An entire blob has been retracted. This cannot be undone.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    event logRetract(bytes32 indexed id);
+    event logRetract(bytes32 indexed blobId);
 
     /**
      * @dev A blob has been transfered to a new address.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param recipient The address that now owns the blob.
      */
-    event logTransfer(bytes32 indexed id, address recipient);
+    event logTransfer(bytes32 indexed blobId, address recipient);
 
     /**
      * @dev A blob has been disowned. This cannot be undone.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    event logDisown(bytes32 indexed id);
+    event logDisown(bytes32 indexed blobId);
 
     /**
      * @dev A blob has been set as not updatable. This cannot be undone.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    event logSetNotUpdatable(bytes32 indexed id);
+    event logSetNotUpdatable(bytes32 indexed blobId);
 
     /**
      * @dev A blob has been set as enforcing revisions. This cannot be undone.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    event logSetEnforceRevisions(bytes32 indexed id);
+    event logSetEnforceRevisions(bytes32 indexed blobId);
 
     /**
      * @dev A blob has been set as not retractable. This cannot be undone.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    event logSetNotRetractable(bytes32 indexed id);
+    event logSetNotRetractable(bytes32 indexed blobId);
 
     /**
      * @dev A blob has been set as not transferable. This cannot be undone.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    event logSetNotTransferable(bytes32 indexed id);
+    event logSetNotTransferable(bytes32 indexed blobId);
 
     /**
      * @dev Throw if the blob has not been used before or it has been retracted.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    modifier exists(bytes32 id) {
-        BlobInfo info = blobInfo[id];
+    modifier exists(bytes32 blobId) {
+        BlobInfo info = blobInfo[blobId];
         if (info.blockNumber == 0 || info.blockNumber == uint32(-1)) {
             throw;
         }
@@ -114,10 +114,10 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Throw if the owner of the blob is not the message sender.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    modifier isOwner(bytes32 id) {
-        if (blobInfo[id].owner != msg.sender) {
+    modifier isOwner(bytes32 blobId) {
+        if (blobInfo[blobId].owner != msg.sender) {
             throw;
         }
         _;
@@ -125,10 +125,10 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Throw if the blob is not updatable.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    modifier isUpdatable(bytes32 id) {
-        if (!blobInfo[id].updatable) {
+    modifier isUpdatable(bytes32 blobId) {
+        if (!blobInfo[blobId].updatable) {
             throw;
         }
         _;
@@ -136,10 +136,10 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Throw if the blob is not enforcing revisions.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    modifier isNotEnforceRevisions(bytes32 id) {
-        if (blobInfo[id].enforceRevisions) {
+    modifier isNotEnforceRevisions(bytes32 blobId) {
+        if (blobInfo[blobId].enforceRevisions) {
             throw;
         }
         _;
@@ -147,10 +147,10 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Throw if the blob is not retractable.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    modifier isRetractable(bytes32 id) {
-        if (!blobInfo[id].retractable) {
+    modifier isRetractable(bytes32 blobId) {
+        if (!blobInfo[blobId].retractable) {
             throw;
         }
         _;
@@ -158,10 +158,10 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Throw if the blob is not transferable.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    modifier isTransferable(bytes32 id) {
-        if (!blobInfo[id].transferable) {
+    modifier isTransferable(bytes32 blobId) {
+        if (!blobInfo[blobId].transferable) {
             throw;
         }
         _;
@@ -169,11 +169,11 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Throw if the blob is not transferable to a specific user.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param recipient Address of the user.
      */
-    modifier isTransferEnabled(bytes32 id, address recipient) {
-        if (!enabledTransfers[id][recipient]) {
+    modifier isTransferEnabled(bytes32 blobId, address recipient) {
+        if (!enabledTransfers[blobId][recipient]) {
             throw;
         }
         _;
@@ -181,10 +181,10 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Throw if the blob only has one revision.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    modifier hasAdditionalRevisions(bytes32 id) {
-        if (blobInfo[id].revisionCount == 1) {
+    modifier hasAdditionalRevisions(bytes32 blobId) {
+        if (blobInfo[blobId].revisionCount == 1) {
             throw;
         }
         _;
@@ -192,11 +192,11 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Throw if a specific blob revision does not exist.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param revisionId Id of the revision.
      */
-    modifier revisionExists(bytes32 id, uint revisionId) {
-        if (revisionId >= blobInfo[id].revisionCount) {
+    modifier revisionExists(bytes32 blobId, uint revisionId) {
+        if (revisionId >= blobInfo[blobId].revisionCount) {
             throw;
         }
         _;
@@ -222,17 +222,17 @@ contract BlobStore is AbstractBlobStore {
      * @param retractable True if the blob should be retractable.
      * @param transferable True if the blob should be transferable.
      * @param anon True if the blob should be anonymous.
-     * @return id Id of the blob.
+     * @return blobId Id of the blob.
      */
-    function create(bytes blob, bytes32 nonce, bool updatable, bool enforceRevisions, bool retractable, bool transferable, bool anon) external returns (bytes32 id) {
-        // Determine the id.
-        id = contractId | (sha3(msg.sender, nonce) & (2 ** 160 - 1));
-        // Make sure this id has not been used before.
-        if (blobInfo[id].blockNumber != 0) {
+    function create(bytes blob, bytes32 nonce, bool updatable, bool enforceRevisions, bool retractable, bool transferable, bool anon) external returns (bytes32 blobId) {
+        // Determine the blob id.
+        blobId = contractId | (sha3(msg.sender, nonce) & (2 ** 160 - 1));
+        // Make sure this blob id has not been used before.
+        if (blobInfo[blobId].blockNumber != 0) {
             throw;
         }
         // Store blob info in state.
-        blobInfo[id] = BlobInfo({
+        blobInfo[blobId] = BlobInfo({
             updatable: updatable,
             enforceRevisions: enforceRevisions,
             retractable: retractable,
@@ -242,112 +242,112 @@ contract BlobStore is AbstractBlobStore {
             owner: anon ? 0 : msg.sender,
         });
         // Store the blob in a log in the current block.
-        logBlob(id, 0, blob);
+        logBlob(blobId, 0, blob);
     }
 
     /**
      * @dev Store a blob revision block number in a packed slot.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param offset The offset of the block number should be retreived.
      */
-    function _setPackedBlockNumber(bytes32 id, uint offset) internal {
+    function _setPackedBlockNumber(bytes32 blobId, uint offset) internal {
         // Get the slot.
-        bytes32 slot = packedBlockNumbers[id][offset / 8];
+        bytes32 slot = packedBlockNumbers[blobId][offset / 8];
         // Wipe the previous block number.
         slot &= ~bytes32(uint32(-1) * 2 ** ((offset % 8) * 32));
         // Insert the current block number.
         slot |= bytes32(uint32(block.number) * 2 ** ((offset % 8) * 32));
         // Store the slot.
-        packedBlockNumbers[id][offset / 8] = slot;
+        packedBlockNumbers[blobId][offset / 8] = slot;
     }
 
     /**
      * @dev Create a new blob revision.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param blob Blob that should be stored as the new revision. Typically a VCDIFF of an earlier revision.
      * @return revisionId The new revisionId.
      */
-    function createNewRevision(bytes32 id, bytes blob) isOwner(id) isUpdatable(id) external returns (uint revisionId) {
+    function createNewRevision(bytes32 blobId, bytes blob) isOwner(blobId) isUpdatable(blobId) external returns (uint revisionId) {
         // Increment the number of revisions.
-        revisionId = blobInfo[id].revisionCount++;
+        revisionId = blobInfo[blobId].revisionCount++;
         // Store the block number.
-        _setPackedBlockNumber(id, revisionId - 1);
+        _setPackedBlockNumber(blobId, revisionId - 1);
         // Store the new blob in a log in the current block.
-        logBlob(id, revisionId, blob);
+        logBlob(blobId, revisionId, blob);
     }
 
     /**
      * @dev Update a blob's latest revision.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param blob Blob that should replace the latest revision. Typically a VCDIFF if there is an earlier revision.
      */
-    function updateLatestRevision(bytes32 id, bytes blob) isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) external {
-        BlobInfo info = blobInfo[id];
+    function updateLatestRevision(bytes32 blobId, bytes blob) isOwner(blobId) isUpdatable(blobId) isNotEnforceRevisions(blobId) external {
+        BlobInfo info = blobInfo[blobId];
         uint revisionId = info.revisionCount - 1;
         // Update the block number.
         if (revisionId == 0) {
             info.blockNumber = uint32(block.number);
         }
         else {
-            _setPackedBlockNumber(id, revisionId - 1);
+            _setPackedBlockNumber(blobId, revisionId - 1);
         }
         // Store the new blob in a log in the current block.
-        logBlob(id, revisionId, blob);
+        logBlob(blobId, revisionId, blob);
     }
 
     /**
      * @dev Retract a blob's latest revision. Revision 0 cannot be retracted.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    function retractLatestRevision(bytes32 id) isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) hasAdditionalRevisions(id) external {
-        uint revisionId = --blobInfo[id].revisionCount;
+    function retractLatestRevision(bytes32 blobId) isOwner(blobId) isUpdatable(blobId) isNotEnforceRevisions(blobId) hasAdditionalRevisions(blobId) external {
+        uint revisionId = --blobInfo[blobId].revisionCount;
         // Delete the slot if it is no longer required.
         if (revisionId % 8 == 1) {
-            delete packedBlockNumbers[id][revisionId / 8];
+            delete packedBlockNumbers[blobId][revisionId / 8];
         }
         // Log the retraction.
-        logRetractRevision(id, revisionId);
+        logRetractRevision(blobId, revisionId);
     }
 
     /**
      * @dev Delete all of a blob's packed revision block numbers.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    function _deleteAllPackedRevisionBlockNumbers(bytes32 id) internal {
+    function _deleteAllPackedRevisionBlockNumbers(bytes32 blobId) internal {
         // Determine how many slots should be deleted.
         // Block number of the first revision is stored in the blob info, so the first slot only needs to be deleted of there are at least 2 revisions.
-        uint slotCount = (blobInfo[id].revisionCount + 6) / 8;
+        uint slotCount = (blobInfo[blobId].revisionCount + 6) / 8;
         // Delete the slots.
         for (uint i = 0; i < slotCount; i++) {
-            delete packedBlockNumbers[id][i];
+            delete packedBlockNumbers[blobId][i];
         }
     }
 
     /**
      * @dev Delete all a blob's revisions and replace it with a new blob.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param blob Blob that should be stored.
      */
-    function restart(bytes32 id, bytes blob) isOwner(id) isUpdatable(id) isNotEnforceRevisions(id) external {
+    function restart(bytes32 blobId, bytes blob) isOwner(blobId) isUpdatable(blobId) isNotEnforceRevisions(blobId) external {
         // Delete the packed revision block numbers.
-        _deleteAllPackedRevisionBlockNumbers(id);
+        _deleteAllPackedRevisionBlockNumbers(blobId);
         // Update the blob state info.
-        BlobInfo info = blobInfo[id];
+        BlobInfo info = blobInfo[blobId];
         info.revisionCount = 1;
         info.blockNumber = uint32(block.number);
         // Store the blob in a log in the current block.
-        logBlob(id, 0, blob);
+        logBlob(blobId, 0, blob);
     }
 
     /**
      * @dev Retract a blob.
-     * @param id Id of the blob. This id can never be used again.
+     * @param blobId Id of the blob. This id can never be used again.
      */
-    function retract(bytes32 id) isOwner(id) isRetractable(id) external {
+    function retract(bytes32 blobId) isOwner(blobId) isRetractable(blobId) external {
         // Delete the packed revision block numbers.
-        _deleteAllPackedRevisionBlockNumbers(id);
+        _deleteAllPackedRevisionBlockNumbers(blobId);
         // Mark this blob as retracted.
-        blobInfo[id] = BlobInfo({
+        blobInfo[blobId] = BlobInfo({
             updatable: false,
             enforceRevisions: false,
             retractable: false,
@@ -357,94 +357,94 @@ contract BlobStore is AbstractBlobStore {
             owner: 0,
         });
         // Log that the blob has been retracted.
-        logRetract(id);
+        logRetract(blobId);
     }
 
     /**
      * @dev Enable transfer of the blob to the current user.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    function transferEnable(bytes32 id) isTransferable(id) external {
+    function transferEnable(bytes32 blobId) isTransferable(blobId) external {
         // Record in state that the current user will accept this blob.
-        enabledTransfers[id][msg.sender] = true;
+        enabledTransfers[blobId][msg.sender] = true;
     }
 
     /**
      * @dev Disable transfer of the blob to the current user.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    function transferDisable(bytes32 id) isTransferEnabled(id, msg.sender) external {
+    function transferDisable(bytes32 blobId) isTransferEnabled(blobId, msg.sender) external {
         // Record in state that the current user will not accept this blob.
-        enabledTransfers[id][msg.sender] = false;
+        enabledTransfers[blobId][msg.sender] = false;
     }
 
     /**
      * @dev Transfer a blob to a new user.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param recipient Address of the user to transfer to blob to.
      */
-    function transfer(bytes32 id, address recipient) isOwner(id) isTransferable(id) isTransferEnabled(id, recipient) external {
+    function transfer(bytes32 blobId, address recipient) isOwner(blobId) isTransferable(blobId) isTransferEnabled(blobId, recipient) external {
         // Update ownership of the blob.
-        blobInfo[id].owner = recipient;
+        blobInfo[blobId].owner = recipient;
         // Disable this transfer in future and free up the slot.
-        enabledTransfers[id][recipient] = false;
+        enabledTransfers[blobId][recipient] = false;
         // Log the transfer.
-        logTransfer(id, recipient);
+        logTransfer(blobId, recipient);
     }
 
     /**
      * @dev Disown a blob.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    function disown(bytes32 id) isOwner(id) isTransferable(id) external {
+    function disown(bytes32 blobId) isOwner(blobId) isTransferable(blobId) external {
         // Remove the owner from the blob's state.
-        delete blobInfo[id].owner;
+        delete blobInfo[blobId].owner;
         // Log as blob as disowned.
-        logDisown(id);
+        logDisown(blobId);
     }
 
     /**
      * @dev Set a blob as not updatable.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    function setNotUpdatable(bytes32 id) isOwner(id) external {
+    function setNotUpdatable(bytes32 blobId) isOwner(blobId) external {
         // Record in state that the blob is not updatable.
-        blobInfo[id].updatable = false;
+        blobInfo[blobId].updatable = false;
         // Log that the blob is not updatable.
-        logSetNotUpdatable(id);
+        logSetNotUpdatable(blobId);
     }
 
     /**
      * @dev Set a blob to enforce revisions.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    function setEnforceRevisions(bytes32 id) isOwner(id) external {
+    function setEnforceRevisions(bytes32 blobId) isOwner(blobId) external {
         // Record in state that all changes to this blob must be new revisions.
-        blobInfo[id].enforceRevisions = true;
+        blobInfo[blobId].enforceRevisions = true;
         // Log that the blob now forces new revisions.
-        logSetEnforceRevisions(id);
+        logSetEnforceRevisions(blobId);
     }
 
     /**
      * @dev Set a blob to not be retractable.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    function setNotRetractable(bytes32 id) isOwner(id) external {
+    function setNotRetractable(bytes32 blobId) isOwner(blobId) external {
         // Record in state that the blob is not retractable.
-        blobInfo[id].retractable = false;
+        blobInfo[blobId].retractable = false;
         // Log that the blob is not retractable.
-        logSetNotRetractable(id);
+        logSetNotRetractable(blobId);
     }
 
     /**
      * @dev Set a blob to not be transferable.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      */
-    function setNotTransferable(bytes32 id) isOwner(id) external {
+    function setNotTransferable(bytes32 blobId) isOwner(blobId) external {
         // Record in state that the blob is not transferable.
-        blobInfo[id].transferable = false;
+        blobInfo[blobId].transferable = false;
         // Log that the blob is not transferable.
-        logSetNotTransferable(id);
+        logSetNotTransferable(blobId);
     }
 
     /**
@@ -457,46 +457,46 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Check if a blob exists.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return exists True if the blob exists.
      */
-    function getExists(bytes32 id) constant external returns (bool exists) {
-        BlobInfo info = blobInfo[id];
+    function getExists(bytes32 blobId) constant external returns (bool exists) {
+        BlobInfo info = blobInfo[blobId];
         exists = info.blockNumber != 0 && info.blockNumber != uint32(-1);
     }
 
     /**
      * @dev Get the block number for a specific blob revision.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param revisionId Id of the revision.
      * @return blockNumber Block number of the specified revision.
      */
-    function _getRevisionBlockNumber(bytes32 id, uint revisionId) internal returns (uint blockNumber) {
+    function _getRevisionBlockNumber(bytes32 blobId, uint revisionId) internal returns (uint blockNumber) {
         if (revisionId == 0) {
-            blockNumber = blobInfo[id].blockNumber;
+            blockNumber = blobInfo[blobId].blockNumber;
         }
         else {
-            bytes32 slot = packedBlockNumbers[id][(revisionId - 1) / 8];
+            bytes32 slot = packedBlockNumbers[blobId][(revisionId - 1) / 8];
             blockNumber = uint32(uint256(slot) / 2 ** (((revisionId - 1) % 8) * 32));
         }
     }
 
     /**
      * @dev Get the block numbers for all of a blob's revisions.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return blockNumbers Revision block numbers.
      */
-    function _getAllRevisionBlockNumbers(bytes32 id) internal returns (uint[] blockNumbers) {
-        uint revisionCount = blobInfo[id].revisionCount;
+    function _getAllRevisionBlockNumbers(bytes32 blobId) internal returns (uint[] blockNumbers) {
+        uint revisionCount = blobInfo[blobId].revisionCount;
         blockNumbers = new uint[](revisionCount);
         for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
-            blockNumbers[revisionId] = _getRevisionBlockNumber(id, revisionId);
+            blockNumbers[revisionId] = _getRevisionBlockNumber(blobId, revisionId);
         }
     }
 
     /**
      * @dev Get info about a blob.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return owner Owner of the blob.
      * @return revisionCount How many revisions the blob has.
      * @return blockNumbers The block numbers of the revisions.
@@ -505,11 +505,11 @@ contract BlobStore is AbstractBlobStore {
      * @return retractable Is the blob retractable?
      * @return transferable Is the blob transferable?
      */
-    function getInfo(bytes32 id) exists(id) constant external returns (address owner, uint revisionCount, uint[] blockNumbers, bool updatable, bool enforceRevisions, bool retractable, bool transferable) {
-        BlobInfo info = blobInfo[id];
+    function getInfo(bytes32 blobId) exists(blobId) constant external returns (address owner, uint revisionCount, uint[] blockNumbers, bool updatable, bool enforceRevisions, bool retractable, bool transferable) {
+        BlobInfo info = blobInfo[blobId];
         owner = info.owner;
         revisionCount = info.revisionCount;
-        blockNumbers = _getAllRevisionBlockNumbers(id);
+        blockNumbers = _getAllRevisionBlockNumbers(blobId);
         updatable = info.updatable;
         enforceRevisions = info.enforceRevisions;
         retractable = info.retractable;
@@ -518,75 +518,75 @@ contract BlobStore is AbstractBlobStore {
 
     /**
      * @dev Get the owner of a blob.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return owner Owner of the blob.
      */
-    function getOwner(bytes32 id) exists(id) constant external returns (address owner) {
-        owner = blobInfo[id].owner;
+    function getOwner(bytes32 blobId) exists(blobId) constant external returns (address owner) {
+        owner = blobInfo[blobId].owner;
     }
 
     /**
      * @dev Get the number of revisions a blob has.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return revisionCount How many revisions the blob has.
      */
-    function getRevisionCount(bytes32 id) exists(id) constant external returns (uint revisionCount) {
-        revisionCount = blobInfo[id].revisionCount;
+    function getRevisionCount(bytes32 blobId) exists(blobId) constant external returns (uint revisionCount) {
+        revisionCount = blobInfo[blobId].revisionCount;
     }
 
     /**
      * @dev Get the block number for a specific blob revision.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @param revisionId Id of the revision.
      * @return blockNumber Block number of the specified revision.
      */
-    function getRevisionBlockNumber(bytes32 id, uint revisionId) constant external returns (uint blockNumber) {
-        blockNumber = _getRevisionBlockNumber(id, revisionId);
+    function getRevisionBlockNumber(bytes32 blobId, uint revisionId) constant external returns (uint blockNumber) {
+        blockNumber = _getRevisionBlockNumber(blobId, revisionId);
     }
 
     /**
      * @dev Get the block numbers for all of a blob's revisions.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return blockNumbers Revision block numbers.
      */
-    function getAllRevisionBlockNumbers(bytes32 id) exists(id) constant external returns (uint[] blockNumbers) {
-        blockNumbers = _getAllRevisionBlockNumbers(id);
+    function getAllRevisionBlockNumbers(bytes32 blobId) exists(blobId) constant external returns (uint[] blockNumbers) {
+        blockNumbers = _getAllRevisionBlockNumbers(blobId);
     }
 
     /**
      * @dev Determine if a blob is updatable.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return updatable True if the blob is updatable.
      */
-    function getUpdatable(bytes32 id) exists(id) constant external returns (bool updatable) {
-        updatable = blobInfo[id].updatable;
+    function getUpdatable(bytes32 blobId) exists(blobId) constant external returns (bool updatable) {
+        updatable = blobInfo[blobId].updatable;
     }
 
     /**
      * @dev Determine if a blob enforces revisions.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return enforceRevisions True if the blob enforces revisions.
      */
-    function getEnforceRevisions(bytes32 id) exists(id) constant external returns (bool enforceRevisions) {
-        enforceRevisions = blobInfo[id].enforceRevisions;
+    function getEnforceRevisions(bytes32 blobId) exists(blobId) constant external returns (bool enforceRevisions) {
+        enforceRevisions = blobInfo[blobId].enforceRevisions;
     }
 
     /**
      * @dev Determine if a blob is retractable.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return retractable True if the blob is blob retractable.
      */
-    function getRetractable(bytes32 id) exists(id) constant external returns (bool retractable) {
-        retractable = blobInfo[id].retractable;
+    function getRetractable(bytes32 blobId) exists(blobId) constant external returns (bool retractable) {
+        retractable = blobInfo[blobId].retractable;
     }
 
     /**
      * @dev Determine if a blob is transferable.
-     * @param id Id of the blob.
+     * @param blobId Id of the blob.
      * @return transferable True if the blob is transferable.
      */
-    function getTransferable(bytes32 id) exists(id) constant external returns (bool transferable) {
-        transferable = blobInfo[id].transferable;
+    function getTransferable(bytes32 blobId) exists(blobId) constant external returns (bool transferable) {
+        transferable = blobInfo[blobId].transferable;
     }
 
 }
