@@ -4,7 +4,6 @@
   "description": "Stores arbitrary-sized blobs of data in Ethereum's transaction log.",
   "main": "blobstore.js",
   "dependencies": {
-    "dapple": "^0.8.5",
     "web3": "^0.16.0"
   },
   "devDependencies": {},
