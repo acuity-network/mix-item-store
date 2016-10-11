@@ -30,12 +30,12 @@ contract BlobStoreTest is Test {
     }
 
     function testThrowCreateExistingNonce() {
-        blobStore.create(hex"00", 0, false, false, false, false, false);
-        blobStore.create(hex"00", 0, false, false, false, false, false);
+        blobStore.create(hex"00", 0, 0);
+        blobStore.create(hex"00", 0, 0);
     }
 
     function testCreate() {
-        bytes32 blobId0 = blobStore.create(hex"00", 0, false, false, false, false, false);
+        bytes32 blobId0 = blobStore.create(hex"00", 0, 0);
         assertEq12(blobStore.getContractId(), bytes12(blobId0));
         assertTrue(blobStore.getExists(blobId0));
         assertEq(blobStore.getOwner(blobId0), this);
@@ -45,7 +45,7 @@ contract BlobStoreTest is Test {
         assertFalse(blobStore.getRetractable(blobId0));
         assertFalse(blobStore.getTransferable(blobId0));
 
-        bytes32 blobId1 = blobStore.create(hex"00", 1, true, true, true, true, true);
+        bytes32 blobId1 = blobStore.create(hex"00", 1, 0x1f);
         assertEq12(blobStore.getContractId(), bytes12(blobId1));
         assertTrue(blobStore.getExists(blobId1));
         assertEq(blobStore.getOwner(blobId1), 0);
@@ -59,12 +59,12 @@ contract BlobStoreTest is Test {
     }
 
     function testThrowsCreateNewRevisionNotUpdatable() {
-        bytes32 blobId = blobStore.create(hex"00", 0, false, false, false, false, false);
+        bytes32 blobId = blobStore.create(hex"00", 0, 0);
         blobStore.createNewRevision(blobId, hex"00");
     }
 
     function testCreateNewRevision() {
-        bytes32 blobId = blobStore.create(hex"00", 0, true, false, false, false, false);
+        bytes32 blobId = blobStore.create(hex"00", 0, 0x1);
         uint revisionId = blobStore.createNewRevision(blobId, hex"00");
         assertEq(revisionId, 1);
         assertEq(blobStore.getRevisionCount(blobId), 2);
