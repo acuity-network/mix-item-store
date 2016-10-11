@@ -21,6 +21,17 @@ contract BlobStoreRegistry {
     event logRegistration(bytes12 indexed contractId, address indexed contractAddress);
 
     /**
+     * @dev Throw if contract is registered.
+     * @param contractId Id of the contract.
+     */
+    modifier isNotRegistered(bytes12 contractId) {
+        if (contractAddresses[contractId] != 0) {
+            throw;
+        }
+        _;
+    }
+
+    /**
      * @dev Throw if contract is not registered.
      * @param contractId Id of the contract.
      */
@@ -35,11 +46,7 @@ contract BlobStoreRegistry {
      * @dev Register the calling BlobStore contract.
      * @param contractId Id of the BlobStore contract.
      */
-    function register(bytes12 contractId) external {
-        // Check if this contractId has been registered before.
-        if (contractAddresses[contractId] != 0) {
-            throw;
-        }
+    function register(bytes12 contractId) isNotRegistered(contractId) external {
         // Record the calling contract address.
         contractAddresses[contractId] = msg.sender;
         // Log the registration.
