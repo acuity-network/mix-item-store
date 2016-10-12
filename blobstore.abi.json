@@ -55,6 +55,19 @@
 	"payable": false,
 	"type": "function"
 }, {
+	"constant": true,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes32"
+	}],
+	"name": "getFlags",
+	"outputs": [{
+		"name": "flags",
+		"type": "bytes1"
+	}],
+	"payable": false,
+	"type": "function"
+}, {
 	"constant": false,
 	"inputs": [{
 		"name": "blobId",
@@ -114,6 +127,25 @@
 	"payable": false,
 	"type": "function"
 }, {
+	"constant": false,
+	"inputs": [{
+		"name": "contents",
+		"type": "bytes"
+	}, {
+		"name": "nonce",
+		"type": "bytes32"
+	}, {
+		"name": "flags",
+		"type": "bytes1"
+	}],
+	"name": "create",
+	"outputs": [{
+		"name": "blobId",
+		"type": "bytes32"
+	}],
+	"payable": false,
+	"type": "function"
+}, {
 	"constant": true,
 	"inputs": [{
 		"name": "blobId",
@@ -156,17 +188,8 @@
 		"name": "blockNumbers",
 		"type": "uint256[]"
 	}, {
-		"name": "updatable",
-		"type": "bool"
-	}, {
-		"name": "enforceRevisions",
-		"type": "bool"
-	}, {
-		"name": "retractable",
-		"type": "bool"
-	}, {
-		"name": "transferable",
-		"type": "bool"
+		"name": "flags",
+		"type": "bytes1"
 	}],
 	"payable": false,
 	"type": "function"
@@ -255,41 +278,10 @@
 }, {
 	"constant": false,
 	"inputs": [{
-		"name": "blob",
-		"type": "bytes"
-	}, {
-		"name": "nonce",
-		"type": "bytes32"
-	}, {
-		"name": "updatable",
-		"type": "bool"
-	}, {
-		"name": "enforceRevisions",
-		"type": "bool"
-	}, {
-		"name": "retractable",
-		"type": "bool"
-	}, {
-		"name": "transferable",
-		"type": "bool"
-	}, {
-		"name": "anon",
-		"type": "bool"
-	}],
-	"name": "create",
-	"outputs": [{
-		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": false,
-	"inputs": [{
 		"name": "blobId",
 		"type": "bytes32"
 	}, {
-		"name": "blob",
+		"name": "contents",
 		"type": "bytes"
 	}],
 	"name": "updateLatestRevision",
@@ -315,7 +307,7 @@
 		"name": "blobId",
 		"type": "bytes32"
 	}, {
-		"name": "blob",
+		"name": "contents",
 		"type": "bytes"
 	}],
 	"name": "createNewRevision",
