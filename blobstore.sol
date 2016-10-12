@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.2;
 
 import "abstract_blobstore.sol";
 import "blobstore_registry.sol";
