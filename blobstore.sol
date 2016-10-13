@@ -322,9 +322,9 @@ contract BlobStore is AbstractBlobStore {
     /**
      * @dev Delete all a blob's revisions and replace it with a new blob.
      * @param blobId Id of the blob.
-     * @param blob Blob that should be stored.
+     * @param contents Contents that should be stored.
      */
-    function restart(bytes32 blobId, bytes blob) isOwner(blobId) isUpdatable(blobId) isNotEnforceRevisions(blobId) external {
+    function restart(bytes32 blobId, bytes contents) isOwner(blobId) isUpdatable(blobId) isNotEnforceRevisions(blobId) external {
         // Delete the packed revision block numbers.
         _deleteAllPackedRevisionBlockNumbers(blobId);
         // Update the blob state info.
@@ -332,7 +332,7 @@ contract BlobStore is AbstractBlobStore {
         info.revisionCount = 1;
         info.blockNumber = uint32(block.number);
         // Store the blob in a log in the current block.
-        logBlob(blobId, 0, blob);
+        logBlob(blobId, 0, contents);
     }
 
     /**

@@ -73,7 +73,7 @@
 		"name": "blobId",
 		"type": "bytes32"
 	}, {
-		"name": "blob",
+		"name": "contents",
 		"type": "bytes"
 	}],
 	"name": "restart",
