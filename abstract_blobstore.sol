@@ -20,7 +20,7 @@ contract AbstractBlobStore {
 
     /**
      * @dev Get the id for this BlobStore contract.
-     * @return Id of the contract.
+     * @return contractId Id of the contract.
      */
     function getContractId() constant external returns (bytes12 contractId);
 
@@ -30,20 +30,6 @@ contract AbstractBlobStore {
      * @return exists True if the blob exists.
      */
     function getExists(bytes32 blobId) constant external returns (bool exists);
-
-    /**
-     * @dev Get the owner of a blob.
-     * @param blobId Id of the blob.
-     * @return owner Owner of the blob.
-     */
-    function getOwner(bytes32 blobId) constant external returns (address owner);
-
-    /**
-     * @dev Get the number of revisions a blob has.
-     * @param blobId Id of the blob.
-     * @return revisionCount How many revisions the blob has.
-     */
-    function getRevisionCount(bytes32 blobId) constant external returns (uint revisionCount);
 
     /**
      * @dev Determine if a blob is updatable.
@@ -72,5 +58,19 @@ contract AbstractBlobStore {
      * @return transferable True if the blob is transferable.
      */
     function getTransferable(bytes32 blobId) constant external returns (bool transferable);
+
+    /**
+     * @dev Get the owner of a blob.
+     * @param blobId Id of the blob.
+     * @return owner Owner of the blob.
+     */
+    function getOwner(bytes32 blobId) constant external returns (address owner);
+
+    /**
+     * @dev Get the number of revisions a blob has.
+     * @param blobId Id of the blob.
+     * @return revisionCount How many revisions the blob has.
+     */
+    function getRevisionCount(bytes32 blobId) constant external returns (uint revisionCount);
 
 }
