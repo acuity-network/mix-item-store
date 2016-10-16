@@ -19,7 +19,7 @@ contract BlobStore is AbstractBlobStore {
      * @dev Single slot structure of blob info.
      */
     struct BlobInfo {
-        byte flags;                 // Packed boolean settings.
+        byte flags;                 // Packed blob settings.
         uint32 revisionCount;       // Number of revisions including revision 0.
         uint32 blockNumber;         // Block number which contains revision 0.
         address owner;              // Who owns this blob.
@@ -220,7 +220,7 @@ contract BlobStore is AbstractBlobStore {
      * @dev Creates a new blob. It is guaranteed that each user will get a different blobId from the same nonce.
      * @param contents Contents of the blob to be stored.
      * @param nonce Any value that the user has not used previously to create a blob.
-     * @param flags Blob settings.
+     * @param flags Packed blob settings.
      * @return blobId Id of the blob.
      */
     function create(bytes contents, bytes32 nonce, byte flags) external returns (bytes32 blobId) {
@@ -490,60 +490,23 @@ contract BlobStore is AbstractBlobStore {
     /**
      * @dev Get info about a blob.
      * @param blobId Id of the blob.
+     * @return flags Packed blob settings.
      * @return owner Owner of the blob.
      * @return revisionCount How many revisions the blob has.
      * @return blockNumbers The block numbers of the revisions.
-     * @return flags
      */
-    function getInfo(bytes32 blobId) exists(blobId) constant external returns (address owner, uint revisionCount, uint[] blockNumbers, byte flags) {
+    function getInfo(bytes32 blobId) exists(blobId) constant external returns (byte flags, address owner, uint revisionCount, uint[] blockNumbers) {
         BlobInfo info = blobInfo[blobId];
+        flags = info.flags;
         owner = info.owner;
         revisionCount = info.revisionCount;
-        blockNumbers = _getAllRevisionBlockNumbers(blobId);
-        flags = info.flags;
-    }
-
-    /**
-     * @dev Get the owner of a blob.
-     * @param blobId Id of the blob.
-     * @return owner Owner of the blob.
-     */
-    function getOwner(bytes32 blobId) exists(blobId) constant external returns (address owner) {
-        owner = blobInfo[blobId].owner;
-    }
-
-    /**
-     * @dev Get the number of revisions a blob has.
-     * @param blobId Id of the blob.
-     * @return revisionCount How many revisions the blob has.
-     */
-    function getRevisionCount(bytes32 blobId) exists(blobId) constant external returns (uint revisionCount) {
-        revisionCount = blobInfo[blobId].revisionCount;
-    }
-
-    /**
-     * @dev Get the block number for a specific blob revision.
-     * @param blobId Id of the blob.
-     * @param revisionId Id of the revision.
-     * @return blockNumber Block number of the specified revision.
-     */
-    function getRevisionBlockNumber(bytes32 blobId, uint revisionId) constant external returns (uint blockNumber) {
-        blockNumber = _getRevisionBlockNumber(blobId, revisionId);
-    }
-
-    /**
-     * @dev Get the block numbers for all of a blob's revisions.
-     * @param blobId Id of the blob.
-     * @return blockNumbers Revision block numbers.
-     */
-    function getAllRevisionBlockNumbers(bytes32 blobId) exists(blobId) constant external returns (uint[] blockNumbers) {
         blockNumbers = _getAllRevisionBlockNumbers(blobId);
     }
 
     /**
      * @dev Get all a blob's flags.
      * @param blobId Id of the blob.
-     * @return flags The blob's flags.
+     * @return flags Packed blob settings.
      */
     function getFlags(bytes32 blobId) exists(blobId) constant external returns (byte flags) {
         flags = blobInfo[blobId].flags;
@@ -583,6 +546,43 @@ contract BlobStore is AbstractBlobStore {
      */
     function getTransferable(bytes32 blobId) exists(blobId) constant external returns (bool transferable) {
         transferable = blobInfo[blobId].flags & FLAG_TRANSFERABLE != 0;
+    }
+
+    /**
+     * @dev Get the owner of a blob.
+     * @param blobId Id of the blob.
+     * @return owner Owner of the blob.
+     */
+    function getOwner(bytes32 blobId) exists(blobId) constant external returns (address owner) {
+        owner = blobInfo[blobId].owner;
+    }
+
+    /**
+     * @dev Get the number of revisions a blob has.
+     * @param blobId Id of the blob.
+     * @return revisionCount How many revisions the blob has.
+     */
+    function getRevisionCount(bytes32 blobId) exists(blobId) constant external returns (uint revisionCount) {
+        revisionCount = blobInfo[blobId].revisionCount;
+    }
+
+    /**
+     * @dev Get the block number for a specific blob revision.
+     * @param blobId Id of the blob.
+     * @param revisionId Id of the revision.
+     * @return blockNumber Block number of the specified revision.
+     */
+    function getRevisionBlockNumber(bytes32 blobId, uint revisionId) constant external returns (uint blockNumber) {
+        blockNumber = _getRevisionBlockNumber(blobId, revisionId);
+    }
+
+    /**
+     * @dev Get the block numbers for all of a blob's revisions.
+     * @param blobId Id of the blob.
+     * @return blockNumbers Revision block numbers.
+     */
+    function getAllRevisionBlockNumbers(bytes32 blobId) exists(blobId) constant external returns (uint[] blockNumbers) {
+        blockNumbers = _getAllRevisionBlockNumbers(blobId);
     }
 
 }
