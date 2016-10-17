@@ -44,9 +44,9 @@ contract BlobStore is AbstractBlobStore {
      * @dev A blob revision has been published.
      * @param blobId Id of the blob.
      * @param revisionId Id of the revision (the highest at time of logging).
-     * @param blob Contents of the blob.
+     * @param contents Contents of the blob.
      */
-    event Blob(bytes32 indexed blobId, uint indexed revisionId, bytes blob);
+    event Blob(bytes32 indexed blobId, uint indexed revisionId, bytes contents);
 
     /**
      * @dev A revision has been retracted.
