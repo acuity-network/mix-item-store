@@ -46,7 +46,7 @@ contract BlobStore is AbstractBlobStore {
      * @param revisionId Id of the revision (the highest at time of logging).
      * @param contents Contents of the blob.
      */
-    event Blob(bytes32 indexed blobId, uint indexed revisionId, bytes contents);
+    event Store(bytes32 indexed blobId, uint indexed revisionId, bytes contents);
 
     /**
      * @dev A revision has been retracted.
@@ -232,8 +232,8 @@ contract BlobStore is AbstractBlobStore {
             blockNumber: uint32(block.number),
             owner: (flags & FLAG_ANONYMOUS != 0) ? 0 : msg.sender,
         });
-        // Store the blob in a log in the current block.
-        Blob(blobId, 0, contents);
+        // Store the first revision in a log in the current block.
+        Store(blobId, 0, contents);
     }
 
     /**
@@ -263,8 +263,8 @@ contract BlobStore is AbstractBlobStore {
         revisionId = blobInfo[blobId].revisionCount++;
         // Store the block number.
         _setPackedBlockNumber(blobId, revisionId - 1);
-        // Store the new blob in a log in the current block.
-        Blob(blobId, revisionId, contents);
+        // Store the revision in a log in the current block.
+        Store(blobId, revisionId, contents);
     }
 
     /**
@@ -282,8 +282,8 @@ contract BlobStore is AbstractBlobStore {
         else {
             _setPackedBlockNumber(blobId, revisionId - 1);
         }
-        // Store the new blob in a log in the current block.
-        Blob(blobId, revisionId, contents);
+        // Store the revision in a log in the current block.
+        Store(blobId, revisionId, contents);
     }
 
     /**
@@ -327,7 +327,7 @@ contract BlobStore is AbstractBlobStore {
         info.revisionCount = 1;
         info.blockNumber = uint32(block.number);
         // Store the blob in a log in the current block.
-        Blob(blobId, 0, contents);
+        Store(blobId, 0, contents);
     }
 
     /**
