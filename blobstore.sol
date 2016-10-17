@@ -567,7 +567,7 @@ contract BlobStore is AbstractBlobStore {
      * @param revisionId Id of the revision.
      * @return blockNumber Block number of the specified revision.
      */
-    function getRevisionBlockNumber(bytes32 blobId, uint revisionId) external constant returns (uint blockNumber) {
+    function getRevisionBlockNumber(bytes32 blobId, uint revisionId) external constant revisionExists(blobId, revisionId) returns (uint blockNumber) {
         blockNumber = _getRevisionBlockNumber(blobId, revisionId);
     }
 
