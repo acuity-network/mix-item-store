@@ -3,6 +3,7 @@ pragma solidity ^0.4.2;
 import "dapple/test.sol";
 import "blobstore.sol";
 
+
 /**
  * @title BlobStoreTest
  * @author Jonathan Brown <jbrown@bluedroplet.com>

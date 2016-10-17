@@ -1,5 +1,6 @@
 pragma solidity ^0.4.2;
 
+
 /**
  * @title AbstractBlobStore
  * @author Jonathan Brown <jbrown@bluedroplet.com>
@@ -109,14 +110,14 @@ contract AbstractBlobStore {
      * @dev Get the id for this BlobStore contract.
      * @return Id of the contract.
      */
-    function getContractId() constant external returns (bytes12);
+    function getContractId() external constant returns (bytes12);
 
     /**
      * @dev Check if a blob exists.
      * @param blobId Id of the blob.
      * @return exists True if the blob exists.
      */
-    function getExists(bytes32 blobId) constant external returns (bool exists);
+    function getExists(bytes32 blobId) external constant returns (bool exists);
 
     /**
      * @dev Get info about a blob.
@@ -126,62 +127,62 @@ contract AbstractBlobStore {
      * @return revisionCount How many revisions the blob has.
      * @return blockNumbers The block numbers of the revisions.
      */
-    function getInfo(bytes32 blobId) constant external returns (byte flags, address owner, uint revisionCount, uint[] blockNumbers);
+    function getInfo(bytes32 blobId) external constant returns (byte flags, address owner, uint revisionCount, uint[] blockNumbers);
 
     /**
      * @dev Get all a blob's flags.
      * @param blobId Id of the blob.
      * @return flags Packed blob settings.
      */
-    function getFlags(bytes32 blobId) constant external returns (byte flags);
+    function getFlags(bytes32 blobId) external constant returns (byte flags);
 
     /**
      * @dev Determine if a blob is updatable.
      * @param blobId Id of the blob.
      * @return updatable True if the blob is updatable.
      */
-    function getUpdatable(bytes32 blobId) constant external returns (bool updatable);
+    function getUpdatable(bytes32 blobId) external constant returns (bool updatable);
 
     /**
      * @dev Determine if a blob enforces revisions.
      * @param blobId Id of the blob.
      * @return enforceRevisions True if the blob enforces revisions.
      */
-    function getEnforceRevisions(bytes32 blobId) constant external returns (bool enforceRevisions);
+    function getEnforceRevisions(bytes32 blobId) external constant returns (bool enforceRevisions);
 
     /**
      * @dev Determine if a blob is retractable.
      * @param blobId Id of the blob.
      * @return retractable True if the blob is blob retractable.
      */
-    function getRetractable(bytes32 blobId) constant external returns (bool retractable);
+    function getRetractable(bytes32 blobId) external constant returns (bool retractable);
 
     /**
      * @dev Determine if a blob is transferable.
      * @param blobId Id of the blob.
      * @return transferable True if the blob is transferable.
      */
-    function getTransferable(bytes32 blobId) constant external returns (bool transferable);
+    function getTransferable(bytes32 blobId) external constant returns (bool transferable);
 
     /**
      * @dev Get the owner of a blob.
      * @param blobId Id of the blob.
      * @return owner Owner of the blob.
      */
-    function getOwner(bytes32 blobId) constant external returns (address owner);
+    function getOwner(bytes32 blobId) external constant returns (address owner);
 
     /**
      * @dev Get the number of revisions a blob has.
      * @param blobId Id of the blob.
      * @return revisionCount How many revisions the blob has.
      */
-    function getRevisionCount(bytes32 blobId) constant external returns (uint revisionCount);
+    function getRevisionCount(bytes32 blobId) external constant returns (uint revisionCount);
 
     /**
      * @dev Get the block numbers for all of a blob's revisions.
      * @param blobId Id of the blob.
      * @return blockNumbers Revision block numbers.
      */
-    function getAllRevisionBlockNumbers(bytes32 blobId) constant external returns (uint[] blockNumbers);
+    function getAllRevisionBlockNumbers(bytes32 blobId) external constant returns (uint[] blockNumbers);
 
 }

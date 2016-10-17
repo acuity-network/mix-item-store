@@ -2,6 +2,7 @@ pragma solidity ^0.4.2;
 
 import "abstract_blobstore.sol";
 
+
 /**
  * @title BlobStoreRegistry
  * @author Jonathan Brown <jbrown@bluedroplet.com>
@@ -46,7 +47,7 @@ contract BlobStoreRegistry {
      * @dev Register the calling BlobStore contract.
      * @param contractId Id of the BlobStore contract.
      */
-    function register(bytes12 contractId) isNotRegistered(contractId) external {
+    function register(bytes12 contractId) external isNotRegistered(contractId) {
         // Record the calling contract address.
         contractAddresses[contractId] = msg.sender;
         // Log the registration.
@@ -58,7 +59,7 @@ contract BlobStoreRegistry {
      * @param contractId Id of the contract.
      * @return blobStore The AbstractBlobStore contract.
      */
-    function getBlobStore(bytes12 contractId) isRegistered(contractId) constant external returns (AbstractBlobStore blobStore) {
+    function getBlobStore(bytes12 contractId) external constant isRegistered(contractId) returns (AbstractBlobStore blobStore) {
         blobStore = AbstractBlobStore(contractAddresses[contractId]);
     }
 
