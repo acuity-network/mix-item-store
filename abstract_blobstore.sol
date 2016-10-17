@@ -7,6 +7,12 @@ pragma solidity ^0.4.2;
  */
 contract AbstractBlobStore {
 
+    byte constant FLAG_UPDATABLE = 0x01;           // True if the blob is updatable. After creation can only be disabled.
+    byte constant FLAG_ENFORCE_REVISIONS = 0x02;   // True if the blob is enforcing revisions. After creation can only be enabled.
+    byte constant FLAG_RETRACTABLE = 0x04;         // True if the blob can be retracted. After creation can only be disabled.
+    byte constant FLAG_TRANSFERABLE = 0x08;        // True if the blob be transfered to another user or disowned. After creation can only be disabled.
+    byte constant FLAG_ANONYMOUS = 0x10;           // True if the blob should not have an owner.
+
     /**
      * @dev Creates a new blob. It is guaranteed that each user will get a different blobId from the same nonce.
      * @param contents Contents of the blob to be stored.
