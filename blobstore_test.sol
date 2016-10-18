@@ -37,8 +37,7 @@ contract BlobStoreTest is Test, BlobStoreFlags {
     }
 
     function testCreate() {
-        bytes32 blobId0 = blobStore.create(0, hex"00");
-        assertEq12(blobStore.getContractId(), bytes12(blobId0));
+        bytes20 blobId0 = blobStore.create(0, hex"00");
         assertTrue(blobStore.getExists(blobId0));
         assertEq(blobStore.getOwner(blobId0), this);
         assertEq(blobStore.getRevisionCount(blobId0), 1);
@@ -47,8 +46,7 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertFalse(blobStore.getRetractable(blobId0));
         assertFalse(blobStore.getTransferable(blobId0));
 
-        bytes32 blobId1 = blobStore.create(FLAG_UPDATABLE | FLAG_ENFORCE_REVISIONS | FLAG_RETRACTABLE | FLAG_TRANSFERABLE | FLAG_ANONYMOUS, hex"00");
-        assertEq12(blobStore.getContractId(), bytes12(blobId1));
+        bytes20 blobId1 = blobStore.create(FLAG_UPDATABLE | FLAG_ENFORCE_REVISIONS | FLAG_RETRACTABLE | FLAG_TRANSFERABLE | FLAG_ANONYMOUS, hex"00");
         assertTrue(blobStore.getExists(blobId1));
         assertEq(blobStore.getOwner(blobId1), 0);
         assertEq(blobStore.getRevisionCount(blobId1), 1);
@@ -61,12 +59,12 @@ contract BlobStoreTest is Test, BlobStoreFlags {
     }
 
     function testThrowsCreateNewRevisionNotUpdatable() {
-        bytes32 blobId = blobStore.create(0, hex"00");
+        bytes20 blobId = blobStore.create(0, hex"00");
         blobStore.createNewRevision(blobId, hex"00");
     }
 
     function testCreateNewRevision() {
-        bytes32 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
         uint revisionId = blobStore.createNewRevision(blobId, hex"00");
         assertEq(revisionId, 1);
         assertEq(blobStore.getRevisionCount(blobId), 2);
