@@ -1,6 +1,7 @@
 pragma solidity ^0.4.2;
 
 import "abstract_blobstore.sol";
+import "blobstore_flags.sol";
 import "blobstore_registry.sol";
 
 
@@ -8,13 +9,13 @@ import "blobstore_registry.sol";
  * @title BlobStore
  * @author Jonathan Brown <jbrown@bluedroplet.com>
  */
-contract BlobStore is AbstractBlobStore {
+contract BlobStore is AbstractBlobStore, BlobStoreFlags {
 
     /**
      * @dev Single slot structure of blob info.
      */
     struct BlobInfo {
-        byte flags;                 // Packed blob settings.
+        bytes4 flags;               // Packed blob settings.
         uint32 revisionCount;       // Number of revisions including revision 0.
         uint32 blockNumber;         // Block number which contains revision 0.
         address owner;              // Who owns this blob.
@@ -212,25 +213,24 @@ contract BlobStore is AbstractBlobStore {
     }
 
     /**
-     * @dev Creates a new blob. It is guaranteed that each user will get a different blobId from the same nonce.
-     * @param flags Packed blob settings.
-     * @param nonce Any value that the user has not used previously to create a blob.
+     * @dev Creates a new blob. It is guaranteed that different users will never receive the same blobId.
+     * @param flagsNonce First 4 bytes packed blob settings. The whole parameter needs to not have been passed previously by this user.
      * @param contents Contents of the blob to be stored.
      * @return blobId Id of the blob.
      */
-    function create(byte flags, bytes32 nonce, bytes contents) external returns (bytes32 blobId) {
+    function create(bytes32 flagsNonce, bytes contents) external returns (bytes32 blobId) {
         // Determine the blobId.
-        blobId = contractId | (sha3(msg.sender, nonce) & (2**160 - 1));
+        blobId = contractId | (sha3(msg.sender, flagsNonce) & (2**160 - 1));
         // Make sure this blobId has not been used before.
         if (blobInfo[blobId].blockNumber != 0) {
             throw;
         }
         // Store blob info in state.
         blobInfo[blobId] = BlobInfo({
-            flags: flags,
+            flags: bytes4(flagsNonce),
             revisionCount: 1,
             blockNumber: uint32(block.number),
-            owner: (flags & FLAG_ANONYMOUS != 0) ? 0 : msg.sender,
+            owner: (bytes4(flagsNonce) & FLAG_ANONYMOUS != 0) ? 0 : msg.sender,
         });
         // Store the first revision in a log in the current block.
         Store(blobId, 0, contents);
@@ -490,7 +490,7 @@ contract BlobStore is AbstractBlobStore {
      * @return revisionCount How many revisions the blob has.
      * @return blockNumbers The block numbers of the revisions.
      */
-    function getInfo(bytes32 blobId) external constant exists(blobId) returns (byte flags, address owner, uint revisionCount, uint[] blockNumbers) {
+    function getInfo(bytes32 blobId) external constant exists(blobId) returns (bytes4 flags, address owner, uint revisionCount, uint[] blockNumbers) {
         BlobInfo info = blobInfo[blobId];
         flags = info.flags;
         owner = info.owner;
@@ -503,7 +503,7 @@ contract BlobStore is AbstractBlobStore {
      * @param blobId Id of the blob.
      * @return flags Packed blob settings.
      */
-    function getFlags(bytes32 blobId) external constant exists(blobId) returns (byte flags) {
+    function getFlags(bytes32 blobId) external constant exists(blobId) returns (bytes4 flags) {
         flags = blobInfo[blobId].flags;
     }
 

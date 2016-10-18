@@ -2,13 +2,14 @@ pragma solidity ^0.4.2;
 
 import "dapple/test.sol";
 import "blobstore.sol";
+import "blobstore_flags.sol";
 
 
 /**
  * @title BlobStoreTest
  * @author Jonathan Brown <jbrown@bluedroplet.com>
  */
-contract BlobStoreTest is Test {
+contract BlobStoreTest is Test, BlobStoreFlags {
 
     BlobStoreRegistry blobStoreRegistry;
     BlobStore blobStore;
@@ -31,12 +32,12 @@ contract BlobStoreTest is Test {
     }
 
     function testThrowCreateExistingNonce() {
-        blobStore.create(0, 0, hex"00");
-        blobStore.create(0, 0, hex"00");
+        blobStore.create(0, hex"00");
+        blobStore.create(0, hex"00");
     }
 
     function testCreate() {
-        bytes32 blobId0 = blobStore.create(0, 0, hex"00");
+        bytes32 blobId0 = blobStore.create(0, hex"00");
         assertEq12(blobStore.getContractId(), bytes12(blobId0));
         assertTrue(blobStore.getExists(blobId0));
         assertEq(blobStore.getOwner(blobId0), this);
@@ -46,7 +47,7 @@ contract BlobStoreTest is Test {
         assertFalse(blobStore.getRetractable(blobId0));
         assertFalse(blobStore.getTransferable(blobId0));
 
-        bytes32 blobId1 = blobStore.create(0x1f, 1, hex"00");
+        bytes32 blobId1 = blobStore.create(FLAG_UPDATABLE | FLAG_ENFORCE_REVISIONS | FLAG_RETRACTABLE | FLAG_TRANSFERABLE | FLAG_ANONYMOUS, hex"00");
         assertEq12(blobStore.getContractId(), bytes12(blobId1));
         assertTrue(blobStore.getExists(blobId1));
         assertEq(blobStore.getOwner(blobId1), 0);
@@ -60,12 +61,12 @@ contract BlobStoreTest is Test {
     }
 
     function testThrowsCreateNewRevisionNotUpdatable() {
-        bytes32 blobId = blobStore.create(0, 0, hex"00");
+        bytes32 blobId = blobStore.create(0, hex"00");
         blobStore.createNewRevision(blobId, hex"00");
     }
 
     function testCreateNewRevision() {
-        bytes32 blobId = blobStore.create(0x1, 0, hex"00");
+        bytes32 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
         uint revisionId = blobStore.createNewRevision(blobId, hex"00");
         assertEq(revisionId, 1);
         assertEq(blobStore.getRevisionCount(blobId), 2);

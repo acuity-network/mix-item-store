@@ -8,20 +8,13 @@ pragma solidity ^0.4.2;
  */
 contract AbstractBlobStore {
 
-    byte constant FLAG_UPDATABLE = 0x01;           // True if the blob is updatable. After creation can only be disabled.
-    byte constant FLAG_ENFORCE_REVISIONS = 0x02;   // True if the blob is enforcing revisions. After creation can only be enabled.
-    byte constant FLAG_RETRACTABLE = 0x04;         // True if the blob can be retracted. After creation can only be disabled.
-    byte constant FLAG_TRANSFERABLE = 0x08;        // True if the blob be transfered to another user or disowned. After creation can only be disabled.
-    byte constant FLAG_ANONYMOUS = 0x10;           // True if the blob should not have an owner.
-
     /**
-     * @dev Creates a new blob. It is guaranteed that each user will get a different blobId from the same nonce.
-     * @param flags Packed blob settings.
-     * @param nonce Any value that the user has not used previously to create a blob.
+     * @dev Creates a new blob. It is guaranteed that different users will never receive the same blobId.
+     * @param flagsNonce First 4 bytes packed blob settings. The whole parameter needs to not have been passed previously by this user.
      * @param contents Contents of the blob to be stored.
      * @return blobId Id of the blob.
      */
-    function create(byte flags, bytes32 nonce, bytes contents) external returns (bytes32 blobId);
+    function create(bytes32 flagsNonce, bytes contents) external returns (bytes32 blobId);
 
     /**
      * @dev Create a new blob revision.
@@ -127,14 +120,14 @@ contract AbstractBlobStore {
      * @return revisionCount How many revisions the blob has.
      * @return blockNumbers The block numbers of the revisions.
      */
-    function getInfo(bytes32 blobId) external constant returns (byte flags, address owner, uint revisionCount, uint[] blockNumbers);
+    function getInfo(bytes32 blobId) external constant returns (bytes4 flags, address owner, uint revisionCount, uint[] blockNumbers);
 
     /**
      * @dev Get all a blob's flags.
      * @param blobId Id of the blob.
      * @return flags Packed blob settings.
      */
-    function getFlags(bytes32 blobId) external constant returns (byte flags);
+    function getFlags(bytes32 blobId) external constant returns (bytes4 flags);
 
     /**
      * @dev Determine if a blob is updatable.
