@@ -19,7 +19,7 @@ contract BlobStoreRegistry {
      * @param contractId Id of the contract.
      * @param contractAddress Address of the contract.
      */
-    event logRegistration(bytes12 indexed contractId, address indexed contractAddress);
+    event Register(bytes12 indexed contractId, address indexed contractAddress);
 
     /**
      * @dev Throw if contract is registered.
@@ -51,7 +51,7 @@ contract BlobStoreRegistry {
         // Record the calling contract address.
         contractAddresses[contractId] = msg.sender;
         // Log the registration.
-        logRegistration(contractId, msg.sender);
+        Register(contractId, msg.sender);
     }
 
     /**
