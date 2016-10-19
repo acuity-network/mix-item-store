@@ -106,11 +106,29 @@ contract BlobStoreTest is Test, BlobStoreFlags {
 
     function testRetractLatestRevision() {
         bytes20 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
-        uint revisionId = blobStore.createNewRevision(blobId, hex"00");
-        assertEq(revisionId, 1);
-        assertEq(blobStore.getRevisionCount(blobId), 2);
+        blobStore.createNewRevision(blobId, hex"00");
+        blobStore.createNewRevision(blobId, hex"00");
+        assertEq(blobStore.getRevisionCount(blobId), 3);
         blobStore.retractLatestRevision(blobId);
-        assertEq(blobStore.getRevisionCount(blobId), 1);
+        assertEq(blobStore.getRevisionCount(blobId), 2);
     }
 
+    function testThrowsRestartNotUpdatable() {
+        bytes20 blobId = blobStore.create(0, hex"00");
+        blobStore.restart(blobId, hex"00");
+    }
+
+    function testThrowsRestartEnforceRevisions() {
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE | FLAG_ENFORCE_REVISIONS, hex"00");
+        blobStore.restart(blobId, hex"00");
+    }
+
+    function testRestart() {
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
+        blobStore.createNewRevision(blobId, hex"00");
+        blobStore.createNewRevision(blobId, hex"00");
+        assertEq(blobStore.getRevisionCount(blobId), 3);
+        blobStore.restart(blobId, hex"00");
+        assertEq(blobStore.getRevisionCount(blobId), 1);
+    }
 }
