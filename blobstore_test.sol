@@ -86,4 +86,31 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertEq(blobStore.getRevisionCount(blobId), 1);
     }
 
+    function testThrowsRetractLatestRevisionNotUpdatable() {
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
+        blobStore.createNewRevision(blobId, hex"00");
+        blobStore.setNotUpdatable(blobId);
+        blobStore.retractLatestRevision(blobId);
+    }
+
+    function testThrowsRetractLatestRevisionEnforceRevisions() {
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE | FLAG_ENFORCE_REVISIONS, hex"00");
+        blobStore.createNewRevision(blobId, hex"00");
+        blobStore.retractLatestRevision(blobId);
+    }
+
+    function testThrowsRetractLatestRevisionDoesntHaveAdditionalRevisions() {
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
+        blobStore.retractLatestRevision(blobId);
+    }
+
+    function testRetractLatestRevision() {
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
+        uint revisionId = blobStore.createNewRevision(blobId, hex"00");
+        assertEq(revisionId, 1);
+        assertEq(blobStore.getRevisionCount(blobId), 2);
+        blobStore.retractLatestRevision(blobId);
+        assertEq(blobStore.getRevisionCount(blobId), 1);
+    }
+
 }
