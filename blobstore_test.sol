@@ -70,4 +70,20 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertEq(blobStore.getRevisionCount(blobId), 2);
     }
 
+    function testThrowsUpdateLatestRevisionNotUpdatable() {
+        bytes20 blobId = blobStore.create(0, hex"00");
+        blobStore.updateLatestRevision(blobId, hex"00");
+    }
+
+    function testThrowsUpdateLatestRevisionEnforceRevisions() {
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE | FLAG_ENFORCE_REVISIONS, hex"00");
+        blobStore.updateLatestRevision(blobId, hex"00");
+    }
+
+    function testUpdateLatestRevision() {
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
+        blobStore.updateLatestRevision(blobId, hex"00");
+        assertEq(blobStore.getRevisionCount(blobId), 1);
+    }
+
 }
