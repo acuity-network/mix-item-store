@@ -36,6 +36,12 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         blobStore.create(0, hex"00");
     }
 
+    function testThrowCreateRetracted() {
+        bytes20 blobId = blobStore.create(FLAG_RETRACTABLE, hex"00");
+        blobStore.retract(blobId);
+        blobStore.create(FLAG_RETRACTABLE, hex"00");
+    }
+
     function testCreate() {
         bytes20 blobId0 = blobStore.create(0, hex"00");
         assertTrue(blobStore.getExists(blobId0));
@@ -131,4 +137,28 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         blobStore.restart(blobId, hex"00");
         assertEq(blobStore.getRevisionCount(blobId), 1);
     }
+
+    function testThrowsRetractNotRetractable() {
+        bytes20 blobId = blobStore.create(0, hex"00");
+        blobStore.retract(blobId);
+    }
+
+    function testRetract() {
+        bytes20 blobId = blobStore.create(FLAG_RETRACTABLE, hex"00");
+        blobStore.retract(blobId);
+        assertEq(blobStore.getExists(blobId), false);
+    }
+
+    function testThrowsDisownNotTransferable() {
+        bytes20 blobId = blobStore.create(0, hex"00");
+        blobStore.disown(blobId);
+    }
+
+    function testDisown() {
+        bytes20 blobId = blobStore.create(FLAG_TRANSFERABLE, hex"00");
+        assertEq(blobStore.getOwner(blobId), this);
+        blobStore.disown(blobId);
+        assertEq(blobStore.getOwner(blobId), 0);
+    }
+
 }
