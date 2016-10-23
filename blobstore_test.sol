@@ -161,4 +161,32 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertEq(blobStore.getOwner(blobId), 0);
     }
 
+    function testSetNotUpdatable() {
+        bytes20 blobId = blobStore.create(FLAG_UPDATABLE, hex"00");
+        assertTrue(blobStore.getUpdatable(blobId));
+        blobStore.setNotUpdatable(blobId);
+        assertEq(blobStore.getUpdatable(blobId), false);
+    }
+
+    function testSetEnforceRevisions() {
+        bytes20 blobId = blobStore.create(0, hex"00");
+        assertEq(blobStore.getEnforceRevisions(blobId), false);
+        blobStore.setEnforceRevisions(blobId);
+        assertTrue(blobStore.getEnforceRevisions(blobId));
+    }
+
+    function testSetNotRetractable() {
+        bytes20 blobId = blobStore.create(FLAG_RETRACTABLE, hex"00");
+        assertTrue(blobStore.getRetractable(blobId));
+        blobStore.setNotRetractable(blobId);
+        assertEq(blobStore.getRetractable(blobId), false);
+    }
+
+    function testSetNotTransferable() {
+        bytes20 blobId = blobStore.create(FLAG_TRANSFERABLE, hex"00");
+        assertTrue(blobStore.getTransferable(blobId));
+        blobStore.setNotTransferable(blobId);
+        assertEq(blobStore.getTransferable(blobId), false);
+    }
+
 }
