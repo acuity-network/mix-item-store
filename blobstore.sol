@@ -296,7 +296,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
         if (revisionId % 8 == 1) {
             delete packedBlockNumbers[blobId][revisionId / 8];
         }
-        //  the retraction.
+        // Log the revision retraction.
         RetractRevision(blobId, revisionId);
     }
 
@@ -344,7 +344,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
             blockNumber: uint32(-1),
             owner: 0,
         });
-        //  that the blob has been retracted.
+        // Log the blob retraction.
         Retract(blobId);
     }
 
@@ -376,7 +376,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
         blobInfo[blobId].owner = recipient;
         // Disable this transfer in future and free up the slot.
         enabledTransfers[blobId][recipient] = false;
-        //  the transfer.
+        // Log the transfer.
         Transfer(blobId, recipient);
     }
 
@@ -387,7 +387,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
     function disown(bytes20 blobId) external isOwner(blobId) isTransferable(blobId) {
         // Remove the owner from the blob's state.
         delete blobInfo[blobId].owner;
-        //  as blob as disowned.
+        // Log that the blob has been disowned.
         Disown(blobId);
     }
 
@@ -398,7 +398,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
     function setNotUpdatable(bytes20 blobId) external isOwner(blobId) {
         // Record in state that the blob is not updatable.
         blobInfo[blobId].flags &= ~FLAG_UPDATABLE;
-        //  that the blob is not updatable.
+        // Log that the blob is not updatable.
         SetNotUpdatable(blobId);
     }
 
@@ -409,7 +409,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
     function setEnforceRevisions(bytes20 blobId) external isOwner(blobId) {
         // Record in state that all changes to this blob must be new revisions.
         blobInfo[blobId].flags |= FLAG_ENFORCE_REVISIONS;
-        //  that the blob now forces new revisions.
+        // Log that the blob now forces new revisions.
         SetEnforceRevisions(blobId);
     }
 
@@ -420,7 +420,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
     function setNotRetractable(bytes20 blobId) external isOwner(blobId) {
         // Record in state that the blob is not retractable.
         blobInfo[blobId].flags &= ~FLAG_RETRACTABLE;
-        //  that the blob is not retractable.
+        // Log that the blob is not retractable.
         SetNotRetractable(blobId);
     }
 
@@ -431,7 +431,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
     function setNotTransferable(bytes20 blobId) external isOwner(blobId) {
         // Record in state that the blob is not transferable.
         blobInfo[blobId].flags &= ~FLAG_TRANSFERABLE;
-        //  that the blob is not transferable.
+        // Log that the blob is not transferable.
         SetNotTransferable(blobId);
     }
 
