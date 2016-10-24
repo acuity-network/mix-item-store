@@ -31,17 +31,6 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertEq(blobStoreRegistry.getBlobStore(blobStore.getContractId()), blobStore);
     }
 
-    function testThrowCreateExistingNonce() {
-        blobStore.create(0, hex"00");
-        blobStore.create(0, hex"00");
-    }
-
-    function testThrowCreateRetracted() {
-        bytes20 blobId = blobStore.create(FLAG_RETRACTABLE, hex"00");
-        blobStore.retract(blobId);
-        blobStore.create(FLAG_RETRACTABLE, hex"00");
-    }
-
     function testCreate() {
         bytes20 blobId0 = blobStore.create(0, hex"00");
         assertTrue(blobStore.getExists(blobId0));

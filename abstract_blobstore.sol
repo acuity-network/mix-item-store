@@ -10,11 +10,11 @@ contract AbstractBlobStore {
 
     /**
      * @dev Creates a new blob. It is guaranteed that different users will never receive the same blobId.
-     * @param flagsNonce First 4 bytes packed blob settings. The whole parameter needs to not have been passed previously by this user.
+     * @param flags Packed blob settings.
      * @param contents Contents of the blob to be stored.
      * @return blobId Id of the blob.
      */
-    function create(bytes32 flagsNonce, bytes contents) external returns (bytes20 blobId);
+    function create(bytes4 flags, bytes contents) external returns (bytes20 blobId);
 
     /**
      * @dev Create a new blob revision.

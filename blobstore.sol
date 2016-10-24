@@ -214,23 +214,23 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
 
     /**
      * @dev Creates a new blob. It is guaranteed that different users will never receive the same blobId.
-     * @param flagsNonce First 4 bytes packed blob settings. The whole parameter needs to not have been passed previously by this user.
+     * @param flags Packed blob settings.
      * @param contents Contents of the blob to be stored.
      * @return blobId Id of the blob.
      */
-    function create(bytes32 flagsNonce, bytes contents) external returns (bytes20 blobId) {
-        // Determine the blobId.
-        blobId = bytes20(sha3(msg.sender, flagsNonce));
+    function create(bytes4 flags, bytes contents) external returns (bytes20 blobId) {
+        // Generate the blobId.
+        blobId = bytes20(sha3(msg.sender, block.blockhash(block.number - 1)));
         // Make sure this blobId has not been used before.
-        if (blobInfo[blobId].blockNumber != 0) {
-            throw;
+        while (blobInfo[blobId].blockNumber != 0) {
+            blobId = bytes20(sha3(blobId));
         }
         // Store blob info in state.
         blobInfo[blobId] = BlobInfo({
-            flags: bytes4(flagsNonce),
+            flags: flags,
             revisionCount: 1,
             blockNumber: uint32(block.number),
-            owner: (bytes4(flagsNonce) & FLAG_ANONYMOUS != 0) ? 0 : msg.sender,
+            owner: (flags & FLAG_ANONYMOUS != 0) ? 0 : msg.sender,
         });
         // Store the first revision in a log in the current block.
         Store(blobId, 0, contents);
