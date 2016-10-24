@@ -6,7 +6,7 @@
 BlobStore
 =========
 
-Contents:
+BlobStore is a smart contract for Ethereum blockchains that permanently stores blobs of data.
 
 .. toctree::
    :maxdepth: 2
