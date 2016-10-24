@@ -2,7 +2,20 @@
 	"constant": true,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
+	}],
+	"name": "getFlags",
+	"outputs": [{
+		"name": "flags",
+		"type": "bytes4"
+	}],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
 	}],
 	"name": "getExists",
 	"outputs": [{
@@ -12,79 +25,49 @@
 	"payable": false,
 	"type": "function"
 }, {
-	"constant": true,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "getEnforceRevisions",
-	"outputs": [{
-		"name": "enforceRevisions",
-		"type": "bool"
-	}],
-	"payable": false,
-	"type": "function"
-}, {
 	"constant": false,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "setNotRetractable",
-	"outputs": [],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": false,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
 	"name": "transferEnable",
 	"outputs": [],
 	"payable": false,
 	"type": "function"
 }, {
-	"constant": false,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "retract",
-	"outputs": [],
-	"payable": false,
-	"type": "function"
-}, {
 	"constant": true,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "getFlags",
+	"name": "getAllRevisionBlockNumbers",
 	"outputs": [{
-		"name": "flags",
-		"type": "bytes1"
+		"name": "blockNumbers",
+		"type": "uint256[]"
 	}],
 	"payable": false,
 	"type": "function"
 }, {
 	"constant": false,
 	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
+		"name": "flags",
+		"type": "bytes4"
 	}, {
 		"name": "contents",
 		"type": "bytes"
 	}],
-	"name": "restart",
-	"outputs": [],
+	"name": "create",
+	"outputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
 	"payable": false,
 	"type": "function"
 }, {
 	"constant": true,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
 	"name": "getRetractable",
 	"outputs": [{
@@ -94,13 +77,29 @@
 	"payable": false,
 	"type": "function"
 }, {
-	"constant": false,
+	"constant": true,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "retractLatestRevision",
-	"outputs": [],
+	"name": "getUpdatable",
+	"outputs": [{
+		"name": "updatable",
+		"type": "bool"
+	}],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"name": "getRevisionCount",
+	"outputs": [{
+		"name": "revisionCount",
+		"type": "uint256"
+	}],
 	"payable": false,
 	"type": "function"
 }, {
@@ -114,60 +113,12 @@
 	"payable": false,
 	"type": "function"
 }, {
-	"constant": true,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "getUpdatable",
-	"outputs": [{
-		"name": "updatable",
-		"type": "bool"
-	}],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": false,
-	"inputs": [{
-		"name": "contents",
-		"type": "bytes"
-	}, {
-		"name": "nonce",
-		"type": "bytes32"
-	}, {
-		"name": "flags",
-		"type": "bytes1"
-	}],
-	"name": "create",
-	"outputs": [{
-		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": true,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "getRevisionCount",
-	"outputs": [{
-		"name": "revisionCount",
-		"type": "uint256"
-	}],
-	"payable": false,
-	"type": "function"
-}, {
 	"constant": false,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
-	}, {
-		"name": "recipient",
-		"type": "address"
+		"type": "bytes20"
 	}],
-	"name": "transfer",
+	"name": "transferDisable",
 	"outputs": [],
 	"payable": false,
 	"type": "function"
@@ -175,39 +126,7 @@
 	"constant": true,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "getInfo",
-	"outputs": [{
-		"name": "owner",
-		"type": "address"
-	}, {
-		"name": "revisionCount",
-		"type": "uint256"
-	}, {
-		"name": "blockNumbers",
-		"type": "uint256[]"
-	}, {
-		"name": "flags",
-		"type": "bytes1"
-	}],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": false,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "setNotUpdatable",
-	"outputs": [],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": true,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}, {
 		"name": "revisionId",
 		"type": "uint256"
@@ -223,9 +142,9 @@
 	"constant": false,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "transferDisable",
+	"name": "setEnforceRevisions",
 	"outputs": [],
 	"payable": false,
 	"type": "function"
@@ -233,53 +152,17 @@
 	"constant": false,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "setNotTransferable",
+	"name": "setNotRetractable",
 	"outputs": [],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": true,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "getAllRevisionBlockNumbers",
-	"outputs": [{
-		"name": "blockNumbers",
-		"type": "uint256[]"
-	}],
 	"payable": false,
 	"type": "function"
 }, {
 	"constant": false,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "disown",
-	"outputs": [],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": true,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
-	}],
-	"name": "getOwner",
-	"outputs": [{
-		"name": "owner",
-		"type": "address"
-	}],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": false,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}, {
 		"name": "contents",
 		"type": "bytes"
@@ -289,23 +172,20 @@
 	"payable": false,
 	"type": "function"
 }, {
-	"constant": true,
+	"constant": false,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "getTransferable",
-	"outputs": [{
-		"name": "transferable",
-		"type": "bool"
-	}],
+	"name": "retractLatestRevision",
+	"outputs": [],
 	"payable": false,
 	"type": "function"
 }, {
 	"constant": false,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}, {
 		"name": "contents",
 		"type": "bytes"
@@ -318,13 +198,130 @@
 	"payable": false,
 	"type": "function"
 }, {
+	"constant": true,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"name": "getTransferable",
+	"outputs": [{
+		"name": "transferable",
+		"type": "bool"
+	}],
+	"payable": false,
+	"type": "function"
+}, {
 	"constant": false,
 	"inputs": [{
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
+	}, {
+		"name": "recipient",
+		"type": "address"
 	}],
-	"name": "setEnforceRevisions",
+	"name": "transfer",
 	"outputs": [],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"name": "setNotTransferable",
+	"outputs": [],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"name": "getInfo",
+	"outputs": [{
+		"name": "flags",
+		"type": "bytes4"
+	}, {
+		"name": "owner",
+		"type": "address"
+	}, {
+		"name": "revisionCount",
+		"type": "uint256"
+	}, {
+		"name": "blockNumbers",
+		"type": "uint256[]"
+	}],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"name": "retract",
+	"outputs": [],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"name": "setNotUpdatable",
+	"outputs": [],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"name": "disown",
+	"outputs": [],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"name": "getEnforceRevisions",
+	"outputs": [{
+		"name": "enforceRevisions",
+		"type": "bool"
+	}],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}, {
+		"name": "contents",
+		"type": "bytes"
+	}],
+	"name": "restart",
+	"outputs": [],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"name": "getOwner",
+	"outputs": [{
+		"name": "owner",
+		"type": "address"
+	}],
 	"payable": false,
 	"type": "function"
 }, {
@@ -338,96 +335,96 @@
 	"inputs": [{
 		"indexed": true,
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}, {
 		"indexed": true,
 		"name": "revisionId",
 		"type": "uint256"
 	}, {
 		"indexed": false,
-		"name": "blob",
+		"name": "contents",
 		"type": "bytes"
 	}],
-	"name": "logBlob",
+	"name": "Store",
 	"type": "event"
 }, {
 	"anonymous": false,
 	"inputs": [{
 		"indexed": true,
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}, {
 		"indexed": false,
 		"name": "revisionId",
 		"type": "uint256"
 	}],
-	"name": "logRetractRevision",
+	"name": "RetractRevision",
 	"type": "event"
 }, {
 	"anonymous": false,
 	"inputs": [{
 		"indexed": true,
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "logRetract",
+	"name": "Retract",
 	"type": "event"
 }, {
 	"anonymous": false,
 	"inputs": [{
 		"indexed": true,
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}, {
 		"indexed": false,
 		"name": "recipient",
 		"type": "address"
 	}],
-	"name": "logTransfer",
+	"name": "Transfer",
 	"type": "event"
 }, {
 	"anonymous": false,
 	"inputs": [{
 		"indexed": true,
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "logDisown",
+	"name": "Disown",
 	"type": "event"
 }, {
 	"anonymous": false,
 	"inputs": [{
 		"indexed": true,
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "logSetNotUpdatable",
+	"name": "SetNotUpdatable",
 	"type": "event"
 }, {
 	"anonymous": false,
 	"inputs": [{
 		"indexed": true,
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "logSetEnforceRevisions",
+	"name": "SetEnforceRevisions",
 	"type": "event"
 }, {
 	"anonymous": false,
 	"inputs": [{
 		"indexed": true,
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "logSetNotRetractable",
+	"name": "SetNotRetractable",
 	"type": "event"
 }, {
 	"anonymous": false,
 	"inputs": [{
 		"indexed": true,
 		"name": "blobId",
-		"type": "bytes32"
+		"type": "bytes20"
 	}],
-	"name": "logSetNotTransferable",
+	"name": "SetNotTransferable",
 	"type": "event"
 }]
