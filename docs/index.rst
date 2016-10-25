@@ -58,7 +58,7 @@ It has the following properties:
    BlobStore has a simple library to ease the process of reading and writing blobs.
 
 * Multiple blockchains
-   BlobStore is currently deployed on Ethereum, Ethereum Classic, Expanse, Shift and Link.
+   BlobStore is currently deployed on Ethereum, Ethereum Classic, Expanse and Link.
 
 .. toctree::
    :maxdepth: 2
