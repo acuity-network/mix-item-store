@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.3;
 
 import "abstract_blobstore.sol";
 import "blobstore_flags.sol";
@@ -207,7 +207,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      */
     function BlobStore(BlobStoreRegistry registry) {
         // Create id for this contract.
-        contractId = bytes12(sha3(this, block.blockhash(block.number - 1)));
+        contractId = bytes12(keccak256(this, block.blockhash(block.number - 1)));
         // Register this contract.
         registry.register(contractId);
     }
@@ -220,10 +220,10 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      */
     function create(bytes4 flags, bytes contents) external returns (bytes20 blobId) {
         // Generate the blobId.
-        blobId = bytes20(sha3(msg.sender, block.blockhash(block.number - 1)));
+        blobId = bytes20(keccak256(msg.sender, block.blockhash(block.number - 1)));
         // Make sure this blobId has not been used before.
         while (blobInfo[blobId].blockNumber != 0) {
-            blobId = bytes20(sha3(blobId));
+            blobId = bytes20(keccak256(blobId));
         }
         // Store blob info in state.
         blobInfo[blobId] = BlobInfo({

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.3;
 
 import "dapple/test.sol";
 import "blobstore.sol";
