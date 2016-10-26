@@ -213,7 +213,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
     }
 
     /**
-     * @dev Creates a new blob. It is guaranteed that different users will never receive the same blobId.
+     * @dev Creates a new blob. It is guaranteed that different users will never receive the same blobId, even before consensus has been reached. This prevents blobId sniping. Consider createWithNonce() if not calling from another contract.
      * @param flags Packed blob settings.
      * @param contents Contents of the blob to be stored.
      * @return blobId Id of the blob.
@@ -221,7 +221,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
     function create(bytes4 flags, bytes contents) external returns (bytes20 blobId) {
         // Generate the blobId.
         blobId = bytes20(keccak256(msg.sender, block.blockhash(block.number - 1)));
-        // Make sure this blobId has not been used before.
+        // Make sure this blobId has not been used before (could be in the same block).
         while (blobInfo[blobId].blockNumber != 0) {
             blobId = bytes20(keccak256(blobId));
         }
@@ -231,6 +231,30 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
             revisionCount: 1,
             blockNumber: uint32(block.number),
             owner: (flags & FLAG_ANONYMOUS != 0) ? 0 : msg.sender,
+        });
+        // Store the first revision in a log in the current block.
+        Store(blobId, 0, contents);
+    }
+
+    /**
+     * @dev Creates a new blob using provided nonce. It is guaranteed that different users will never receive the same blobId, even before consensus has been reached. This prevents blobId sniping. This method is cheaper than create(), especially if multiple blobs from the same account end up in the same block. However, it is not suitable for calling from other contracts because it will throw if a unique nonce is not provided.
+     * @param flagsNonce First 4 bytes: Packed blob settings. The parameter as a whole must never have been passed to this function from the same account, or it will throw.
+     * @param contents Contents of the blob to be stored.
+     * @return blobId Id of the blob.
+     */
+    function createWithNonce(bytes32 flagsNonce, bytes contents) external returns (bytes20 blobId) {
+        // Generate the blobId.
+        blobId = bytes20(keccak256(msg.sender, flagsNonce));
+        // Make sure this blobId has not been used before.
+        if (blobInfo[blobId].blockNumber != 0) {
+            throw;
+        }
+        // Store blob info in state.
+        blobInfo[blobId] = BlobInfo({
+            flags: bytes4(flagsNonce),
+            revisionCount: 1,
+            blockNumber: uint32(block.number),
+            owner: (bytes4(flagsNonce) & FLAG_ANONYMOUS != 0) ? 0 : msg.sender,
         });
         // Store the first revision in a log in the current block.
         Store(blobId, 0, contents);

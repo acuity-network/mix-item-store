@@ -9,12 +9,20 @@ pragma solidity ^0.4.3;
 contract AbstractBlobStore {
 
     /**
-     * @dev Creates a new blob. It is guaranteed that different users will never receive the same blobId.
+     * @dev Creates a new blob. It is guaranteed that different users will never receive the same blobId, even before consensus has been reached. This prevents blobId sniping. Consider createWithNonce() if not calling from another contract.
      * @param flags Packed blob settings.
      * @param contents Contents of the blob to be stored.
      * @return blobId Id of the blob.
      */
     function create(bytes4 flags, bytes contents) external returns (bytes20 blobId);
+
+    /**
+     * @dev Creates a new blob using provided nonce. It is guaranteed that different users will never receive the same blobId, even before consensus has been reached. This prevents blobId sniping. This method is cheaper than create(), especially if multiple blobs from the same account end up in the same block. However, it is not suitable for calling from other contracts because it will throw if a unique nonce is not provided.
+     * @param flagsNonce First 4 bytes: Packed blob settings. The parameter as a whole must never have been passed to this function from the same account, or it will throw.
+     * @param contents Contents of the blob to be stored.
+     * @return blobId Id of the blob.
+     */
+    function createWithNonce(bytes32 flagsNonce, bytes contents) external returns (bytes20 blobId);
 
     /**
      * @dev Create a new blob revision.
