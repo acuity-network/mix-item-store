@@ -32,6 +32,6 @@
 		"name": "contractAddress",
 		"type": "address"
 	}],
-	"name": "logRegistration",
+	"name": "Register",
 	"type": "event"
 }]

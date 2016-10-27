@@ -123,6 +123,22 @@
 	"payable": false,
 	"type": "function"
 }, {
+	"constant": false,
+	"inputs": [{
+		"name": "flagsNonce",
+		"type": "bytes32"
+	}, {
+		"name": "contents",
+		"type": "bytes"
+	}],
+	"name": "createWithNonce",
+	"outputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}],
+	"payable": false,
+	"type": "function"
+}, {
 	"constant": true,
 	"inputs": [{
 		"name": "blobId",
