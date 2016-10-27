@@ -23,7 +23,7 @@ It has the following properties:
    BlobStore has a rudimentary revisioning system built-in where a blob can have multiple revisions, e.g. for editing posts. More sophisticated revisioning systems can be built on top of BlobStore where each blob is a revision.
 
 * Low latency
-   Searching Ethereum logs is not normally instantaneous becuase they are not fully indexed like state entries. However, BlobStore stores in state the block number that each log is stored in. This allows for instantaneous retrival.
+   Searching Ethereum logs is not normally instantaneous because they are not fully indexed like state entries. However, BlobStore stores in state the block number that each log is stored in. This allows for instantaneous retrival.
    
    Geth does not currently support reading logs from unconfirmed transactions, so may not be suitable at the moment for many use cases. However, Parity does have this feature. This is why Parity is the recommended client when using BlobStore.
 
