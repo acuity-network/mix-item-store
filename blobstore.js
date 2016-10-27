@@ -16,13 +16,13 @@ else {
 
 var blobStoreAbi = require('./blobstore.abi.json');
 var blobStoreContract = web3.eth.contract(blobStoreAbi);
-var blobStoreAddress = '0xd0ba092adb5c791cbdf204203c65dfbe809d2eb1';
+var blobStoreAddress = '0x3f40845b2c436bd2d367fc4a50638981dec61b0b';
 var blobStore = blobStoreContract.at(blobStoreAddress);
 
 // solc version: 0.4.2+commit.af6afb04.Linux.g++
 
 var createAssisted = function(contents, flags, callback) {
-  // Combine the flags into a byte.
+  // Combine the flags into 4 bytes.
   var flagsBinary = 0;
   if (flags.updatable) {
     flagsBinary |= 0x01;
@@ -39,31 +39,38 @@ var createAssisted = function(contents, flags, callback) {
   if (flags.anonymous) {
     flagsBinary |= 0x10;
   }
-  var flagsBuf = new Buffer(1);
-  flagsBuf.writeUInt8(flagsBinary, 0);
+  var flagsBuf = new Buffer(4);
+  flagsBuf.writeUInt8(flagsBinary, 3);
+
   // Keep hashing until we find a unique blobId.
   var nonce = web3.sha3(contents.toString('hex'), {encoding: 'hex'});
+  var flagsNonce = "0x" + flagsBuf.toString('hex') + nonce.substr(2, 56);
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.create.getData('0x' + contents.toString('hex'), nonce, "0x" + flagsBuf.toString('hex'))
+    data: blobStore.createWithNonce.getData(flagsNonce, '0x' + contents.toString('hex'))
   }
   var blobId = web3.eth.call(tx, 'pending');
   while (blobId == "0x") {
     nonce = web3.sha3(nonce);
+    flagsNonce = "0x" + flagsBuf.toString('hex') + nonce.substr(2, 56);
     // Create transaction object.
     tx = {
       to: blobStoreAddress,
-      data: blobStore.create.getData("0x" + contents.toString('hex'), nonce, "0x" + flagsBuf.toString('hex'))
+      data: blobStore.createWithNonce.getData(flagsNonce, '0x' + contents.toString('hex'))
     }
     blobId = web3.eth.call(tx, 'pending');
   }
+  // Remove the padding from blobId.
+  blobId = blobId.substr(0, 42);
   // Calculate maximum transaction gas.
   web3.eth.estimateGas(tx, 'pending', function(error, gas) {
     if (error) { callback(error); return; }
     tx.gas = gas;
+    tx.gasPrice = 20000000000;
     // Broadcast the transaction.
     web3.eth.sendTransaction(tx, function(error, result) {
+      console.log(result);
       if (error) { callback(error); return; }
       callback(null, blobId);
     });
@@ -127,7 +134,7 @@ var getContents = function(blobId, revisionId, callback) {
     revisionIdBuf.fill(0);
     revisionIdBuf.writeUInt32BE(revisionId, 28);
     // Search the logs.
-    web3.eth.filter({fromBlock: fromBlock, toBlock: toBlock, address: blobStoreAddress, topics: ["0x1b3165ae125b4fcd8ba9516c3c62690139492d91cc45b85e07613b95d47ce863", blobId, "0x" + revisionIdBuf.toString('hex')]}).get(function(error, result) {
+    web3.eth.filter({fromBlock: fromBlock, toBlock: toBlock, address: blobStoreAddress, topics: ["0xfd5eeef8919c5473de9558a49bf3a5b19bcf59ec0d36e420586d7c3bbaf17d01", blobId + "000000000000000000000000", "0x" + revisionIdBuf.toString('hex')]}).get(function(error, result) {
       if (error) { callback(error); return; }
       for (var i = 0; i < result.length; i++) {
         var length = parseInt(result[i].data.substr(66, 64), 16);
@@ -144,14 +151,22 @@ module.exports.updateLatestRevisionAssisted = updateLatestRevisionAssisted;
 module.exports.getContents = getContents;
 
 
+
+var contents = new Buffer("Hello Parity this is an updatable blob2.");
+
+
+
 /*
-var contents = new Buffer("Hello Parity this is an updatable blob.");
-var blobId = createAssisted(contents, {updatable: true}, function(error, result) {
+var blobId = createAssisted(contents, {updatable: true}, function(error, blobId) {
   if (error) {
     console.log(error);
     return;
   }
-  getContents(result, 0, function(error, result) {
+  
+  console.log(blobId);
+  
+
+  getContents(blobId, 0, function(error, result) {
     if (error) {
       console.log(error.toString());
     }
@@ -161,12 +176,10 @@ var blobId = createAssisted(contents, {updatable: true}, function(error, result)
   });
 });
 
-
-console.log(blobId);
 */
 
 
-var blobId = "0x2b63df6cf0f80cbad2af59c9ff02bf6c52957a18c6d26ff0e2455a98cf7f4c3c";
+var blobId = "0x3ac0a6b049e311a71ed8448c5a7627affa4b339d";
 
 
 getContents(blobId, 1, function(error, result) {
@@ -181,7 +194,9 @@ getContents(blobId, 1, function(error, result) {
 
 
 
-blobStore.getInfo(blobId, 'pending', function(error, result){
+
+
+blobStore.getRevisionCount(blobId, 'pending', function(error, result){
   if (error) {
     console.log(error.toString());
   }
@@ -201,6 +216,6 @@ blobStore.createNewRevisionAssisted(blobId, contents, function(error, result) {
   }
 });
 
+
+
 */
-
-
