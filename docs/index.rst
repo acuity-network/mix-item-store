@@ -63,6 +63,7 @@ It has the following properties:
 .. toctree::
    :maxdepth: 2
 
+   blobid.rst
 
 
 Indices and tables
