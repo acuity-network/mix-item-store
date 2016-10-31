@@ -8,6 +8,8 @@ BlobStore
 
 BlobStore is a smart contract for Ethereum blockchains that permanently stores blobs of data.
 
+`Source code <https://github.com/link-blockchain/blobstore>`_
+
 It has the following properties:
 
 * Immutable
