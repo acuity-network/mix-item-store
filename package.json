@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bluedroplet/blobstore-ethereum.git"
+    "url": "git+https://github.com/link-blockchain/blobstore"
   },
   "keywords": [
     "ethereum",
@@ -21,9 +21,9 @@
   "author": "Jonathan Brown <jbrown@bluedroplet.com>",
   "license": "Unlicense",
   "bugs": {
-    "url": "https://github.com/bluedroplet/blobstore-ethereum/issues"
+    "url": "https://github.com/link-blockchain/blobstore/issues"
   },
-  "homepage": "https://github.com/bluedroplet/blobstore-ethereum#readme",
+  "homepage": "http://docs.link-blockchain.org/projects/blobstore/en/latest/index.html",
   "directories": {
     "doc": "docs"
   }
