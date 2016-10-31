@@ -10,18 +10,32 @@ if (typeof web3 !== 'undefined') {
   web3.eth.defaultAccount = defaultAccount;
 }
 else {
-  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8645"));
-  web3.eth.defaultAccount = '0x9a2b39c4512177403650227863b8768e378bc7b1';
+  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+  web3.eth.defaultAccount = web3.eth.accounts[0];
 }
 
 var blobStoreAbi = require('./blobstore.abi.json');
 var blobStoreContract = web3.eth.contract(blobStoreAbi);
-var blobStoreAddress = '0x3f40845b2c436bd2d367fc4a50638981dec61b0b';
+var blobStoreAddress = '0x8a69A63fcA907939e5C7d92A260D8875C8700383';
 var blobStore = blobStoreContract.at(blobStoreAddress);
+
+module.exports.contract = blobStore;
 
 // solc version: 0.4.2+commit.af6afb04.Linux.g++
 
-var createAssisted = function(contents, flags, callback) {
+function sendTransaction(tx, callback) {
+  web3.eth.estimateGas(tx, 'pending', function(error, gas) {
+    if (error) { callback(error); return; }
+    tx.gas = gas;
+    // Broadcast the transaction.
+    web3.eth.sendTransaction(tx, function(error, result) {
+      if (error) { callback(error); return; }
+      callback(null, result);
+    });
+  });
+}
+
+module.exports.create = function(contents, flags, callback) {
   // Combine the flags into 4 bytes.
   var flagsBinary = 0;
   if (flags.updatable) {
@@ -61,60 +75,155 @@ var createAssisted = function(contents, flags, callback) {
     }
     blobId = web3.eth.call(tx, 'pending');
   }
+  sendTransaction(tx, callback);
   // Remove the padding from blobId.
-  blobId = blobId.substr(0, 42);
-  // Calculate maximum transaction gas.
-  web3.eth.estimateGas(tx, 'pending', function(error, gas) {
-    if (error) { callback(error); return; }
-    tx.gas = gas;
-    tx.gasPrice = 20000000000;
-    // Broadcast the transaction.
-    web3.eth.sendTransaction(tx, function(error, result) {
-      console.log(result);
-      if (error) { callback(error); return; }
-      callback(null, blobId);
-    });
-  });
-  return blobId;
+  return blobId.substr(0, 42);
 }
 
-var createNewRevisionAssisted = function(blobId, blob, callback) {
-  // Create transaction object.
+module.exports.createNewRevision = function(blobId, blob, callback) {
+  // Create the transaction.
   var tx = {
     to: blobStoreAddress,
     data: blobStore.createNewRevision.getData(blobId, '0x' + contents.toString('hex'))
   }
-  // Calculate maximum transaction gas.
-  web3.eth.estimateGas(tx, 'pending', function(error, gas) {
-    if (error) { callback(error); return; }
-    tx.gas = gas;
-    // Broadcast the transaction.
-    web3.eth.sendTransaction(tx, function(error, result) {
-      if (error) { callback(error); return; }
-      callback(null, blobId);
-    });
-  });
+  // Send it.
+  sendTransaction(tx, callback);
 }
 
-var updateLatestRevisionAssisted = function(blobId, blob, callback) {
+module.exports.updateLatestRevision = function(blobId, blob, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
     data: blobStore.updateLatestRevision.getData(blobId, '0x' + contents.toString('hex'))
   }
-  // Calculate maximum transaction gas.
-  web3.eth.estimateGas(tx, 'pending', function(error, gas) {
-    if (error) { callback(error); return; }
-    tx.gas = gas;
-    // Broadcast the transaction.
-    web3.eth.sendTransaction(tx, function(error, result) {
-      if (error) { callback(error); return; }
-      callback(null, blobId);
-    });
-  });
+  // Create the transaction.
+  sendTransaction(tx, callback);
 }
 
-var getContents = function(blobId, revisionId, callback) {
+module.exports.retractLatestRevision = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.retractLatestRevision.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.restart = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.restart.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.retract = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.retract.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.transferEnable = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.transferEnable.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.transferDisable = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.transferDisable.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.transfer = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.transfer.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.disown = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.disown.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.setNotUpdatable = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.setNotUpdatable.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.setEnforceRevisions = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.setEnforceRevisions.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.setNotRetractable = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.setNotRetractable.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.setNotTransferable = function(blobId, callback) {
+  // Create transaction object.
+  var tx = {
+    to: blobStoreAddress,
+    data: blobStore.setNotTransferable.getData(blobId, '0x' + contents.toString('hex'))
+  }
+  // Create the transaction.
+  sendTransaction(tx, callback);
+}
+
+module.exports.getContractId = module.exports.contract.getContractId;
+module.exports.getExists = module.exports.contract.getExists;
+module.exports.getInfo = module.exports.contract.getInfo;
+module.exports.getFlags = module.exports.contract.getFlags;
+module.exports.getUpdatable = module.exports.contract.getUpdatable;
+module.exports.getEnforceRevisions = module.exports.contract.getEnforceRevisions;
+module.exports.getRetractable = module.exports.contract.getRetractable;
+module.exports.getTransferable = module.exports.contract.getTransferable;
+module.exports.getOwner = module.exports.contract.getOwner;
+module.exports.getRevisionCount = module.exports.contract.getRevisionCount;
+module.exports.getRevisionBlockNumber = module.exports.contract.getRevisionBlockNumber;
+module.exports.getAllRevisionBlockNumbers = module.exports.contract.getAllRevisionBlockNumbers;
+
+module.exports.getContents = function(blobId, revisionId, callback) {
   // Get the block number.
   blobStore.getRevisionBlockNumber(blobId, revisionId, 'pending', function(error, blockNumber) {
     if (error) { callback(error); return; }
@@ -143,79 +252,3 @@ var getContents = function(blobId, revisionId, callback) {
     });
   });
 }
-
-module.exports = blobStore;
-module.exports.createAssisted = createAssisted;
-module.exports.createNewRevisionAssisted = createNewRevisionAssisted;
-module.exports.updateLatestRevisionAssisted = updateLatestRevisionAssisted;
-module.exports.getContents = getContents;
-
-
-
-var contents = new Buffer("Hello Parity this is an updatable blob2.");
-
-
-
-/*
-var blobId = createAssisted(contents, {updatable: true}, function(error, blobId) {
-  if (error) {
-    console.log(error);
-    return;
-  }
-  
-  console.log(blobId);
-  
-
-  getContents(blobId, 0, function(error, result) {
-    if (error) {
-      console.log(error.toString());
-    }
-    else {
-      console.log(result.toString());
-    }
-  });
-});
-
-*/
-
-
-var blobId = "0x3ac0a6b049e311a71ed8448c5a7627affa4b339d";
-
-
-getContents(blobId, 1, function(error, result) {
-  if (error) {
-    console.log(error.toString());
-  }
-  else {
-    console.log(result.toString());
-  }
-});
-
-
-
-
-
-
-blobStore.getRevisionCount(blobId, 'pending', function(error, result){
-  if (error) {
-    console.log(error.toString());
-  }
-  else {
-    console.log(result.toString());
-  }
-});
-
-/*
-var contents = new Buffer("This blob has a new revision.");
-blobStore.createNewRevisionAssisted(blobId, contents, function(error, result) {
-  if (error) {
-    console.log(error.toString());
-  }
-  else {
-    console.log(result.toString());
-  }
-});
-
-
-
-*/
