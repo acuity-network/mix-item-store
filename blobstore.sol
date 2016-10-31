@@ -127,7 +127,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      * @param blobId Id of the blob.
      */
     modifier isUpdatable(bytes20 blobId) {
-        if (blobInfo[blobId].flags & FLAG_UPDATABLE == 0) {
+        if (blobInfo[blobId].flags & UPDATABLE == 0) {
             throw;
         }
         _;
@@ -138,7 +138,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      * @param blobId Id of the blob.
      */
     modifier isNotEnforceRevisions(bytes20 blobId) {
-        if (blobInfo[blobId].flags & FLAG_ENFORCE_REVISIONS != 0) {
+        if (blobInfo[blobId].flags & ENFORCE_REVISIONS != 0) {
             throw;
         }
         _;
@@ -149,7 +149,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      * @param blobId Id of the blob.
      */
     modifier isRetractable(bytes20 blobId) {
-        if (blobInfo[blobId].flags & FLAG_RETRACTABLE == 0) {
+        if (blobInfo[blobId].flags & RETRACTABLE == 0) {
             throw;
         }
         _;
@@ -160,7 +160,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      * @param blobId Id of the blob.
      */
     modifier isTransferable(bytes20 blobId) {
-        if (blobInfo[blobId].flags & FLAG_TRANSFERABLE == 0) {
+        if (blobInfo[blobId].flags & TRANSFERABLE == 0) {
             throw;
         }
         _;
@@ -230,7 +230,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
             flags: flags,
             revisionCount: 1,
             blockNumber: uint32(block.number),
-            owner: (flags & FLAG_ANONYMOUS != 0) ? 0 : msg.sender,
+            owner: (flags & ANONYMOUS != 0) ? 0 : msg.sender,
         });
         // Store the first revision in a log in the current block.
         Store(blobId, 0, contents);
@@ -254,7 +254,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
             flags: bytes4(flagsNonce),
             revisionCount: 1,
             blockNumber: uint32(block.number),
-            owner: (bytes4(flagsNonce) & FLAG_ANONYMOUS != 0) ? 0 : msg.sender,
+            owner: (bytes4(flagsNonce) & ANONYMOUS != 0) ? 0 : msg.sender,
         });
         // Store the first revision in a log in the current block.
         Store(blobId, 0, contents);
@@ -421,7 +421,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      */
     function setNotUpdatable(bytes20 blobId) external isOwner(blobId) {
         // Record in state that the blob is not updatable.
-        blobInfo[blobId].flags &= ~FLAG_UPDATABLE;
+        blobInfo[blobId].flags &= ~UPDATABLE;
         // Log that the blob is not updatable.
         SetNotUpdatable(blobId);
     }
@@ -432,7 +432,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      */
     function setEnforceRevisions(bytes20 blobId) external isOwner(blobId) {
         // Record in state that all changes to this blob must be new revisions.
-        blobInfo[blobId].flags |= FLAG_ENFORCE_REVISIONS;
+        blobInfo[blobId].flags |= ENFORCE_REVISIONS;
         // Log that the blob now forces new revisions.
         SetEnforceRevisions(blobId);
     }
@@ -443,7 +443,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      */
     function setNotRetractable(bytes20 blobId) external isOwner(blobId) {
         // Record in state that the blob is not retractable.
-        blobInfo[blobId].flags &= ~FLAG_RETRACTABLE;
+        blobInfo[blobId].flags &= ~RETRACTABLE;
         // Log that the blob is not retractable.
         SetNotRetractable(blobId);
     }
@@ -454,7 +454,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      */
     function setNotTransferable(bytes20 blobId) external isOwner(blobId) {
         // Record in state that the blob is not transferable.
-        blobInfo[blobId].flags &= ~FLAG_TRANSFERABLE;
+        blobInfo[blobId].flags &= ~TRANSFERABLE;
         // Log that the blob is not transferable.
         SetNotTransferable(blobId);
     }
@@ -537,7 +537,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      * @return updatable True if the blob is updatable.
      */
     function getUpdatable(bytes20 blobId) external constant exists(blobId) returns (bool updatable) {
-        updatable = blobInfo[blobId].flags & FLAG_UPDATABLE != 0;
+        updatable = blobInfo[blobId].flags & UPDATABLE != 0;
     }
 
     /**
@@ -546,7 +546,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      * @return enforceRevisions True if the blob enforces revisions.
      */
     function getEnforceRevisions(bytes20 blobId) external constant exists(blobId) returns (bool enforceRevisions) {
-        enforceRevisions = blobInfo[blobId].flags & FLAG_ENFORCE_REVISIONS != 0;
+        enforceRevisions = blobInfo[blobId].flags & ENFORCE_REVISIONS != 0;
     }
 
     /**
@@ -555,7 +555,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      * @return retractable True if the blob is blob retractable.
      */
     function getRetractable(bytes20 blobId) external constant exists(blobId) returns (bool retractable) {
-        retractable = blobInfo[blobId].flags & FLAG_RETRACTABLE != 0;
+        retractable = blobInfo[blobId].flags & RETRACTABLE != 0;
     }
 
     /**
@@ -564,7 +564,7 @@ contract BlobStore is AbstractBlobStore, BlobStoreFlags {
      * @return transferable True if the blob is transferable.
      */
     function getTransferable(bytes20 blobId) external constant exists(blobId) returns (bool transferable) {
-        transferable = blobInfo[blobId].flags & FLAG_TRANSFERABLE != 0;
+        transferable = blobInfo[blobId].flags & TRANSFERABLE != 0;
     }
 
     /**
