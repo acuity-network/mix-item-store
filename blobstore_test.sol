@@ -14,10 +14,12 @@ contract BlobStoreTest is Test, BlobStoreFlags {
 
     BlobStoreRegistry blobStoreRegistry;
     BlobStore blobStore;
+    BlobStoreProxy blobStoreProxy;
 
     function setUp() {
         blobStoreRegistry = new BlobStoreRegistry();
         blobStore = new BlobStore(blobStoreRegistry);
+        blobStoreProxy = new BlobStoreProxy(blobStore);
     }
 
     function testThrowRegisterContractAgain() {
@@ -69,7 +71,18 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertFalse(blobStore.getRetractable(blobId0));
         assertFalse(blobStore.getTransferable(blobId0));
 
-        bytes20 blobId1 = blobStore.createWithNonce(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, hex"00");
+        bytes20 blobId1 = blobStoreProxy.createWithNonce(0, hex"00");
+
+        assertTrue(blobStore.getExists(blobId1));
+        assertEq(blobStore.getOwner(blobId1), blobStoreProxy);
+        assertEq(blobStore.getRevisionCount(blobId1), 1);
+        assertFalse(blobStore.getUpdatable(blobId1));
+        assertFalse(blobStore.getEnforceRevisions(blobId1));
+        assertFalse(blobStore.getRetractable(blobId1));
+        assertFalse(blobStore.getTransferable(blobId1));
+        assertFalse(blobId0 == blobId1);
+
+        blobId1 = blobStore.createWithNonce(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, hex"00");
         assertTrue(blobStore.getExists(blobId1));
         assertEq(blobStore.getOwner(blobId1), 0);
         assertEq(blobStore.getRevisionCount(blobId1), 1);
@@ -77,7 +90,6 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertTrue(blobStore.getEnforceRevisions(blobId1));
         assertTrue(blobStore.getRetractable(blobId1));
         assertTrue(blobStore.getTransferable(blobId1));
-
         assertFalse(blobId0 == blobId1);
     }
 
@@ -85,6 +97,11 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         bytes20 blobId = blobStore.createWithNonce(RETRACTABLE, hex"00");
         blobStore.retract(blobId);
         blobStore.createWithNonce(RETRACTABLE, hex"00");
+    }
+
+    function testThrowsCreateNewRevisionNotOwner() {
+        bytes20 blobId = blobStore.create(UPDATABLE, hex"00");
+        blobStoreProxy.createNewRevision(blobId, hex"00");
     }
 
     function testThrowsCreateNewRevisionNotUpdatable() {
@@ -97,6 +114,11 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         uint revisionId = blobStore.createNewRevision(blobId, hex"00");
         assertEq(revisionId, 1);
         assertEq(blobStore.getRevisionCount(blobId), 2);
+    }
+
+    function testThrowsUpdateLatestRevisionNotOwner() {
+        bytes20 blobId = blobStore.create(UPDATABLE, hex"00");
+        blobStoreProxy.updateLatestRevision(blobId, hex"00");
     }
 
     function testThrowsUpdateLatestRevisionNotUpdatable() {
@@ -113,6 +135,12 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         bytes20 blobId = blobStore.create(UPDATABLE, hex"00");
         blobStore.updateLatestRevision(blobId, hex"00");
         assertEq(blobStore.getRevisionCount(blobId), 1);
+    }
+
+    function testThrowsRetractLatestRevisionNotOwner() {
+        bytes20 blobId = blobStore.create(UPDATABLE, hex"00");
+        blobStore.createNewRevision(blobId, hex"00");
+        blobStoreProxy.retractLatestRevision(blobId);
     }
 
     function testThrowsRetractLatestRevisionNotUpdatable() {
@@ -142,6 +170,11 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertEq(blobStore.getRevisionCount(blobId), 2);
     }
 
+    function testThrowsRestartNotOwner() {
+        bytes20 blobId = blobStore.create(UPDATABLE, hex"00");
+        blobStoreProxy.restart(blobId, hex"00");
+    }
+
     function testThrowsRestartNotUpdatable() {
         bytes20 blobId = blobStore.create(0, hex"00");
         blobStore.restart(blobId, hex"00");
@@ -161,6 +194,11 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertEq(blobStore.getRevisionCount(blobId), 1);
     }
 
+    function testThrowsRetractNotOwner() {
+        bytes20 blobId = blobStore.create(RETRACTABLE, hex"00");
+        blobStoreProxy.retract(blobId);
+    }
+
     function testThrowsRetractNotRetractable() {
         bytes20 blobId = blobStore.create(0, hex"00");
         blobStore.retract(blobId);
@@ -170,6 +208,11 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         bytes20 blobId = blobStore.create(RETRACTABLE, hex"00");
         blobStore.retract(blobId);
         assertEq(blobStore.getExists(blobId), false);
+    }
+
+    function testThrowsDisownNotOwner() {
+        bytes20 blobId = blobStore.create(TRANSFERABLE, hex"00");
+        blobStoreProxy.disown(blobId);
     }
 
     function testThrowsDisownNotTransferable() {
@@ -184,11 +227,21 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertEq(blobStore.getOwner(blobId), 0);
     }
 
+    function testThrowsSetNotUpdatableNotOwner() {
+        bytes20 blobId = blobStore.create(UPDATABLE, hex"00");
+        blobStoreProxy.setNotUpdatable(blobId);
+    }
+
     function testSetNotUpdatable() {
         bytes20 blobId = blobStore.create(UPDATABLE, hex"00");
         assertTrue(blobStore.getUpdatable(blobId));
         blobStore.setNotUpdatable(blobId);
         assertEq(blobStore.getUpdatable(blobId), false);
+    }
+
+    function testThrowsSetEnforceRevisionsNotOwner() {
+        bytes20 blobId = blobStore.create(0, hex"00");
+        blobStoreProxy.setEnforceRevisions(blobId);
     }
 
     function testSetEnforceRevisions() {
@@ -198,11 +251,21 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertTrue(blobStore.getEnforceRevisions(blobId));
     }
 
+    function testThrowsSetNotRetractableNotOwner() {
+        bytes20 blobId = blobStore.create(RETRACTABLE, hex"00");
+        blobStoreProxy.setNotRetractable(blobId);
+    }
+
     function testSetNotRetractable() {
         bytes20 blobId = blobStore.create(RETRACTABLE, hex"00");
         assertTrue(blobStore.getRetractable(blobId));
         blobStore.setNotRetractable(blobId);
         assertEq(blobStore.getRetractable(blobId), false);
+    }
+
+    function testThrowsSetNotTransferableNotOwner() {
+        bytes20 blobId = blobStore.create(TRANSFERABLE, hex"00");
+        blobStoreProxy.setNotTransferable(blobId);
     }
 
     function testSetNotTransferable() {
