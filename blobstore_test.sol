@@ -3,6 +3,7 @@ pragma solidity ^0.4.4;
 import "dapple/test.sol";
 import "./blobstore.sol";
 import "./blobstore_flags.sol";
+import "./blobstore_proxy.sol";
 
 
 /**
