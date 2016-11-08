@@ -1,8 +1,8 @@
 pragma solidity ^0.4.4;
 
-import "abstract_blobstore.sol";
-import "blobstore_flags.sol";
-import "blobstore_registry.sol";
+import "./abstract_blobstore.sol";
+import "./blobstore_flags.sol";
+import "./blobstore_registry.sol";
 
 
 /**

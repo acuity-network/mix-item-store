@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 
-import "abstract_blobstore.sol";
+import "./abstract_blobstore.sol";
 
 
 /**
