@@ -210,6 +210,42 @@ contract BlobStoreTest is Test, BlobStoreFlags {
         assertEq(blobStore.getExists(blobId), false);
     }
 
+    function testThrowsTransferEnableNotTransferable() {
+        bytes20 blobId = blobStore.create(0, hex"00");
+        blobStoreProxy.transferEnable(blobId);
+    }
+
+    function testThrowsTransferDisableNotEnabled() {
+        bytes20 blobId = blobStore.create(TRANSFERABLE, hex"00");
+        blobStoreProxy.transferDisable(blobId);
+    }
+
+    function testThrowsTransferNotTransferable() {
+        bytes20 blobId = blobStore.create(0, hex"00");
+        blobStoreProxy.transferEnable(blobId);
+        blobStore.transfer(blobId, blobStoreProxy);
+    }
+
+    function testThrowsTransferNotEnabled() {
+        bytes20 blobId = blobStore.create(TRANSFERABLE, hex"00");
+        blobStore.transfer(blobId, blobStoreProxy);
+    }
+
+    function testThrowsTransferDisabled() {
+        bytes20 blobId = blobStore.create(TRANSFERABLE, hex"00");
+        blobStoreProxy.transferEnable(blobId);
+        blobStoreProxy.transferDisable(blobId);
+        blobStore.transfer(blobId, blobStoreProxy);
+        assertEq(blobStore.getOwner(blobId), blobStoreProxy);
+    }
+
+    function testTransfer() {
+        bytes20 blobId = blobStore.create(TRANSFERABLE, hex"00");
+        blobStoreProxy.transferEnable(blobId);
+        blobStore.transfer(blobId, blobStoreProxy);
+        assertEq(blobStore.getOwner(blobId), blobStoreProxy);
+    }
+
     function testThrowsDisownNotOwner() {
         bytes20 blobId = blobStore.create(TRANSFERABLE, hex"00");
         blobStoreProxy.disown(blobId);
