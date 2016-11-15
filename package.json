@@ -1,7 +1,7 @@
 {
   "name": "blobstore-ethereum",
-  "version": "0.1.0",
-  "description": "Stores arbitrary-sized blobs of data in Ethereum's transaction log.",
+  "version": "0.1.1",
+  "description": "Stores arbitrary-sized blobs of data in Ethereum transaction logs.",
   "main": "blobstore.js",
   "dependencies": {
     "web3": "^0.16.0"
@@ -23,7 +23,7 @@
   "bugs": {
     "url": "https://github.com/link-blockchain/blobstore/issues"
   },
-  "homepage": "http://docs.link-blockchain.org/projects/blobstore/en/latest/index.html",
+  "homepage": "http://docs.link-blockchain.org/projects/blobstore",
   "directories": {
     "doc": "docs"
   }
