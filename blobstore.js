@@ -16,12 +16,10 @@ else {
 
 var blobStoreAbi = require('./blobstore.abi.json');
 var blobStoreContract = web3.eth.contract(blobStoreAbi);
-var blobStoreAddress = '0x8a69A63fcA907939e5C7d92A260D8875C8700383';
+var blobStoreAddress = '0xe70e90fdD2B9d3e27BDd56ef249EE1D408F40BE2';
 var blobStore = blobStoreContract.at(blobStoreAddress);
 
 module.exports.contract = blobStore;
-
-// solc version: 0.4.2+commit.af6afb04.Linux.g++
 
 function sendTransaction(tx, callback) {
   web3.eth.estimateGas(tx, 'pending', function(error, gas) {
