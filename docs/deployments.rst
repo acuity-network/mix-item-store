@@ -2,7 +2,7 @@
 Deployments
 ###########
 
-BlobStore can be deployed on any Ethereum blockchain. Each blockchain needs a sinle BlobStoreRegistry to be deployed. This is so that when later versions of BlobStore are deployed they can register with it.
+BlobStore can be deployed on any Ethereum blockchain. Each blockchain needs a single BlobStoreRegistry to be deployed. This is so that when later versions of BlobStore are deployed they can register with it.
 
 On each blockchain, each BlobStore contract has a serial number that is used outside the blockchain to identify which contract a blob is stored on. This page is the authority on which contracts have which serial numbers on which blockchains.
 

@@ -74,6 +74,7 @@ It has the following properties:
 
    blobid.rst
    deployments.rst
+   example.rst
    faq.rst
 
 
