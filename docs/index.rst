@@ -10,6 +10,8 @@ BlobStore is a smart contract for Ethereum blockchains that permanently stores b
 
 `Source code <https://github.com/link-blockchain/blobstore>`_
 
+`Solidity API <http://solidity-apis.link-blockchain.org/docs/BlobStore/>`_
+
 It has the following properties:
 
 * Immutable
