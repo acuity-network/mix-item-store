@@ -8,7 +8,7 @@ On each blockchain, each BlobStore contract has a serial number that is used out
 
 Each BlobStore contract also has a contractId that is used within contracts.
 
-See blobid_ for more information.
+See :ref:`blobid` for more information.
 
 Ethereum
 ========
