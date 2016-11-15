@@ -70,6 +70,7 @@ It has the following properties:
    :maxdepth: 2
 
    blobid.rst
+   deployments.rst
 
 
 Indices and tables
