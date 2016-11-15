@@ -74,6 +74,7 @@ It has the following properties:
 
    blobid.rst
    deployments.rst
+   faq.rst
 
 
 Indices and tables
