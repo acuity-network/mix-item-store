@@ -6,7 +6,7 @@
 BlobStore
 =========
 
-BlobStore is a smart contract for Ethereum blockchains that permanently stores blobs of data.
+BlobStore is a smart contract for Ethereum blockchains that permanently stores blobs of data. It will be the principle contract of the Link Blockchain.
 
 Useful links
 ------------
@@ -16,6 +16,8 @@ Useful links
 * `Solidity API <http://solidity-apis.link-blockchain.org/docs/BlobStore/>`_
 
 * `Node.js NPM <https://www.npmjs.com/package/blobstore-ethereum>`_
+
+* `Link Blockchain Blog <https://blog.link-blockchain.org/>`_
 
 It has the following properties:
 
