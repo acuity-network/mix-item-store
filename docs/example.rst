@@ -38,6 +38,7 @@ Creating a blob::
             console.error(error);
         }
     });
+    console.log(blobId);
 
 Creating a new revision::
 
