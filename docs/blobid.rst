@@ -8,7 +8,7 @@ Each blob has a 20 byte blobId that is unique to the contract that generated it.
 
 Off-chain
 =========
-For each blockchain there is considered to be an ordered list of BlobStore contracts. For example, the first contract would be #0. The next one would be #1. This list is maintained by convention. 20 byte blobIds can be prefixed with a single byte to indicate which contract the blob is in. BlobStore itself has no means of specifiying which blockchain a blob is on. This is either to be assumed or to be specified by some other method, e.g. a URI.
+For each blockchain there is considered to be an ordered list of BlobStore contracts. For example, the first contract would be #0. The next one would be #1. This list is maintained on the :ref:`deployments` page. 20 byte blobIds can be prefixed with a single byte to indicate which contract the blob is in. BlobStore itself has no means of specifiying which blockchain a blob is on. This is either to be assumed or to be specified by some other method, e.g. a URI.
 
 Client software should have a hard coded whitelist of BlobStore contracts that its knows how to read from.
 
