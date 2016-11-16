@@ -14,10 +14,10 @@ module.exports.web3 = function() {
     return web3;
 }
 
-function sendTransaction(tx, callback) {
+function sendTransaction(tx, gasMultiplier, callback) {
   web3.eth.estimateGas(tx, 'pending', function(error, gas) {
     if (error) { callback(error); return; }
-    tx.gas = gas;
+    tx.gas = gas * gasMultiplier;
     // Broadcast the transaction.
     web3.eth.sendTransaction(tx, function(error, result) {
       if (error) { callback(error); return; }
@@ -66,7 +66,7 @@ module.exports.create = function(contents, flags, callback) {
     }
     blobId = web3.eth.call(tx, 'pending');
   }
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 1, callback);
   // Remove the padding from blobId.
   return blobId.substr(0, 42);
 }
@@ -78,7 +78,7 @@ module.exports.createNewRevision = function(blobId, contents, callback) {
     data: blobStore.createNewRevision.getData(blobId, '0x' + contents.toString('hex'))
   }
   // Send it.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 1, callback);
 }
 
 module.exports.updateLatestRevision = function(blobId, contents, callback) {
@@ -88,7 +88,7 @@ module.exports.updateLatestRevision = function(blobId, contents, callback) {
     data: blobStore.updateLatestRevision.getData(blobId, '0x' + contents.toString('hex'))
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 1, callback);
 }
 
 module.exports.retractLatestRevision = function(blobId, callback) {
@@ -98,7 +98,7 @@ module.exports.retractLatestRevision = function(blobId, callback) {
     data: blobStore.retractLatestRevision.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.restart = function(blobId, callback) {
@@ -108,7 +108,7 @@ module.exports.restart = function(blobId, callback) {
     data: blobStore.restart.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.retract = function(blobId, callback) {
@@ -118,7 +118,7 @@ module.exports.retract = function(blobId, callback) {
     data: blobStore.retract.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.transferEnable = function(blobId, callback) {
@@ -128,7 +128,7 @@ module.exports.transferEnable = function(blobId, callback) {
     data: blobStore.transferEnable.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 1, callback);
 }
 
 module.exports.transferDisable = function(blobId, callback) {
@@ -138,7 +138,7 @@ module.exports.transferDisable = function(blobId, callback) {
     data: blobStore.transferDisable.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.transfer = function(blobId, recipient, callback) {
@@ -148,7 +148,7 @@ module.exports.transfer = function(blobId, recipient, callback) {
     data: blobStore.transfer.getData(blobId, recipient)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.disown = function(blobId, callback) {
@@ -158,7 +158,7 @@ module.exports.disown = function(blobId, callback) {
     data: blobStore.disown.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.setNotUpdatable = function(blobId, callback) {
@@ -168,7 +168,7 @@ module.exports.setNotUpdatable = function(blobId, callback) {
     data: blobStore.setNotUpdatable.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.setEnforceRevisions = function(blobId, callback) {
@@ -178,7 +178,7 @@ module.exports.setEnforceRevisions = function(blobId, callback) {
     data: blobStore.setEnforceRevisions.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.setNotRetractable = function(blobId, callback) {
@@ -188,7 +188,7 @@ module.exports.setNotRetractable = function(blobId, callback) {
     data: blobStore.setNotRetractable.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.setNotTransferable = function(blobId, callback) {
@@ -198,7 +198,7 @@ module.exports.setNotTransferable = function(blobId, callback) {
     data: blobStore.setNotTransferable.getData(blobId)
   }
   // Create the transaction.
-  sendTransaction(tx, callback);
+  sendTransaction(tx, 2, callback);
 }
 
 module.exports.getContractId = module.exports.contract.getContractId;
