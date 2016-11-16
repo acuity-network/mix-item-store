@@ -71,7 +71,7 @@ module.exports.create = function(contents, flags, callback) {
   return blobId.substr(0, 42);
 }
 
-module.exports.createNewRevision = function(blobId, blob, callback) {
+module.exports.createNewRevision = function(blobId, contents, callback) {
   // Create the transaction.
   var tx = {
     to: blobStoreAddress,
@@ -81,7 +81,7 @@ module.exports.createNewRevision = function(blobId, blob, callback) {
   sendTransaction(tx, callback);
 }
 
-module.exports.updateLatestRevision = function(blobId, blob, callback) {
+module.exports.updateLatestRevision = function(blobId, contents, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
@@ -95,7 +95,7 @@ module.exports.retractLatestRevision = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.retractLatestRevision.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.retractLatestRevision.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
@@ -105,7 +105,7 @@ module.exports.restart = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.restart.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.restart.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
@@ -115,7 +115,7 @@ module.exports.retract = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.retract.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.retract.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
@@ -125,7 +125,7 @@ module.exports.transferEnable = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.transferEnable.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.transferEnable.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
@@ -135,17 +135,17 @@ module.exports.transferDisable = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.transferDisable.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.transferDisable.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
 }
 
-module.exports.transfer = function(blobId, callback) {
+module.exports.transfer = function(blobId, recipient, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.transfer.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.transfer.getData(blobId, recipient)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
@@ -155,7 +155,7 @@ module.exports.disown = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.disown.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.disown.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
@@ -165,7 +165,7 @@ module.exports.setNotUpdatable = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.setNotUpdatable.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.setNotUpdatable.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
@@ -175,7 +175,7 @@ module.exports.setEnforceRevisions = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.setEnforceRevisions.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.setEnforceRevisions.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
@@ -185,7 +185,7 @@ module.exports.setNotRetractable = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.setNotRetractable.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.setNotRetractable.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
@@ -195,7 +195,7 @@ module.exports.setNotTransferable = function(blobId, callback) {
   // Create transaction object.
   var tx = {
     to: blobStoreAddress,
-    data: blobStore.setNotTransferable.getData(blobId, '0x' + contents.toString('hex'))
+    data: blobStore.setNotTransferable.getData(blobId)
   }
   // Create the transaction.
   sendTransaction(tx, callback);
