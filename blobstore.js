@@ -1,18 +1,7 @@
 "use strict";
 
 var Web3 = require('web3');
-var web3;
-
-// @see https://gist.github.com/frozeman/fbc7465d0b0e6c1c4c23
-if (typeof web3 !== 'undefined') {
-  var defaultAccount = web3.eth.defaultAccount;
-  web3 = new Web3(web3.currentProvider);
-  web3.eth.defaultAccount = defaultAccount;
-}
-else {
-  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-  web3.eth.defaultAccount = web3.eth.accounts[0];
-}
+var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 
 var blobStoreAbi = require('./blobstore.abi.json');
 var blobStoreContract = web3.eth.contract(blobStoreAbi);
@@ -20,6 +9,10 @@ var blobStoreAddress = '0xe70e90fdD2B9d3e27BDd56ef249EE1D408F40BE2';
 var blobStore = blobStoreContract.at(blobStoreAddress);
 
 module.exports.contract = blobStore;
+
+module.exports.web3 = function() {
+    return web3;
+}
 
 function sendTransaction(tx, callback) {
   web3.eth.estimateGas(tx, 'pending', function(error, gas) {
