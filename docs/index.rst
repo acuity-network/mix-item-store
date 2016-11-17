@@ -13,6 +13,8 @@ Useful links
 
 * `Source code <https://github.com/link-blockchain/blobstore>`_
 
+* `Issue tracker <https://github.com/link-blockchain/blobstore/issues>`_
+
 * `Solidity API <http://solidity-apis.link-blockchain.org/docs/BlobStore/>`_
 
 * `Node.js NPM <https://www.npmjs.com/package/blobstore-ethereum>`_
