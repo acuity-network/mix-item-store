@@ -17,7 +17,9 @@ Useful links
 
 * `Node.js NPM <https://www.npmjs.com/package/blobstore-ethereum>`_
 
-* `Link Blockchain Blog <https://blog.link-blockchain.org/>`_
+* `Link Blockchain blog <https://blog.link-blockchain.org/>`_
+
+* `Gitter channel <https://gitter.im/link-blockchain/blobstore>`_
 
 It has the following properties:
 
