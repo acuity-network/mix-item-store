@@ -72,7 +72,7 @@ BlobStore has the following properties:
 * Upgradability
     BlobStore is an upgradable system. Due to a security vulnerability, new features, or performance improvements a new BlobStore contract may be deployed.
 
-* Unit Tests
+* Unit tests
    BlobStore has tests written in Solidity using the Dapple framework.
 
 * JavaScript library
