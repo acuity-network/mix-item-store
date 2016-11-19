@@ -23,7 +23,13 @@ Useful links
 
 * `Gitter channel <https://gitter.im/link-blockchain/blobstore>`_
 
-It has the following properties:
+Properties
+------------
+
+BlobStore has the following properties:
+
+* World-readable
+   Every blob published can be read by anyone who connects to the blockchain it was published on. The only way to avoid this would be to encrypt the blob before publishing it.
 
 * Immutable
     While a blob can be "retracted", it can never really be deleted because the transaction that created it will be archived for eternity on full nodes.
