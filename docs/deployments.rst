@@ -30,8 +30,20 @@ Ethereum Classic
 BlobStoreRegistry contract address: ``0xb2a3a31c5425cab2a592b22ba6eab4dd24885a18``
 
 Ethereum Classic BlobStore #0
-`````````````````````
+`````````````````````````````
 
 contract address: ``0x142c02617643b4fd6d50179580169bdef391353a``
 
 BlobStore contractId: ``0xc23a81a289591896339e1411``
+
+Expanse
+=======
+
+BlobStoreRegistry contract address: ``0x4d7bec7eafc33915f7ac4c3375762c58643eee5b``
+
+Expanse BlobStore #0
+````````````````````
+
+contract address: ``0xd09bc8e21b6ef637f40522918f88064f783d3002``
+
+BlobStore contractId: ``0xe65c702e1e4d84fcc7e1cbb8``
