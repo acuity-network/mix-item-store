@@ -15,7 +15,7 @@ Accessing the library from JavaScript::
 Retreiving a blob::
 
     var blobId = "0x0598888a30f36c84fe78b45247184a25309520ba";
-    var revisionId = 1;
+    var revisionId = 0;
 
     blobStore.getContents(blobId, revisionId, function(error, result) {
         if (!error) {
