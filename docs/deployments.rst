@@ -12,6 +12,8 @@ Each BlobStore contract also has a contractId that is used within contracts.
 
 See :ref:`blobid` for more information.
 
+All current deployments are of BlobStore `1.0 <https://github.com/link-blockchain/blobstore/tree/1.0>`_ compiled with Solidity 4.4 with optimization enabled.
+
 Ethereum
 ========
 
