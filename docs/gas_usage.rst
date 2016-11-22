@@ -7,7 +7,7 @@ Gas usage
 The base price for creating a new blob is 45760 gas. It costs on average an additional 76.32 gas per byte that is stored in the blob. Additional revisions have slightly different base prices, depending on the revision number. Updating any existing revision has a base price of 32589.
 
 +------------------+-------------+-------------+------------+----------------+
-| Blockchain       | Gas price   | Unit price  | Blob   | Additional     |
+| Blockchain       | Gas price   | Unit price  | Blob       | Additional     |
 |                  |             |             | base price | price per 1 kB |
 +==================+=============+=============+============+================+
 | Ethereum         | 21.557 gwei | $ 10.01     | $ 0.0099   | $ 0.0168       |
