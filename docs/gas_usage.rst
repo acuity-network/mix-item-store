@@ -6,4 +6,4 @@ Gas usage
 
 .. raw:: html
 
-    <iframe width="700" height="450" src="//embed.chartblocks.com/1.0/?c=5833f8dc9973d2401022b179&t=6ad0758ea8b4f9c" frameBorder="0"></iframe>
+    <iframe width="700" height="455" src="//embed.chartblocks.com/1.0/?c=5833f8dc9973d2401022b179&t=6ad0758ea8b4f9c" frameBorder="0"></iframe>
