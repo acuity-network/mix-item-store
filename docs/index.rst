@@ -86,6 +86,7 @@ BlobStore has the following properties:
 
    blobid.rst
    deployments.rst
+   gas-usage.rst
    example.rst
    faq.rst
 
