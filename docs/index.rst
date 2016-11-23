@@ -53,13 +53,13 @@ BlobStore has the following properties:
       The blob can be transfered to another user (if they accept it), or disowned completely. Once disabled it cannot be re-enabled. At creation time blobs can also be flaged as anonymous to not have an owner associated. An alternative to transferable blobs is to use a proxy account with transferable ownership as the blob owner.
 
 * Light client support
-   Blobs are stored in Ethereum log storage so can be retreived by light clients.
+   Blobs are stored in Ethereum log storage so can be retrieved by light clients.
    
 * Scalable
    Currently every Ethereum full node processes every transaction, limiting the scalability of BlobStore. However, in future Ethereum blockchains will become "sharded", effectively providing unlimited scalability.
    
 * Low latency
-   Searching Ethereum logs is not normally instantaneous because they are not fully indexed like state entries. However, BlobStore stores in state the block number that each log is stored in. This allows for instantaneous retrival.
+   Searching Ethereum logs is not normally instantaneous because they are not fully indexed like state entries. However, BlobStore stores in state the block number that each log is stored in. This allows for instantaneous retrieval.
    
    Geth does not currently support reading logs from unconfirmed transactions, so may not be suitable at the moment for many use cases. However, Parity does have this feature. This is why Parity is the recommended client when using BlobStore.
 
