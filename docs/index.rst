@@ -81,6 +81,9 @@ BlobStore has the following properties:
 * Multiple blockchains
    BlobStore will be deployed on all Ethereum blockchains, i.e. Ethereum, Ethereum Classic, Expanse and Link.
 
+Table of contents
+-----------------
+
 .. toctree::
    :maxdepth: 2
 
