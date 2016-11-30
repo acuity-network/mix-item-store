@@ -60,8 +60,6 @@ BlobStore has the following properties:
    
 * Low latency
    Searching Ethereum logs is not normally instantaneous because they are not fully indexed like state entries. However, BlobStore stores in state the block number that each log is stored in. This allows for instantaneous retrieval.
-   
-   Geth does not currently support reading logs from unconfirmed transactions, so may not be suitable at the moment for many use cases. However, Parity does have this feature. This is why Parity is the recommended client when using BlobStore.
 
 * Expensive
    While cheaper than contract state, BlobStore is still considerably more expensive than other decentralized storage systems. This is because it is fully immutable. BlobStore is not cost effective for very large blobs of data or for a large number of blobs that are of low value. As Ethereum blockchains become more scalable BlobStore will become better value.
