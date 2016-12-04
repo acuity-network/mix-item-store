@@ -12,7 +12,19 @@ Each BlobStore contract also has a contractId that is used within contracts.
 
 See :ref:`blobid` for more information.
 
-All current deployments are of BlobStore `1.0 <https://github.com/link-blockchain/blobstore/tree/1.0>`_ compiled with Solidity 4.4 with optimization enabled.
+All current deployments are of BlobStore `1.0 <https://github.com/link-blockchain/blobstore/tree/1.0>`_ compiled with Solidity 4.4 with optimization enabled, except for the deployment on Link Testnet which was compiled with Solidity 0.4.7-nightly.2016.12.3+commit.9be2fb12
+
+Link Testnet
+============
+
+BlobStoreRegistry contract address: ``0x1213575561bbc9db7d8493c84ce36da2737e8b57``
+
+Link Testnet BlobStore #0
+`````````````````````````
+
+contract address: ``0x39f59577421ae6e02cdfdc73a6f9c52d6da102fd``
+
+BlobStore contractId: ``0xc37d0aa52348945800056d8c``
 
 Ethereum
 ========
