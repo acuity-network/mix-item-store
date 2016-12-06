@@ -23,6 +23,8 @@ Useful links
 
 * `Gitter channel <https://gitter.im/link-blockchain/blobstore>`_
 
+* `Link Blockchain <http://www.link-blockchain.org/>`_
+
 Properties
 ------------
 
