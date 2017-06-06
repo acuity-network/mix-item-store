@@ -15,7 +15,7 @@ contract BlobStoreRegistry {
     mapping (bytes12 => BlobStoreInterface) contracts;
 
     /**
-     * @dev An AbstractBlobStore contract has been registered.
+     * @dev A BlobStore contract has been registered.
      * @param contractId Id of the contract.
      * @param contractAddress Address of the contract.
      */
@@ -51,18 +51,18 @@ contract BlobStoreRegistry {
     }
 
     /**
-     * @dev Get an AbstractBlobStore contract.
+     * @dev Get a BlobStore contract.
      * @param contractId Id of the contract.
-     * @return blobStore The AbstractBlobStore contract.
+     * @return blobStore The BlobStore contract.
      */
     function getBlobStore(bytes12 contractId) external constant isRegistered(contractId) returns (BlobStoreInterface blobStore) {
         blobStore = contracts[contractId];
     }
 
     /**
-     * @dev Get an AbstractBlobStore contract.
+     * @dev Get a BlobStore contract.
      * @param fullBlobId Full blob id.
-     * @return blobStore The AbstractBlobStore contract.
+     * @return blobStore The BlobStore contract.
      */
     function getBlobStoreFromFullBlobId(bytes32 fullBlobId) external constant isRegistered(bytes12(fullBlobId)) returns (BlobStoreInterface blobStore) {
         blobStore = contracts[bytes12(fullBlobId)];
