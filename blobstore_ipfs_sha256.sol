@@ -155,12 +155,12 @@ contract BlobStoreIpfsSha256 is BlobStoreInterface {
      * @dev Creates a new blob. It is guaranteed that different users will never receive the same blobId, even before consensus has been reached. This prevents blobId sniping.
      * @param flags Packed blob settings.
      * @param ipfsHash Hash of the IPFS object where the blob revision is stored.
-     * @param nonce Increment this if this user has already created a blob with this IPFS hash.
+     * @param nonce Unique value that this user has never used before to create a new blob.
      * @return blobId Id of the blob.
      */
-    function create(byte flags, bytes32 ipfsHash, uint nonce) external returns (bytes20 blobId) {
+    function create(byte flags, bytes32 ipfsHash, bytes32 nonce) external returns (bytes20 blobId) {
         // Generate the blobId.
-        blobId = bytes20(keccak256(msg.sender, ipfsHash, nonce));
+        blobId = bytes20(keccak256(msg.sender, nonce));
         // Make sure this blobId has not been used before.
         require (blobInfo[blobId].state == State.Unused);
         // Store blob info in state.

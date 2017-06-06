@@ -29,13 +29,12 @@ contract BlobStoreIpfsSha256Test is DSTest {
         blobStoreProxy = new BlobStoreIpfsSha256Proxy(blobStore);
     }
 
-    function testControlCreateSameIpfsHashAndNonce() {
+    function testControlCreateSameNonce() {
         blobStore.create(0, 0x1234, 0);
         blobStore.create(0, 0x1234, 1);
-        blobStore.create(0, 0x2345, 0);
     }
 
-    function testFailCreateSameIpfsHashAndNonce() {
+    function testFailCreateSameNonce() {
         blobStore.create(0, 0x1234, 0);
         blobStore.create(0, 0x1234, 0);
     }
@@ -63,7 +62,7 @@ contract BlobStoreIpfsSha256Test is DSTest {
         assert(blobStore.getTransferable(blobId1));
         assertEq(blobStore.getRevisionIpfsHash(blobId1, 0), 0x1234);
 
-        bytes20 blobId2 = blobStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, 0x2345, 0);
+        bytes20 blobId2 = blobStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, 0x2345, 2);
         assert(blobStore.getExists(blobId2));
         assertEq(blobStore.getFlags(blobId2), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS);
         assertEq(blobStore.getOwner(blobId2), 0);
