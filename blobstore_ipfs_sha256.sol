@@ -5,7 +5,7 @@ import "./blobstore_registry.sol";
 
 
 /**
- * @title BlobStore
+ * @title BlobStoreIpfsSha256
  * @author Jonathan Brown <jbrown@link-blockchain.org>
  */
 contract BlobStoreIpfsSha256 is BlobStoreInterface {
@@ -451,19 +451,19 @@ contract BlobStoreIpfsSha256 is BlobStoreInterface {
     }
 
    /**
-     * @dev Get the block number for a specific blob revision.
+     * @dev Get the IPFS hash for a specific blob revision.
      * @param blobId Id of the blob.
      * @param revisionId Id of the revision.
-     * @return ipfsHash Block number of the specified revision.
+     * @return ipfsHash IPFS hash of the specified revision.
      */
     function getRevisionIpfsHash(bytes20 blobId, uint revisionId) external constant revisionExists(blobId, revisionId) returns (bytes32 ipfsHash) {
         ipfsHash = blobRevisionIpfsHashes[blobId][revisionId];
     }
 
     /**
-     * @dev Get the block numbers for all of a blob's revisions.
+     * @dev Get the IPFS hashes for all of a blob's revisions.
      * @param blobId Id of the blob.
-     * @return ipfsHashes Revision block numbers.
+     * @return ipfsHashes IPFS hashes of all revisions of the blob.
      */
     function getAllRevisionIpfsHashes(bytes20 blobId) external constant returns (bytes32[] ipfsHashes) {
         ipfsHashes = _getAllRevisionIpfsHashes(blobId);

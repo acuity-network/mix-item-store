@@ -4,7 +4,7 @@ import "./blobstore_ipfs_sha256.sol";
 
 
 /**
- * @title BlobStoreProxy
+ * @title BlobStoreIpfsSha256Proxy
  * @author Jonathan Brown <jbrown@link-blockchain.org>
  * @dev Proxy contract for accessing a BlobStore contract from a different address for testing purposes.
  */

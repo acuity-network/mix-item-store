@@ -8,7 +8,7 @@ import "./blobstore_ipfs_sha256_proxy.sol";
 
 /**
  * @title BlobStoreTest
- * @author Jonathan Brown <jbrown@bluedroplet.com>
+ * @author Jonathan Brown <jbrown@link-blockchain.org>
  */
 contract BlobStoreTest is DSTest {
 
