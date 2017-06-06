@@ -19,8 +19,16 @@ contract BlobStoreRegistryTest is DSTest {
         blobStore = new BlobStoreIpfsSha256(blobStoreRegistry);
     }
 
+    function testControlRegisterContractAgain() {
+        blobStoreRegistry.register(~blobStore.getContractId());
+    }
+
     function testFailRegisterContractAgain() {
         blobStoreRegistry.register(blobStore.getContractId());
+    }
+
+    function testControlBlobStoreNotRegistered() {
+        blobStoreRegistry.getBlobStore(blobStore.getContractId());
     }
 
     function testFailBlobStoreNotRegistered() {
