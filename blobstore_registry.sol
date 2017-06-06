@@ -59,13 +59,4 @@ contract BlobStoreRegistry {
         blobStore = contracts[contractId];
     }
 
-    /**
-     * @dev Get a BlobStore contract.
-     * @param fullBlobId Full blob id.
-     * @return blobStore The BlobStore contract.
-     */
-    function getBlobStoreFromFullBlobId(bytes32 fullBlobId) external constant isRegistered(bytes12(fullBlobId)) returns (BlobStoreInterface blobStore) {
-        blobStore = contracts[bytes12(fullBlobId)];
-    }
-
 }

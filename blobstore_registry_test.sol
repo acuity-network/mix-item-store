@@ -39,8 +39,4 @@ contract BlobStoreRegistryTest is DSTest {
         assertEq(blobStoreRegistry.getBlobStore(blobStore.getContractId()), blobStore);
     }
 
-    function testGetBlobStoreFromFullBlobId() {
-        assertEq(blobStoreRegistry.getBlobStoreFromFullBlobId(bytes32(blobStore.getContractId())), blobStore);
-    }
-
 }
