@@ -23,20 +23,20 @@ contract BlobStoreIpfsSha256Proxy is BlobStoreInterface {
     /**
      * @dev Create a new blob revision.
      * @param blobId Id of the blob.
-     * @param IpfsHash Hash of the IPFS object where the blob revision is stored.
+     * @param ipfsHash Hash of the IPFS object where the blob revision is stored.
      * @return revisionId The new revisionId.
      */
-    function createNewRevision(bytes20 blobId, bytes32 IpfsHash) external returns (uint revisionId) {
-        revisionId = blobStore.createNewRevision(blobId, IpfsHash);
+    function createNewRevision(bytes20 blobId, bytes32 ipfsHash) external returns (uint revisionId) {
+        revisionId = blobStore.createNewRevision(blobId, ipfsHash);
     }
 
     /**
      * @dev Update a blob's latest revision.
      * @param blobId Id of the blob.
-     * @param IpfsHash Hash of the IPFS object where the blob revision is stored.
+     * @param ipfsHash Hash of the IPFS object where the blob revision is stored.
      */
-    function updateLatestRevision(bytes20 blobId, bytes32 IpfsHash) external {
-        blobStore.updateLatestRevision(blobId, IpfsHash);
+    function updateLatestRevision(bytes20 blobId, bytes32 ipfsHash) external {
+        blobStore.updateLatestRevision(blobId, ipfsHash);
     }
 
     /**
@@ -50,10 +50,10 @@ contract BlobStoreIpfsSha256Proxy is BlobStoreInterface {
     /**
      * @dev Delete all a blob's revisions and replace it with a new blob.
      * @param blobId Id of the blob.
-     * @param IpfsHash Hash of the IPFS object where the blob revision is stored.
+     * @param ipfsHash Hash of the IPFS object where the blob revision is stored.
      */
-    function restart(bytes20 blobId, bytes32 IpfsHash) external {
-        blobStore.restart(blobId, IpfsHash);
+    function restart(bytes20 blobId, bytes32 ipfsHash) external {
+        blobStore.restart(blobId, ipfsHash);
     }
 
     /**

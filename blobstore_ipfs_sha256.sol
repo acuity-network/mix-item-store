@@ -52,9 +52,9 @@ contract BlobStoreIpfsSha256 is BlobStoreInterface {
      * @dev A blob revision has been published.
      * @param blobId Id of the blob.
      * @param revisionId Id of the revision (the highest at time of logging).
-     * @param IpfsHash Hash of the IPFS object where the blob revision is stored.
+     * @param ipfsHash Hash of the IPFS object where the blob revision is stored.
      */
-    event Publish(bytes20 indexed blobId, uint revisionId, bytes32 IpfsHash);
+    event Publish(bytes20 indexed blobId, uint revisionId, bytes32 ipfsHash);
 
     /**
      * @dev Revert if the blob has not been used before or it has been retracted.
@@ -178,29 +178,29 @@ contract BlobStoreIpfsSha256 is BlobStoreInterface {
     /**
      * @dev Create a new blob revision.
      * @param blobId Id of the blob.
-     * @param IpfsHash Hash of the IPFS object where the blob revision is stored.
+     * @param ipfsHash Hash of the IPFS object where the blob revision is stored.
      * @return revisionId The new revisionId.
      */
-    function createNewRevision(bytes20 blobId, bytes32 IpfsHash) external isOwner(blobId) isUpdatable(blobId) returns (uint revisionId) {
+    function createNewRevision(bytes20 blobId, bytes32 ipfsHash) external isOwner(blobId) isUpdatable(blobId) returns (uint revisionId) {
         // Increment the number of revisions.
         revisionId = blobInfo[blobId].revisionCount++;
         // Store the IPFS hash.
-        blobRevisionIpfsHashes[blobId][revisionId] = IpfsHash;
+        blobRevisionIpfsHashes[blobId][revisionId] = ipfsHash;
         // Log the revision.
-        Publish(blobId, revisionId, IpfsHash);
+        Publish(blobId, revisionId, ipfsHash);
     }
 
     /**
      * @dev Update a blob's latest revision.
      * @param blobId Id of the blob.
-     * @param IpfsHash Hash of the IPFS object where the blob revision is stored.
+     * @param ipfsHash Hash of the IPFS object where the blob revision is stored.
      */
-    function updateLatestRevision(bytes20 blobId, bytes32 IpfsHash) external isOwner(blobId) isUpdatable(blobId) isNotEnforceRevisions(blobId) {
+    function updateLatestRevision(bytes20 blobId, bytes32 ipfsHash) external isOwner(blobId) isUpdatable(blobId) isNotEnforceRevisions(blobId) {
         uint revisionId = blobInfo[blobId].revisionCount - 1;
         // Update the IPFS hash.
-        blobRevisionIpfsHashes[blobId][revisionId] = IpfsHash;
+        blobRevisionIpfsHashes[blobId][revisionId] = ipfsHash;
         // Log the revision.
-        Publish(blobId, revisionId, IpfsHash);
+        Publish(blobId, revisionId, ipfsHash);
     }
 
     /**
@@ -219,9 +219,9 @@ contract BlobStoreIpfsSha256 is BlobStoreInterface {
     /**
      * @dev Delete all a blob's revisions and replace it with a new blob.
      * @param blobId Id of the blob.
-     * @param IpfsHash Hash of the IPFS object where the blob revision is stored.
+     * @param ipfsHash Hash of the IPFS object where the blob revision is stored.
      */
-    function restart(bytes20 blobId, bytes32 IpfsHash) external isOwner(blobId) isUpdatable(blobId) isNotEnforceRevisions(blobId) {
+    function restart(bytes20 blobId, bytes32 ipfsHash) external isOwner(blobId) isUpdatable(blobId) isNotEnforceRevisions(blobId) {
         // Delete all the IPFS hashes except the first one.
         for (uint i = 1; i < blobInfo[blobId].revisionCount; i++) {
             delete blobRevisionIpfsHashes[blobId][i];
@@ -229,9 +229,9 @@ contract BlobStoreIpfsSha256 is BlobStoreInterface {
         // Update the blob state info.
         blobInfo[blobId].revisionCount = 1;
         // Update the first IPFS hash.
-        blobRevisionIpfsHashes[blobId][0] = IpfsHash;
+        blobRevisionIpfsHashes[blobId][0] = ipfsHash;
         // Log the revision.
-        Publish(blobId, 0, IpfsHash);
+        Publish(blobId, 0, ipfsHash);
     }
 
     /**
