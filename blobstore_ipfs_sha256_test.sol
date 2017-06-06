@@ -206,6 +206,9 @@ contract BlobStoreTest is DSTest {
         assertEq(blobStore.getRevisionCount(blobId), 2);
         assertEq(blobStore.getRevisionIpfsHash(blobId, 0), 0x1234);
         assertEq(blobStore.getRevisionIpfsHash(blobId, 1), 0x2345);
+        blobStore.retractLatestRevision(blobId);
+        assertEq(blobStore.getRevisionCount(blobId), 1);
+        assertEq(blobStore.getRevisionIpfsHash(blobId, 0), 0x1234);
     }
 
     function testControlRestartNotOwner() {
@@ -273,6 +276,7 @@ contract BlobStoreTest is DSTest {
 
     function testRetract() {
         bytes20 blobId = blobStore.create(RETRACTABLE, 0x1234, 0);
+        assertEq(blobStore.getRevisionCount(blobId), 1);
         assertEq(blobStore.getRevisionIpfsHash(blobId, 0), 0x1234);
         blobStore.retract(blobId);
         assert(!blobStore.getExists(blobId));
@@ -337,6 +341,7 @@ contract BlobStoreTest is DSTest {
 
     function testTransfer() {
         bytes20 blobId = blobStore.create(TRANSFERABLE, 0x1234, 0);
+        assertEq(blobStore.getOwner(blobId), this);
         assertEq(blobStore.getRevisionCount(blobId), 1);
         assertEq(blobStore.getRevisionIpfsHash(blobId, 0), 0x1234);
         blobStoreProxy.transferEnable(blobId);
