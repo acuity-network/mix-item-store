@@ -8,6 +8,7 @@ import "./blobstore_ipfs_sha256.sol";
 /**
  * @title BlobStoreRegistryTest
  * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @dev Testing contract for BlobStoreRegistry.
  */
 contract BlobStoreRegistryTest is DSTest {
 

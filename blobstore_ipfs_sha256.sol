@@ -7,6 +7,7 @@ import "./blobstore_registry.sol";
 /**
  * @title BlobStoreIpfsSha256
  * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @dev BlobStore implementation where each blob revision is a SHA256 IPFS hash.
  */
 contract BlobStoreIpfsSha256 is BlobStoreInterface {
 

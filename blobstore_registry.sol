@@ -6,6 +6,7 @@ import "./blobstore_interface.sol";
 /**
  * @title BlobStoreRegistry
  * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @dev Contract that every BlobStore implementation must register with.
  */
 contract BlobStoreRegistry {
 

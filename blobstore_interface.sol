@@ -4,6 +4,7 @@ pragma solidity ^0.4.11;
 /**
  * @title BlobStoreInterface
  * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @dev BlobStore implementation interface.
  */
 interface BlobStoreInterface {
 

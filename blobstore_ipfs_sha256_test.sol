@@ -7,10 +7,11 @@ import "./blobstore_ipfs_sha256_proxy.sol";
 
 
 /**
- * @title BlobStoreTest
+ * @title BlobStoreIpfsSha256Test
  * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @dev Testing contract for BlobStoreIpfsSha256.
  */
-contract BlobStoreTest is DSTest {
+contract BlobStoreIpfsSha256Test is DSTest {
 
     byte constant UPDATABLE = 0x01;           // True if the blob is updatable. After creation can only be disabled.
     byte constant ENFORCE_REVISIONS = 0x02;   // True if the blob is enforcing revisions. After creation can only be enabled.
