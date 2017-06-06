@@ -168,7 +168,7 @@ contract BlobStoreIpfsSha256 is BlobStoreInterface {
             state: State.Exists,
             flags: flags,
             revisionCount: 1,
-            owner: (flags & ANONYMOUS != 0) ? 0 : msg.sender,
+            owner: (flags & ANONYMOUS == 0) ? msg.sender : 0,
         });
         // Store the IPFS hash.
         blobRevisionIpfsHashes[blobId][0] = ipfsHash;
