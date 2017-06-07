@@ -1,5 +1,6 @@
 pragma solidity ^0.4.11;
 
+import "./blobstore_interface.sol";
 import "./blobstore_ipfs_sha256.sol";
 
 

@@ -2,6 +2,7 @@ pragma solidity ^0.4.11;
 
 import "ds-test/test.sol";
 
+import "./blobstore_registry.sol";
 import "./blobstore_ipfs_sha256.sol";
 import "./blobstore_ipfs_sha256_proxy.sol";
 
