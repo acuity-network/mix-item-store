@@ -1,34 +1,33 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.11;
 
-import "./abstract_blobstore.sol";
+import "./blobstore_interface.sol";
 
 
 /**
  * @title BlobStoreRegistry
- * @author Jonathan Brown <jbrown@bluedroplet.com>
+ * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @dev Contract that every BlobStore implementation must register with.
  */
 contract BlobStoreRegistry {
 
     /**
      * @dev Mapping of contract id to contract addresses.
      */
-    mapping (bytes12 => address) contractAddresses;
+    mapping (bytes12 => BlobStoreInterface) contracts;
 
     /**
-     * @dev An AbstractBlobStore contract has been registered.
+     * @dev A BlobStore contract has been registered.
      * @param contractId Id of the contract.
      * @param contractAddress Address of the contract.
      */
-    event Register(bytes12 indexed contractId, address indexed contractAddress);
+    event Register(bytes12 indexed contractId, BlobStoreInterface indexed contractAddress);
 
     /**
      * @dev Throw if contract is registered.
      * @param contractId Id of the contract.
      */
     modifier isNotRegistered(bytes12 contractId) {
-        if (contractAddresses[contractId] != 0) {
-            throw;
-        }
+        require (address(contracts[contractId]) == 0);
         _;
     }
 
@@ -37,9 +36,7 @@ contract BlobStoreRegistry {
      * @param contractId Id of the contract.
      */
     modifier isRegistered(bytes12 contractId) {
-        if (contractAddresses[contractId] == 0) {
-            throw;
-        }
+        require (address(contracts[contractId]) != 0);
         _;
     }
 
@@ -49,18 +46,18 @@ contract BlobStoreRegistry {
      */
     function register(bytes12 contractId) external isNotRegistered(contractId) {
         // Record the calling contract address.
-        contractAddresses[contractId] = msg.sender;
+        contracts[contractId] = BlobStoreInterface(msg.sender);
         // Log the registration.
-        Register(contractId, msg.sender);
+        Register(contractId, BlobStoreInterface(msg.sender));
     }
 
     /**
-     * @dev Get an AbstractBlobStore contract.
+     * @dev Get a BlobStore contract.
      * @param contractId Id of the contract.
-     * @return blobStore The AbstractBlobStore contract.
+     * @return blobStore The BlobStore contract.
      */
-    function getBlobStore(bytes12 contractId) external constant isRegistered(contractId) returns (AbstractBlobStore blobStore) {
-        blobStore = AbstractBlobStore(contractAddresses[contractId]);
+    function getBlobStore(bytes12 contractId) external constant isRegistered(contractId) returns (BlobStoreInterface blobStore) {
+        blobStore = contracts[contractId];
     }
 
 }
