@@ -1,3 +1,3 @@
-# BlobStore
+# ItemStore
 
-Ethereum contract system that stores revisionable blobs of data in external systems.
+Pluggable smart contract system for storing revisionable Link content items. 
