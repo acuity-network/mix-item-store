@@ -7,7 +7,7 @@
 	"name": "getFlags",
 	"outputs": [{
 		"name": "flags",
-		"type": "bytes4"
+		"type": "bytes1"
 	}],
 	"payable": false,
 	"type": "function"
@@ -35,31 +35,18 @@
 	"payable": false,
 	"type": "function"
 }, {
-	"constant": true,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes20"
-	}],
-	"name": "getAllRevisionBlockNumbers",
-	"outputs": [{
-		"name": "blockNumbers",
-		"type": "uint256[]"
-	}],
-	"payable": false,
-	"type": "function"
-}, {
 	"constant": false,
 	"inputs": [{
-		"name": "flags",
-		"type": "bytes4"
-	}, {
-		"name": "contents",
-		"type": "bytes"
-	}],
-	"name": "create",
-	"outputs": [{
 		"name": "blobId",
 		"type": "bytes20"
+	}, {
+		"name": "ipfsHash",
+		"type": "bytes32"
+	}],
+	"name": "createNewRevision",
+	"outputs": [{
+		"name": "revisionId",
+		"type": "uint256"
 	}],
 	"payable": false,
 	"type": "function"
@@ -123,18 +110,15 @@
 	"payable": false,
 	"type": "function"
 }, {
-	"constant": false,
+	"constant": true,
 	"inputs": [{
-		"name": "flagsNonce",
-		"type": "bytes32"
-	}, {
-		"name": "contents",
-		"type": "bytes"
-	}],
-	"name": "createWithNonce",
-	"outputs": [{
 		"name": "blobId",
 		"type": "bytes20"
+	}],
+	"name": "getAllRevisionIpfsHashes",
+	"outputs": [{
+		"name": "ipfsHashes",
+		"type": "bytes32[]"
 	}],
 	"payable": false,
 	"type": "function"
@@ -147,10 +131,42 @@
 		"name": "revisionId",
 		"type": "uint256"
 	}],
-	"name": "getRevisionBlockNumber",
+	"name": "getRevisionIpfsHash",
 	"outputs": [{
-		"name": "blockNumber",
-		"type": "uint256"
+		"name": "ipfsHash",
+		"type": "bytes32"
+	}],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "blobId",
+		"type": "bytes20"
+	}, {
+		"name": "ipfsHash",
+		"type": "bytes32"
+	}],
+	"name": "updateLatestRevision",
+	"outputs": [],
+	"payable": false,
+	"type": "function"
+}, {
+	"constant": false,
+	"inputs": [{
+		"name": "flags",
+		"type": "bytes1"
+	}, {
+		"name": "ipfsHash",
+		"type": "bytes32"
+	}, {
+		"name": "nonce",
+		"type": "bytes32"
+	}],
+	"name": "create",
+	"outputs": [{
+		"name": "blobId",
+		"type": "bytes20"
 	}],
 	"payable": false,
 	"type": "function"
@@ -180,10 +196,10 @@
 		"name": "blobId",
 		"type": "bytes20"
 	}, {
-		"name": "contents",
-		"type": "bytes"
+		"name": "ipfsHash",
+		"type": "bytes32"
 	}],
-	"name": "updateLatestRevision",
+	"name": "restart",
 	"outputs": [],
 	"payable": false,
 	"type": "function"
@@ -195,22 +211,6 @@
 	}],
 	"name": "retractLatestRevision",
 	"outputs": [],
-	"payable": false,
-	"type": "function"
-}, {
-	"constant": false,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes20"
-	}, {
-		"name": "contents",
-		"type": "bytes"
-	}],
-	"name": "createNewRevision",
-	"outputs": [{
-		"name": "revisionId",
-		"type": "uint256"
-	}],
 	"payable": false,
 	"type": "function"
 }, {
@@ -258,7 +258,7 @@
 	"name": "getInfo",
 	"outputs": [{
 		"name": "flags",
-		"type": "bytes4"
+		"type": "bytes1"
 	}, {
 		"name": "owner",
 		"type": "address"
@@ -266,8 +266,8 @@
 		"name": "revisionCount",
 		"type": "uint256"
 	}, {
-		"name": "blockNumbers",
-		"type": "uint256[]"
+		"name": "ipfsHashes",
+		"type": "bytes32[]"
 	}],
 	"payable": false,
 	"type": "function"
@@ -315,19 +315,6 @@
 	"payable": false,
 	"type": "function"
 }, {
-	"constant": false,
-	"inputs": [{
-		"name": "blobId",
-		"type": "bytes20"
-	}, {
-		"name": "contents",
-		"type": "bytes"
-	}],
-	"name": "restart",
-	"outputs": [],
-	"payable": false,
-	"type": "function"
-}, {
 	"constant": true,
 	"inputs": [{
 		"name": "blobId",
@@ -345,6 +332,7 @@
 		"name": "registry",
 		"type": "address"
 	}],
+	"payable": false,
 	"type": "constructor"
 }, {
 	"anonymous": false,
@@ -353,15 +341,15 @@
 		"name": "blobId",
 		"type": "bytes20"
 	}, {
-		"indexed": true,
+		"indexed": false,
 		"name": "revisionId",
 		"type": "uint256"
 	}, {
 		"indexed": false,
-		"name": "contents",
-		"type": "bytes"
+		"name": "ipfsHash",
+		"type": "bytes32"
 	}],
-	"name": "Store",
+	"name": "Publish",
 	"type": "event"
 }, {
 	"anonymous": false,
