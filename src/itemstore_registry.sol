@@ -1,26 +1,26 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.14;
 
-import "./blobstore_interface.sol";
+import "./itemstore_interface.sol";
 
 
 /**
- * @title BlobStoreRegistry
+ * @title ItemStoreRegistry
  * @author Jonathan Brown <jbrown@link-blockchain.org>
- * @dev Contract that every BlobStore implementation must register with.
+ * @dev Contract that every ItemStore implementation must register with.
  */
-contract BlobStoreRegistry {
+contract ItemStoreRegistry {
 
     /**
      * @dev Mapping of contract id to contract addresses.
      */
-    mapping (bytes12 => BlobStoreInterface) contracts;
+    mapping (bytes12 => ItemStoreInterface) contracts;
 
     /**
-     * @dev A BlobStore contract has been registered.
+     * @dev A ItemStore contract has been registered.
      * @param contractId Id of the contract.
      * @param contractAddress Address of the contract.
      */
-    event Register(bytes12 indexed contractId, BlobStoreInterface indexed contractAddress);
+    event Register(bytes12 indexed contractId, ItemStoreInterface indexed contractAddress);
 
     /**
      * @dev Throw if contract is registered.
@@ -41,23 +41,23 @@ contract BlobStoreRegistry {
     }
 
     /**
-     * @dev Register the calling BlobStore contract.
-     * @param contractId Id of the BlobStore contract.
+     * @dev Register the calling ItemStore contract.
+     * @param contractId Id of the ItemStore contract.
      */
     function register(bytes12 contractId) external isNotRegistered(contractId) {
         // Record the calling contract address.
-        contracts[contractId] = BlobStoreInterface(msg.sender);
+        contracts[contractId] = ItemStoreInterface(msg.sender);
         // Log the registration.
-        Register(contractId, BlobStoreInterface(msg.sender));
+        Register(contractId, ItemStoreInterface(msg.sender));
     }
 
     /**
-     * @dev Get a BlobStore contract.
+     * @dev Get a ItemStore contract.
      * @param contractId Id of the contract.
-     * @return blobStore The BlobStore contract.
+     * @return itemStore The ItemStore contract.
      */
-    function getBlobStore(bytes12 contractId) external constant isRegistered(contractId) returns (BlobStoreInterface blobStore) {
-        blobStore = contracts[contractId];
+    function getItemStore(bytes12 contractId) external constant isRegistered(contractId) returns (ItemStoreInterface itemStore) {
+        itemStore = contracts[contractId];
     }
 
 }
