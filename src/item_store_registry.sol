@@ -1,6 +1,6 @@
 pragma solidity ^0.4.14;
 
-import "./itemstore_interface.sol";
+import "./item_store_interface.sol";
 
 
 /**

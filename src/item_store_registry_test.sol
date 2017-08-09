@@ -2,8 +2,8 @@ pragma solidity ^0.4.14;
 
 import "ds-test/test.sol";
 
-import "./itemstore_registry.sol";
-import "./itemstore_ipfs_sha256.sol";
+import "./item_store_registry.sol";
+import "./item_store_ipfs_sha256.sol";
 
 
 /**
