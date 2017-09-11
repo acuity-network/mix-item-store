@@ -137,7 +137,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @dev Get the id for this ItemStore contract.
      * @return Id of the contract.
      */
-    function getContractId() external constant returns (bytes12 contractId) {
+    function getContractId() external view returns (bytes12 contractId) {
         contractId = itemStore.getContractId();
     }
 
@@ -146,7 +146,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return exists True if the item exists.
      */
-    function getExists(bytes20 itemId) external constant returns (bool exists) {
+    function getExists(bytes20 itemId) external view returns (bool exists) {
         exists = itemStore.getExists(itemId);
     }
 
@@ -155,7 +155,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return updatable True if the item is updatable.
      */
-    function getUpdatable(bytes20 itemId) external constant returns (bool updatable) {
+    function getUpdatable(bytes20 itemId) external view returns (bool updatable) {
         updatable = itemStore.getUpdatable(itemId);
     }
 
@@ -164,7 +164,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return enforceRevisions True if the item enforces revisions.
      */
-    function getEnforceRevisions(bytes20 itemId) external constant returns (bool enforceRevisions) {
+    function getEnforceRevisions(bytes20 itemId) external view returns (bool enforceRevisions) {
         enforceRevisions = itemStore.getEnforceRevisions(itemId);
     }
 
@@ -173,7 +173,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return retractable True if the item is item retractable.
      */
-    function getRetractable(bytes20 itemId) external constant returns (bool retractable) {
+    function getRetractable(bytes20 itemId) external view returns (bool retractable) {
         retractable = itemStore.getRetractable(itemId);
     }
 
@@ -182,7 +182,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return transferable True if the item is transferable.
      */
-    function getTransferable(bytes20 itemId) external constant returns (bool transferable) {
+    function getTransferable(bytes20 itemId) external view returns (bool transferable) {
         transferable = itemStore.getTransferable(itemId);
     }
 
@@ -191,7 +191,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return owner Owner of the item.
      */
-    function getOwner(bytes20 itemId) external constant returns (address owner) {
+    function getOwner(bytes20 itemId) external view returns (address owner) {
         owner = itemStore.getOwner(itemId);
     }
 
@@ -200,7 +200,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return revisionCount How many revisions the item has.
      */
-    function getRevisionCount(bytes20 itemId) external constant returns (uint revisionCount) {
+    function getRevisionCount(bytes20 itemId) external view returns (uint revisionCount) {
         revisionCount = itemStore.getRevisionCount(itemId);
     }
 

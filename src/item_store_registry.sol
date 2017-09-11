@@ -56,7 +56,7 @@ contract ItemStoreRegistry {
      * @param contractId Id of the contract.
      * @return itemStore The ItemStore contract.
      */
-    function getItemStore(bytes12 contractId) external constant isRegistered(contractId) returns (ItemStoreInterface itemStore) {
+    function getItemStore(bytes12 contractId) external view isRegistered(contractId) returns (ItemStoreInterface itemStore) {
         itemStore = contracts[contractId];
     }
 

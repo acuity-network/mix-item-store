@@ -346,7 +346,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @dev Get the id for this ItemStore contract.
      * @return Id of the contract.
      */
-    function getContractId() external constant returns (bytes12) {
+    function getContractId() external view returns (bytes12) {
         return contractId;
     }
 
@@ -355,7 +355,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return exists True if the item exists.
      */
-    function getExists(bytes20 itemId) external constant returns (bool) {
+    function getExists(bytes20 itemId) external view returns (bool) {
         return itemInfo[itemId].state == State.Exists;
     }
 
@@ -380,7 +380,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return revisionCount How many revisions the item has.
      * @return ipfsHashes IPFS hash of each revision.
      */
-    function getInfo(bytes20 itemId) external constant exists(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes) {
+    function getInfo(bytes20 itemId) external view exists(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes) {
         ItemInfo storage info = itemInfo[itemId];
         flags = info.flags;
         owner = info.owner;
@@ -393,7 +393,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return flags Packed item settings.
      */
-    function getFlags(bytes20 itemId) external constant exists(itemId) returns (byte flags) {
+    function getFlags(bytes20 itemId) external view exists(itemId) returns (byte flags) {
         flags = itemInfo[itemId].flags;
     }
 
@@ -402,7 +402,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return updatable True if the item is updatable.
      */
-    function getUpdatable(bytes20 itemId) external constant exists(itemId) returns (bool updatable) {
+    function getUpdatable(bytes20 itemId) external view exists(itemId) returns (bool updatable) {
         updatable = itemInfo[itemId].flags & UPDATABLE != 0;
     }
 
@@ -411,7 +411,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return enforceRevisions True if the item enforces revisions.
      */
-    function getEnforceRevisions(bytes20 itemId) external constant exists(itemId) returns (bool enforceRevisions) {
+    function getEnforceRevisions(bytes20 itemId) external view exists(itemId) returns (bool enforceRevisions) {
         enforceRevisions = itemInfo[itemId].flags & ENFORCE_REVISIONS != 0;
     }
 
@@ -420,7 +420,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return retractable True if the item is item retractable.
      */
-    function getRetractable(bytes20 itemId) external constant exists(itemId) returns (bool retractable) {
+    function getRetractable(bytes20 itemId) external view exists(itemId) returns (bool retractable) {
         retractable = itemInfo[itemId].flags & RETRACTABLE != 0;
     }
 
@@ -429,7 +429,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return transferable True if the item is transferable.
      */
-    function getTransferable(bytes20 itemId) external constant exists(itemId) returns (bool transferable) {
+    function getTransferable(bytes20 itemId) external view exists(itemId) returns (bool transferable) {
         transferable = itemInfo[itemId].flags & TRANSFERABLE != 0;
     }
 
@@ -438,7 +438,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return owner Owner of the item.
      */
-    function getOwner(bytes20 itemId) external constant exists(itemId) returns (address owner) {
+    function getOwner(bytes20 itemId) external view exists(itemId) returns (address owner) {
         owner = itemInfo[itemId].owner;
     }
 
@@ -447,7 +447,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return revisionCount How many revisions the item has.
      */
-    function getRevisionCount(bytes20 itemId) external constant exists(itemId) returns (uint revisionCount) {
+    function getRevisionCount(bytes20 itemId) external view exists(itemId) returns (uint revisionCount) {
         revisionCount = itemInfo[itemId].revisionCount;
     }
 
@@ -457,7 +457,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param revisionId Id of the revision.
      * @return ipfsHash IPFS hash of the specified revision.
      */
-    function getRevisionIpfsHash(bytes20 itemId, uint revisionId) external constant revisionExists(itemId, revisionId) returns (bytes32 ipfsHash) {
+    function getRevisionIpfsHash(bytes20 itemId, uint revisionId) external view revisionExists(itemId, revisionId) returns (bytes32 ipfsHash) {
         ipfsHash = itemRevisionIpfsHashes[itemId][revisionId];
     }
 
@@ -466,7 +466,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return ipfsHashes IPFS hashes of all revisions of the item.
      */
-    function getAllRevisionIpfsHashes(bytes20 itemId) external constant returns (bytes32[] ipfsHashes) {
+    function getAllRevisionIpfsHashes(bytes20 itemId) external view returns (bytes32[] ipfsHashes) {
         ipfsHashes = _getAllRevisionIpfsHashes(itemId);
     }
 
