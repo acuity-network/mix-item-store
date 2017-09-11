@@ -1,0 +1,91 @@
+{
+	"compiler": {
+		"version": "0.4.16+commit.d7661dd9"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [{
+			"constant": false,
+			"inputs": [{
+				"name": "contractId",
+				"type": "bytes12"
+			}],
+			"name": "register",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "contractId",
+				"type": "bytes12"
+			}],
+			"name": "getItemStore",
+			"outputs": [{
+				"name": "",
+				"type": "address"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "contractId",
+				"type": "bytes12"
+			}, {
+				"indexed": true,
+				"name": "contractAddress",
+				"type": "address"
+			}],
+			"name": "Register",
+			"type": "event"
+		}],
+		"devdoc": {
+			"author": "Jonathan Brown <jbrown@link-blockchain.org>",
+			"methods": {
+				"getItemStore(bytes12)": {
+					"details": "Get a ItemStore contract.",
+					"params": {
+						"contractId": "Id of the contract."
+					},
+					"return": "The ItemStore contract."
+				},
+				"register(bytes12)": {
+					"details": "Register the calling ItemStore contract.",
+					"params": {
+						"contractId": "Id of the ItemStore contract."
+					}
+				}
+			},
+			"title": "ItemStoreRegistry"
+		},
+		"userdoc": {
+			"methods": {}
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"browser/item_store_registry.sol": "ItemStoreRegistry"
+		},
+		"libraries": {},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"browser/item_store_interface.sol": {
+			"keccak256": "0x9f8bfc6a2b7f69d33d1eaec98536f6ee748c0f984fd04291d6f258161fca912b",
+			"urls": ["bzzr://f2178bbfa55dde152bd1a29ceeb9dc8c0afaded9c335d542df2dc94d978460d3"]
+		},
+		"browser/item_store_registry.sol": {
+			"keccak256": "0xe49a20ded43bb0b438322236a619206249b8f90d48612de9c0eae937c6e5ba58",
+			"urls": ["bzzr://a27e250f4dfb9d009a260d9b69b5d8f70f128b4d70328e5c165a2735ee9447b1"]
+		}
+	},
+	"version": 1
+}

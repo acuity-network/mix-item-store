@@ -1,0 +1,678 @@
+{
+	"compiler": {
+		"version": "0.4.16+commit.d7661dd9"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [{
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getFlags",
+			"outputs": [{
+				"name": "",
+				"type": "bytes1"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getExists",
+			"outputs": [{
+				"name": "",
+				"type": "bool"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "transferEnable",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}, {
+				"name": "ipfsHash",
+				"type": "bytes32"
+			}],
+			"name": "createNewRevision",
+			"outputs": [{
+				"name": "revisionId",
+				"type": "uint256"
+			}],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getRetractable",
+			"outputs": [{
+				"name": "",
+				"type": "bool"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getUpdatable",
+			"outputs": [{
+				"name": "",
+				"type": "bool"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getRevisionCount",
+			"outputs": [{
+				"name": "",
+				"type": "uint256"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [],
+			"name": "getContractId",
+			"outputs": [{
+				"name": "",
+				"type": "bytes12"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "transferDisable",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getAllRevisionIpfsHashes",
+			"outputs": [{
+				"name": "",
+				"type": "bytes32[]"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}, {
+				"name": "revisionId",
+				"type": "uint256"
+			}],
+			"name": "getRevisionIpfsHash",
+			"outputs": [{
+				"name": "",
+				"type": "bytes32"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}, {
+				"name": "ipfsHash",
+				"type": "bytes32"
+			}],
+			"name": "updateLatestRevision",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "flags",
+				"type": "bytes1"
+			}, {
+				"name": "ipfsHash",
+				"type": "bytes32"
+			}, {
+				"name": "nonce",
+				"type": "bytes32"
+			}],
+			"name": "create",
+			"outputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "setEnforceRevisions",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "setNotRetractable",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}, {
+				"name": "ipfsHash",
+				"type": "bytes32"
+			}],
+			"name": "restart",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "retractLatestRevision",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getTransferable",
+			"outputs": [{
+				"name": "",
+				"type": "bool"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}, {
+				"name": "recipient",
+				"type": "address"
+			}],
+			"name": "transfer",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "setNotTransferable",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getInfo",
+			"outputs": [{
+				"name": "flags",
+				"type": "bytes1"
+			}, {
+				"name": "owner",
+				"type": "address"
+			}, {
+				"name": "revisionCount",
+				"type": "uint256"
+			}, {
+				"name": "ipfsHashes",
+				"type": "bytes32[]"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "retract",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "setNotUpdatable",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": false,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "disown",
+			"outputs": [],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getEnforceRevisions",
+			"outputs": [{
+				"name": "",
+				"type": "bool"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"constant": true,
+			"inputs": [{
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "getOwner",
+			"outputs": [{
+				"name": "",
+				"type": "address"
+			}],
+			"payable": false,
+			"stateMutability": "view",
+			"type": "function"
+		}, {
+			"inputs": [{
+				"name": "registry",
+				"type": "address"
+			}],
+			"payable": false,
+			"stateMutability": "nonpayable",
+			"type": "constructor"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "itemId",
+				"type": "bytes20"
+			}, {
+				"indexed": false,
+				"name": "revisionId",
+				"type": "uint256"
+			}, {
+				"indexed": false,
+				"name": "ipfsHash",
+				"type": "bytes32"
+			}],
+			"name": "Publish",
+			"type": "event"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "itemId",
+				"type": "bytes20"
+			}, {
+				"indexed": false,
+				"name": "revisionId",
+				"type": "uint256"
+			}],
+			"name": "RetractRevision",
+			"type": "event"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "Retract",
+			"type": "event"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "itemId",
+				"type": "bytes20"
+			}, {
+				"indexed": false,
+				"name": "recipient",
+				"type": "address"
+			}],
+			"name": "Transfer",
+			"type": "event"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "Disown",
+			"type": "event"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "SetNotUpdatable",
+			"type": "event"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "SetEnforceRevisions",
+			"type": "event"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "SetNotRetractable",
+			"type": "event"
+		}, {
+			"anonymous": false,
+			"inputs": [{
+				"indexed": true,
+				"name": "itemId",
+				"type": "bytes20"
+			}],
+			"name": "SetNotTransferable",
+			"type": "event"
+		}],
+		"devdoc": {
+			"author": "Jonathan Brown <jbrown@link-blockchain.org>",
+			"methods": {
+				"create(bytes1,bytes32,bytes32)": {
+					"details": "Creates a new item. It is guaranteed that different users will never receive the same itemId, even before consensus has been reached. This prevents itemId sniping.",
+					"params": {
+						"flags": "Packed item settings.",
+						"ipfsHash": "Hash of the IPFS object where the item revision is stored.",
+						"nonce": "Unique value that this user has never used before to create a new item."
+					},
+					"return": "itemId Id of the item."
+				},
+				"createNewRevision(bytes20,bytes32)": {
+					"details": "Create a new item revision.",
+					"params": {
+						"ipfsHash": "Hash of the IPFS object where the item revision is stored.",
+						"itemId": "Id of the item."
+					},
+					"return": "revisionId The new revisionId."
+				},
+				"disown(bytes20)": {
+					"details": "Disown an item.",
+					"params": {
+						"itemId": "Id of the item."
+					}
+				},
+				"getAllRevisionIpfsHashes(bytes20)": {
+					"details": "Get the IPFS hashes for all of an item's revisions.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "IPFS hashes of all revisions of the item."
+				},
+				"getContractId()": {
+					"details": "Get the id for this ItemStore contract.",
+					"return": "Id of the contract."
+				},
+				"getEnforceRevisions(bytes20)": {
+					"details": "Determine if an item enforces revisions.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "True if the item enforces revisions."
+				},
+				"getExists(bytes20)": {
+					"details": "Check if an item exists.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "True if the item exists."
+				},
+				"getFlags(bytes20)": {
+					"details": "Get all an item's flags.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "Packed item settings."
+				},
+				"getInfo(bytes20)": {
+					"details": "Get info about an item.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "flags Packed item settings.owner Owner of the item.revisionCount How many revisions the item has.ipfsHashes IPFS hash of each revision."
+				},
+				"getOwner(bytes20)": {
+					"details": "Get the owner of an item.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "Owner of the item."
+				},
+				"getRetractable(bytes20)": {
+					"details": "Determine if an item is retractable.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "True if the item is item retractable."
+				},
+				"getRevisionCount(bytes20)": {
+					"details": "Get the number of revisions an item has.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "How many revisions the item has."
+				},
+				"getRevisionIpfsHash(bytes20,uint256)": {
+					"details": "Get the IPFS hash for a specific item revision.",
+					"params": {
+						"itemId": "Id of the item.",
+						"revisionId": "Id of the revision."
+					},
+					"return": "IPFS hash of the specified revision."
+				},
+				"getTransferable(bytes20)": {
+					"details": "Determine if an item is transferable.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "True if the item is transferable."
+				},
+				"getUpdatable(bytes20)": {
+					"details": "Determine if an item is updatable.",
+					"params": {
+						"itemId": "Id of the item."
+					},
+					"return": "True if the item is updatable."
+				},
+				"restart(bytes20,bytes32)": {
+					"details": "Delete all an item's revisions and replace it with a new item.",
+					"params": {
+						"ipfsHash": "Hash of the IPFS object where the item revision is stored.",
+						"itemId": "Id of the item."
+					}
+				},
+				"retract(bytes20)": {
+					"details": "Retract an item.",
+					"params": {
+						"itemId": "Id of the item. This itemId can never be used again."
+					}
+				},
+				"retractLatestRevision(bytes20)": {
+					"details": "Retract an item's latest revision. Revision 0 cannot be retracted.",
+					"params": {
+						"itemId": "Id of the item."
+					}
+				},
+				"setEnforceRevisions(bytes20)": {
+					"details": "Set an item to enforce revisions.",
+					"params": {
+						"itemId": "Id of the item."
+					}
+				},
+				"setNotRetractable(bytes20)": {
+					"details": "Set an item to not be retractable.",
+					"params": {
+						"itemId": "Id of the item."
+					}
+				},
+				"setNotTransferable(bytes20)": {
+					"details": "Set an item to not be transferable.",
+					"params": {
+						"itemId": "Id of the item."
+					}
+				},
+				"setNotUpdatable(bytes20)": {
+					"details": "Set an item as not updatable.",
+					"params": {
+						"itemId": "Id of the item."
+					}
+				},
+				"transfer(bytes20,address)": {
+					"details": "Transfer an item to a new user.",
+					"params": {
+						"itemId": "Id of the item.",
+						"recipient": "Address of the user to transfer to item to."
+					}
+				},
+				"transferDisable(bytes20)": {
+					"details": "Disable transfer of the item to the current user.",
+					"params": {
+						"itemId": "Id of the item."
+					}
+				},
+				"transferEnable(bytes20)": {
+					"details": "Enable transfer of the item to the current user.",
+					"params": {
+						"itemId": "Id of the item."
+					}
+				},
+				"updateLatestRevision(bytes20,bytes32)": {
+					"details": "Update an item's latest revision.",
+					"params": {
+						"ipfsHash": "Hash of the IPFS object where the item revision is stored.",
+						"itemId": "Id of the item."
+					}
+				}
+			},
+			"title": "ItemStoreIpfsSha256"
+		},
+		"userdoc": {
+			"methods": {}
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"browser/item_store_ipfs_sha256.sol": "ItemStoreIpfsSha256"
+		},
+		"libraries": {},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"browser/item_store_interface.sol": {
+			"keccak256": "0x9f8bfc6a2b7f69d33d1eaec98536f6ee748c0f984fd04291d6f258161fca912b",
+			"urls": ["bzzr://f2178bbfa55dde152bd1a29ceeb9dc8c0afaded9c335d542df2dc94d978460d3"]
+		},
+		"browser/item_store_ipfs_sha256.sol": {
+			"keccak256": "0xdebe617a688125f17131975ad93e65f02ac70513bffcad5b64f06afcf34f4aab",
+			"urls": ["bzzr://d363a74b7d71c075b1120c196b9e9c35c05054bf0626a491a35aff8a9b4ed558"]
+		},
+		"browser/item_store_registry.sol": {
+			"keccak256": "0xe49a20ded43bb0b438322236a619206249b8f90d48612de9c0eae937c6e5ba58",
+			"urls": ["bzzr://a27e250f4dfb9d009a260d9b69b5d8f70f128b4d70328e5c165a2735ee9447b1"]
+		}
+	},
+	"version": 1
+}
