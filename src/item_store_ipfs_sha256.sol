@@ -1,4 +1,4 @@
-pragma solidity ^0.4.14;
+pragma solidity ^0.4.16;
 
 import "./item_store_interface.sol";
 import "./item_store_registry.sol";
@@ -168,7 +168,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             state: State.Exists,
             flags: flags,
             revisionCount: 1,
-            owner: (flags & ANONYMOUS == 0) ? msg.sender : 0,
+            owner: (flags & ANONYMOUS == 0) ? msg.sender : 0
         });
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;
@@ -249,7 +249,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             state: State.Retracted,
             flags: 0,
             revisionCount: 0,
-            owner: 0,
+            owner: 0
         });
         // Log the item retraction.
         Retract(itemId);
@@ -355,8 +355,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return exists True if the item exists.
      */
-    function getExists(bytes20 itemId) external constant returns (bool exists) {
-        exists = itemInfo[itemId].state == State.Exists;
+    function getExists(bytes20 itemId) external constant returns (bool) {
+        return itemInfo[itemId].state == State.Exists;
     }
 
     /**
@@ -381,7 +381,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return ipfsHashes IPFS hash of each revision.
      */
     function getInfo(bytes20 itemId) external constant exists(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes) {
-        ItemInfo info = itemInfo[itemId];
+        ItemInfo storage info = itemInfo[itemId];
         flags = info.flags;
         owner = info.owner;
         revisionCount = info.revisionCount;
