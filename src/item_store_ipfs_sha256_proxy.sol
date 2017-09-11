@@ -137,71 +137,71 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @dev Get the id for this ItemStore contract.
      * @return Id of the contract.
      */
-    function getContractId() external view returns (bytes12 contractId) {
-        contractId = itemStore.getContractId();
+    function getContractId() external view returns (bytes12) {
+        return itemStore.getContractId();
     }
 
     /**
      * @dev Check if an item exists.
      * @param itemId Id of the item.
-     * @return exists True if the item exists.
+     * @return True if the item exists.
      */
-    function getExists(bytes20 itemId) external view returns (bool exists) {
-        exists = itemStore.getExists(itemId);
+    function getExists(bytes20 itemId) external view returns (bool) {
+        return itemStore.getExists(itemId);
     }
 
     /**
      * @dev Determine if an item is updatable.
      * @param itemId Id of the item.
-     * @return updatable True if the item is updatable.
+     * @return True if the item is updatable.
      */
-    function getUpdatable(bytes20 itemId) external view returns (bool updatable) {
-        updatable = itemStore.getUpdatable(itemId);
+    function getUpdatable(bytes20 itemId) external view returns (bool) {
+        return itemStore.getUpdatable(itemId);
     }
 
     /**
      * @dev Determine if an item enforces revisions.
      * @param itemId Id of the item.
-     * @return enforceRevisions True if the item enforces revisions.
+     * @return True if the item enforces revisions.
      */
-    function getEnforceRevisions(bytes20 itemId) external view returns (bool enforceRevisions) {
-        enforceRevisions = itemStore.getEnforceRevisions(itemId);
+    function getEnforceRevisions(bytes20 itemId) external view returns (bool) {
+        return itemStore.getEnforceRevisions(itemId);
     }
 
     /**
      * @dev Determine if an item is retractable.
      * @param itemId Id of the item.
-     * @return retractable True if the item is item retractable.
+     * @return True if the item is item retractable.
      */
-    function getRetractable(bytes20 itemId) external view returns (bool retractable) {
-        retractable = itemStore.getRetractable(itemId);
+    function getRetractable(bytes20 itemId) external view returns (bool) {
+        return itemStore.getRetractable(itemId);
     }
 
     /**
      * @dev Determine if an item is transferable.
      * @param itemId Id of the item.
-     * @return transferable True if the item is transferable.
+     * @return True if the item is transferable.
      */
-    function getTransferable(bytes20 itemId) external view returns (bool transferable) {
-        transferable = itemStore.getTransferable(itemId);
+    function getTransferable(bytes20 itemId) external view returns (bool) {
+        return itemStore.getTransferable(itemId);
     }
 
     /**
      * @dev Get the owner of an item.
      * @param itemId Id of the item.
-     * @return owner Owner of the item.
+     * @return Owner of the item.
      */
-    function getOwner(bytes20 itemId) external view returns (address owner) {
-        owner = itemStore.getOwner(itemId);
+    function getOwner(bytes20 itemId) external view returns (address) {
+        return itemStore.getOwner(itemId);
     }
 
     /**
      * @dev Get the number of revisions an item has.
      * @param itemId Id of the item.
-     * @return revisionCount How many revisions the item has.
+     * @return How many revisions the item has.
      */
-    function getRevisionCount(bytes20 itemId) external view returns (uint revisionCount) {
-        revisionCount = itemStore.getRevisionCount(itemId);
+    function getRevisionCount(bytes20 itemId) external view returns (uint) {
+        return itemStore.getRevisionCount(itemId);
     }
 
 }

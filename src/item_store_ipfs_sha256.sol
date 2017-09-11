@@ -353,7 +353,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     /**
      * @dev Check if an item exists.
      * @param itemId Id of the item.
-     * @return exists True if the item exists.
+     * @return True if the item exists.
      */
     function getExists(bytes20 itemId) external view returns (bool) {
         return itemInfo[itemId].state == State.Exists;
@@ -391,83 +391,83 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     /**
      * @dev Get all an item's flags.
      * @param itemId Id of the item.
-     * @return flags Packed item settings.
+     * @return Packed item settings.
      */
-    function getFlags(bytes20 itemId) external view exists(itemId) returns (byte flags) {
-        flags = itemInfo[itemId].flags;
+    function getFlags(bytes20 itemId) external view exists(itemId) returns (byte) {
+        return itemInfo[itemId].flags;
     }
 
     /**
      * @dev Determine if an item is updatable.
      * @param itemId Id of the item.
-     * @return updatable True if the item is updatable.
+     * @return True if the item is updatable.
      */
-    function getUpdatable(bytes20 itemId) external view exists(itemId) returns (bool updatable) {
-        updatable = itemInfo[itemId].flags & UPDATABLE != 0;
+    function getUpdatable(bytes20 itemId) external view exists(itemId) returns (bool) {
+        return itemInfo[itemId].flags & UPDATABLE != 0;
     }
 
     /**
      * @dev Determine if an item enforces revisions.
      * @param itemId Id of the item.
-     * @return enforceRevisions True if the item enforces revisions.
+     * @return True if the item enforces revisions.
      */
-    function getEnforceRevisions(bytes20 itemId) external view exists(itemId) returns (bool enforceRevisions) {
-        enforceRevisions = itemInfo[itemId].flags & ENFORCE_REVISIONS != 0;
+    function getEnforceRevisions(bytes20 itemId) external view exists(itemId) returns (bool) {
+        return itemInfo[itemId].flags & ENFORCE_REVISIONS != 0;
     }
 
     /**
      * @dev Determine if an item is retractable.
      * @param itemId Id of the item.
-     * @return retractable True if the item is item retractable.
+     * @return True if the item is item retractable.
      */
-    function getRetractable(bytes20 itemId) external view exists(itemId) returns (bool retractable) {
-        retractable = itemInfo[itemId].flags & RETRACTABLE != 0;
+    function getRetractable(bytes20 itemId) external view exists(itemId) returns (bool) {
+        return itemInfo[itemId].flags & RETRACTABLE != 0;
     }
 
     /**
      * @dev Determine if an item is transferable.
      * @param itemId Id of the item.
-     * @return transferable True if the item is transferable.
+     * @return True if the item is transferable.
      */
-    function getTransferable(bytes20 itemId) external view exists(itemId) returns (bool transferable) {
-        transferable = itemInfo[itemId].flags & TRANSFERABLE != 0;
+    function getTransferable(bytes20 itemId) external view exists(itemId) returns (bool) {
+        return itemInfo[itemId].flags & TRANSFERABLE != 0;
     }
 
     /**
      * @dev Get the owner of an item.
      * @param itemId Id of the item.
-     * @return owner Owner of the item.
+     * @return Owner of the item.
      */
-    function getOwner(bytes20 itemId) external view exists(itemId) returns (address owner) {
-        owner = itemInfo[itemId].owner;
+    function getOwner(bytes20 itemId) external view exists(itemId) returns (address) {
+        return itemInfo[itemId].owner;
     }
 
     /**
      * @dev Get the number of revisions an item has.
      * @param itemId Id of the item.
-     * @return revisionCount How many revisions the item has.
+     * @return How many revisions the item has.
      */
-    function getRevisionCount(bytes20 itemId) external view exists(itemId) returns (uint revisionCount) {
-        revisionCount = itemInfo[itemId].revisionCount;
+    function getRevisionCount(bytes20 itemId) external view exists(itemId) returns (uint) {
+        return itemInfo[itemId].revisionCount;
     }
 
    /**
      * @dev Get the IPFS hash for a specific item revision.
      * @param itemId Id of the item.
      * @param revisionId Id of the revision.
-     * @return ipfsHash IPFS hash of the specified revision.
+     * @return IPFS hash of the specified revision.
      */
-    function getRevisionIpfsHash(bytes20 itemId, uint revisionId) external view revisionExists(itemId, revisionId) returns (bytes32 ipfsHash) {
-        ipfsHash = itemRevisionIpfsHashes[itemId][revisionId];
+    function getRevisionIpfsHash(bytes20 itemId, uint revisionId) external view revisionExists(itemId, revisionId) returns (bytes32) {
+        return itemRevisionIpfsHashes[itemId][revisionId];
     }
 
     /**
      * @dev Get the IPFS hashes for all of an item's revisions.
      * @param itemId Id of the item.
-     * @return ipfsHashes IPFS hashes of all revisions of the item.
+     * @return IPFS hashes of all revisions of the item.
      */
-    function getAllRevisionIpfsHashes(bytes20 itemId) external view returns (bytes32[] ipfsHashes) {
-        ipfsHashes = _getAllRevisionIpfsHashes(itemId);
+    function getAllRevisionIpfsHashes(bytes20 itemId) external view returns (bytes32[]) {
+        return _getAllRevisionIpfsHashes(itemId);
     }
 
 }
