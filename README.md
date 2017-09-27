@@ -1,3 +1,3 @@
-# Link Item Store
+# MIX Item Store
 
-Pluggable smart contract system for storing revisionable Link content items.
+Pluggable smart contract system for storing revisionable MIX content items.
