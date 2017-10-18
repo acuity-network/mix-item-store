@@ -305,7 +305,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             inUse: true,
             flags: 0,
             revisionCount: 0,
-            timestamp: uint32(block.timestamp),   // ?
+            timestamp: 0,
             owner: 0
         });
         // Log the item retraction.
