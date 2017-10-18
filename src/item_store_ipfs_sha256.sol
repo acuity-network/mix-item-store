@@ -18,9 +18,9 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     byte constant ANONYMOUS = 0x10;           // True if the item should not have an owner at time of creation.
 
     /**
-     * @dev Single slot structure of item info.
+     * @dev Single slot structure of item state.
      */
-    struct ItemInfo {
+    struct ItemState {
         bool inUse;             // Has this itemId ever been used.
         byte flags;             // Packed item settings.
         uint32 revisionCount;   // Number of revisions including revision 0.
@@ -29,9 +29,9 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
-     * @dev Mapping of itemId to item info.
+     * @dev Mapping of itemId to item state.
      */
-    mapping (bytes20 => ItemInfo) itemInfo;
+    mapping (bytes20 => ItemState) itemState;
 
     /**
      * @dev Mapping of itemId to mapping of packed slots of eight 32-bit timestamps.
@@ -66,7 +66,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      */
     modifier inUse(bytes20 itemId) {
-        require (itemInfo[itemId].inUse);
+        require (itemState[itemId].inUse);
         _;
     }
 
@@ -75,7 +75,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      */
     modifier isOwner(bytes20 itemId) {
-        require (itemInfo[itemId].owner == msg.sender);
+        require (itemState[itemId].owner == msg.sender);
         _;
     }
 
@@ -84,7 +84,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      */
     modifier isUpdatable(bytes20 itemId) {
-        require (itemInfo[itemId].flags & UPDATABLE != 0);
+        require (itemState[itemId].flags & UPDATABLE != 0);
         _;
     }
 
@@ -93,7 +93,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      */
     modifier isNotEnforceRevisions(bytes20 itemId) {
-        require (itemInfo[itemId].flags & ENFORCE_REVISIONS == 0);
+        require (itemState[itemId].flags & ENFORCE_REVISIONS == 0);
         _;
     }
 
@@ -102,7 +102,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      */
     modifier isRetractable(bytes20 itemId) {
-        require (itemInfo[itemId].flags & RETRACTABLE != 0);
+        require (itemState[itemId].flags & RETRACTABLE != 0);
         _;
     }
 
@@ -111,7 +111,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      */
     modifier isTransferable(bytes20 itemId) {
-        require (itemInfo[itemId].flags & TRANSFERABLE != 0);
+        require (itemState[itemId].flags & TRANSFERABLE != 0);
         _;
     }
 
@@ -130,7 +130,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      */
     modifier hasAdditionalRevisions(bytes20 itemId) {
-        require (itemInfo[itemId].revisionCount > 1);
+        require (itemState[itemId].revisionCount > 1);
         _;
     }
 
@@ -140,7 +140,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param revisionId Id of the revision.
      */
     modifier revisionExists(bytes20 itemId, uint revisionId) {
-        require (revisionId < itemInfo[itemId].revisionCount);
+        require (revisionId < itemState[itemId].revisionCount);
         _;
     }
 
@@ -166,9 +166,9 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Generate the itemId.
         itemId = bytes20(keccak256(msg.sender, nonce));
         // Make sure this itemId has not been used before.
-        require (!itemInfo[itemId].inUse);
-        // Store item info in state.
-        itemInfo[itemId] = ItemInfo({
+        require (!itemState[itemId].inUse);
+        // Store item state.
+        itemState[itemId] = ItemState({
             inUse: true,
             flags: flags,
             revisionCount: 1,
@@ -207,7 +207,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function createNewRevision(bytes20 itemId, bytes32 ipfsHash) external isOwner(itemId) isUpdatable(itemId) returns (uint revisionId) {
         // Increment the number of revisions.
-        revisionId = itemInfo[itemId].revisionCount++;
+        revisionId = itemState[itemId].revisionCount++;
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][revisionId] = ipfsHash;
         // Store the timestamp.
@@ -222,15 +222,15 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
      */
     function updateLatestRevision(bytes20 itemId, bytes32 ipfsHash) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) {
-        // Get item info.
-        ItemInfo storage info = itemInfo[itemId];
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Determine the revisionId.
-        uint revisionId = info.revisionCount - 1;
+        uint revisionId = state.revisionCount - 1;
         // Update the IPFS hash.
         itemRevisionIpfsHashes[itemId][revisionId] = ipfsHash;
         // Update the timestamp.
         if (revisionId == 0) {
-            info.timestamp = uint32(block.timestamp);
+            state.timestamp = uint32(block.timestamp);
         }
         else {
             _setPackedTimestamp(itemId, revisionId - 1);
@@ -245,7 +245,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function retractLatestRevision(bytes20 itemId) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) hasAdditionalRevisions(itemId) {
         // Decrement the number of revisions.
-        uint revisionId = --itemInfo[itemId].revisionCount;
+        uint revisionId = --itemState[itemId].revisionCount;
         // Delete the IPFS hash.
         delete itemRevisionIpfsHashes[itemId][revisionId];
         // Delete the packed timestamp slot if it is no longer required.
@@ -262,8 +262,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function _deleteAllPackedRevisionTimestamps(bytes20 itemId) internal {
         // Determine how many slots should be deleted.
-        // Timestamp of the first revision is stored in the item info, so the first slot only needs to be deleted if there are at least 2 revisions.
-        uint slotCount = (itemInfo[itemId].revisionCount + 6) / 8;
+        // Timestamp of the first revision is stored in the item state, so the first slot only needs to be deleted if there are at least 2 revisions.
+        uint slotCount = (itemState[itemId].revisionCount + 6) / 8;
         // Delete the slots.
         for (uint i = 0; i < slotCount; i++) {
             delete packedTimestamps[itemId][i];
@@ -277,15 +277,14 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function restart(bytes20 itemId, bytes32 ipfsHash) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) {
         // Delete all the IPFS hashes except the first one.
-        for (uint i = 1; i < itemInfo[itemId].revisionCount; i++) {
+        for (uint i = 1; i < itemState[itemId].revisionCount; i++) {
             delete itemRevisionIpfsHashes[itemId][i];
         }
         // Delete the packed revision timestamps.
         _deleteAllPackedRevisionTimestamps(itemId);
-        // Update the item state info.
-        itemInfo[itemId].revisionCount = 1;
-        // Update the timestamp.
-        itemInfo[itemId].timestamp = uint32(block.timestamp);
+        // Update the item state.
+        itemState[itemId].revisionCount = 1;
+        itemState[itemId].timestamp = uint32(block.timestamp);
         // Update the first IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;
         // Log the revision.
@@ -298,11 +297,11 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function retract(bytes20 itemId) external isOwner(itemId) isRetractable(itemId) {
         // Delete all the IPFS hashes.
-        for (uint i = 0; i < itemInfo[itemId].revisionCount; i++) {
+        for (uint i = 0; i < itemState[itemId].revisionCount; i++) {
             delete itemRevisionIpfsHashes[itemId][i];
         }
         // Mark this item as retracted.
-        itemInfo[itemId] = ItemInfo({
+        itemState[itemId] = ItemState({
             inUse: true,
             flags: 0,
             revisionCount: 0,
@@ -338,7 +337,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function transfer(bytes20 itemId, address recipient) external isOwner(itemId) isTransferable(itemId) isTransferEnabled(itemId, recipient) {
         // Update ownership of the item.
-        itemInfo[itemId].owner = recipient;
+        itemState[itemId].owner = recipient;
         // Disable this transfer in future and free up the slot.
         enabledTransfers[itemId][recipient] = false;
         // Log the transfer.
@@ -351,7 +350,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function disown(bytes20 itemId) external isOwner(itemId) isTransferable(itemId) {
         // Remove the owner from the item's state.
-        delete itemInfo[itemId].owner;
+        delete itemState[itemId].owner;
         // Log that the item has been disowned.
         Disown(itemId);
     }
@@ -362,7 +361,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function setNotUpdatable(bytes20 itemId) external isOwner(itemId) {
         // Record in state that the item is not updatable.
-        itemInfo[itemId].flags &= ~UPDATABLE;
+        itemState[itemId].flags &= ~UPDATABLE;
         // Log that the item is not updatable.
         SetNotUpdatable(itemId);
     }
@@ -373,7 +372,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function setEnforceRevisions(bytes20 itemId) external isOwner(itemId) {
         // Record in state that all changes to this item must be new revisions.
-        itemInfo[itemId].flags |= ENFORCE_REVISIONS;
+        itemState[itemId].flags |= ENFORCE_REVISIONS;
         // Log that the item now enforces new revisions.
         SetEnforceRevisions(itemId);
     }
@@ -384,7 +383,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function setNotRetractable(bytes20 itemId) external isOwner(itemId) {
         // Record in state that the item is not retractable.
-        itemInfo[itemId].flags &= ~RETRACTABLE;
+        itemState[itemId].flags &= ~RETRACTABLE;
         // Log that the item is not retractable.
         SetNotRetractable(itemId);
     }
@@ -395,7 +394,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function setNotTransferable(bytes20 itemId) external isOwner(itemId) {
         // Record in state that the item is not transferable.
-        itemInfo[itemId].flags &= ~TRANSFERABLE;
+        itemState[itemId].flags &= ~TRANSFERABLE;
         // Log that the item is not transferable.
         SetNotTransferable(itemId);
     }
@@ -414,7 +413,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return True if the itemId is in use.
      */
     function getInUse(bytes20 itemId) external view returns (bool) {
-        return itemInfo[itemId].inUse;
+        return itemState[itemId].inUse;
     }
 
     /**
@@ -423,7 +422,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return ipfsHashes Revision IPFS hashes.
      */
     function _getAllRevisionIpfsHashes(bytes20 itemId) internal returns (bytes32[] ipfsHashes) {
-        uint revisionCount = itemInfo[itemId].revisionCount;
+        uint revisionCount = itemState[itemId].revisionCount;
         ipfsHashes = new bytes32[](revisionCount);
         for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
             ipfsHashes[revisionId] = itemRevisionIpfsHashes[itemId][revisionId];
@@ -438,7 +437,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function _getRevisionTimestamp(bytes20 itemId, uint revisionId) internal returns (uint timestamp) {
         if (revisionId == 0) {
-            timestamp = itemInfo[itemId].timestamp;
+            timestamp = itemState[itemId].timestamp;
         }
         else {
             uint offset = revisionId - 1;
@@ -452,7 +451,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return timestamps Revision timestamps.
      */
     function _getAllRevisionTimestamps(bytes20 itemId) internal returns (uint[] timestamps) {
-        uint revisionCount = itemInfo[itemId].revisionCount;
+        uint revisionCount = itemState[itemId].revisionCount;
         timestamps = new uint[](revisionCount);
         for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
             timestamps[revisionId] = _getRevisionTimestamp(itemId, revisionId);
@@ -460,7 +459,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
-     * @dev Get info about an item.
+     * @dev Get item state.
      * @param itemId Id of the item.
      * @return flags Packed item settings.
      * @return owner Owner of the item.
@@ -469,10 +468,10 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return timestamps Timestamp of each revision.
      */
     function getInfo(bytes20 itemId) external view inUse(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes, uint[] timestamps) {
-        ItemInfo storage info = itemInfo[itemId];
-        flags = info.flags;
-        owner = info.owner;
-        revisionCount = info.revisionCount;
+        ItemState storage state = itemState[itemId];
+        flags = state.flags;
+        owner = state.owner;
+        revisionCount = state.revisionCount;
         ipfsHashes = _getAllRevisionIpfsHashes(itemId);
         timestamps = _getAllRevisionTimestamps(itemId);
     }
@@ -483,7 +482,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return Packed item settings.
      */
     function getFlags(bytes20 itemId) external view inUse(itemId) returns (byte) {
-        return itemInfo[itemId].flags;
+        return itemState[itemId].flags;
     }
 
     /**
@@ -492,7 +491,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return True if the item is updatable.
      */
     function getUpdatable(bytes20 itemId) external view inUse(itemId) returns (bool) {
-        return itemInfo[itemId].flags & UPDATABLE != 0;
+        return itemState[itemId].flags & UPDATABLE != 0;
     }
 
     /**
@@ -501,7 +500,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return True if the item enforces revisions.
      */
     function getEnforceRevisions(bytes20 itemId) external view inUse(itemId) returns (bool) {
-        return itemInfo[itemId].flags & ENFORCE_REVISIONS != 0;
+        return itemState[itemId].flags & ENFORCE_REVISIONS != 0;
     }
 
     /**
@@ -510,7 +509,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return True if the item is item retractable.
      */
     function getRetractable(bytes20 itemId) external view inUse(itemId) returns (bool) {
-        return itemInfo[itemId].flags & RETRACTABLE != 0;
+        return itemState[itemId].flags & RETRACTABLE != 0;
     }
 
     /**
@@ -519,7 +518,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return True if the item is transferable.
      */
     function getTransferable(bytes20 itemId) external view inUse(itemId) returns (bool) {
-        return itemInfo[itemId].flags & TRANSFERABLE != 0;
+        return itemState[itemId].flags & TRANSFERABLE != 0;
     }
 
     /**
@@ -528,7 +527,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return Owner of the item.
      */
     function getOwner(bytes20 itemId) external view inUse(itemId) returns (address) {
-        return itemInfo[itemId].owner;
+        return itemState[itemId].owner;
     }
 
     /**
@@ -537,7 +536,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return How many revisions the item has.
      */
     function getRevisionCount(bytes20 itemId) external view inUse(itemId) returns (uint) {
-        return itemInfo[itemId].revisionCount;
+        return itemState[itemId].revisionCount;
     }
 
    /**
