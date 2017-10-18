@@ -8,7 +8,7 @@ import "./item_store_ipfs_sha256.sol";
 
 /**
  * @title ItemStoreRegistryTest
- * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @author Jonathan Brown <jbrown@mix-blockchain.org>
  * @dev Testing contract for ItemStoreRegistry.
  */
 contract ItemStoreRegistryTest is DSTest {

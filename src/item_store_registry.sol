@@ -5,7 +5,7 @@ import "./item_store_interface.sol";
 
 /**
  * @title ItemStoreRegistry
- * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @author Jonathan Brown <jbrown@mix-blockchain.org>
  * @dev Contract that every ItemStore implementation must register with.
  */
 contract ItemStoreRegistry {

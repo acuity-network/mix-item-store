@@ -3,7 +3,7 @@ pragma solidity ^0.4.17;
 
 /**
  * @title ItemStoreInterface
- * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @author Jonathan Brown <jbrown@mix-blockchain.org>
  * @dev ItemStore implementation interface.
  */
 interface ItemStoreInterface {

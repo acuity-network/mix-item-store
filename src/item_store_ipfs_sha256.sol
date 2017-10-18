@@ -6,7 +6,7 @@ import "./item_store_registry.sol";
 
 /**
  * @title ItemStoreIpfsSha256
- * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @author Jonathan Brown <jbrown@mix-blockchain.org>
  * @dev ItemStore implementation where each item revision is a SHA256 IPFS hash.
  */
 contract ItemStoreIpfsSha256 is ItemStoreInterface {

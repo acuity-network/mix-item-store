@@ -9,7 +9,7 @@ import "./item_store_ipfs_sha256_proxy.sol";
 
 /**
  * @title ItemStoreIpfsSha256Test
- * @author Jonathan Brown <jbrown@link-blockchain.org>
+ * @author Jonathan Brown <jbrown@mix-blockchain.org>
  * @dev Testing contract for ItemStoreIpfsSha256.
  */
 contract ItemStoreIpfsSha256Test is DSTest {
