@@ -421,7 +421,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return ipfsHashes Revision IPFS hashes.
      */
-    function _getAllRevisionIpfsHashes(bytes20 itemId) internal returns (bytes32[] ipfsHashes) {
+    function _getAllRevisionIpfsHashes(bytes20 itemId) internal view returns (bytes32[] ipfsHashes) {
         uint revisionCount = itemState[itemId].revisionCount;
         ipfsHashes = new bytes32[](revisionCount);
         for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
@@ -435,7 +435,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param revisionId Id of the revision.
      * @return timestamp Timestamp of the specified revision.
      */
-    function _getRevisionTimestamp(bytes20 itemId, uint revisionId) internal returns (uint timestamp) {
+    function _getRevisionTimestamp(bytes20 itemId, uint revisionId) internal view returns (uint timestamp) {
         if (revisionId == 0) {
             timestamp = itemState[itemId].timestamp;
         }
@@ -450,7 +450,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return timestamps Revision timestamps.
      */
-    function _getAllRevisionTimestamps(bytes20 itemId) internal returns (uint[] timestamps) {
+    function _getAllRevisionTimestamps(bytes20 itemId) internal view returns (uint[] timestamps) {
         uint revisionCount = itemState[itemId].revisionCount;
         timestamps = new uint[](revisionCount);
         for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
