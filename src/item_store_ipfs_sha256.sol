@@ -23,9 +23,10 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @dev Single slot structure of item info.
      */
     struct ItemInfo {
-        State state;            // Unused, exists or retracted.
         byte flags;             // Packed item settings.
+        State state;            // Unused, exists or retracted.
         uint32 revisionCount;   // Number of revisions including revision 0.
+        uint32 timestamp;       // Timestamp of revision 0.
         address owner;          // Who owns this item.
     }
 
@@ -33,6 +34,11 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @dev Mapping of itemId to item info.
      */
     mapping (bytes20 => ItemInfo) itemInfo;
+
+    /**
+     * @dev Mapping of itemId to mapping of packed slots of eight 32-bit timestamps.
+     */
+    mapping (bytes20 => mapping (uint => bytes32)) packedTimestamps;
 
     /**
      * @dev Mapping of itemId to mapping of revision number to IPFS hash.
@@ -165,15 +171,34 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         require (itemInfo[itemId].state == State.Unused);
         // Store item info in state.
         itemInfo[itemId] = ItemInfo({
-            state: State.Exists,
             flags: flags,
+            state: State.Exists,
             revisionCount: 1,
+            timestamp: uint32(block.timestamp),
             owner: (flags & ANONYMOUS == 0) ? msg.sender : 0
         });
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;
         // Log the first revision.
         Publish(itemId, 0, ipfsHash);
+    }
+
+    /**
+     * @dev Store an item revision timestamp in a packed slot.
+     * @param itemId Id of the item.
+     * @param offset The offset of the timestamp that should be stored.
+     */
+    function _setPackedTimestamp(bytes20 itemId, uint offset) internal {
+        // Get the slot.
+        bytes32 slot = packedTimestamps[itemId][offset / 8];
+        // Calculate the shift.
+        uint shift = (offset % 8) * 32;
+        // Wipe the previous timestamp.
+        slot &= ~(bytes32(uint32(-1)) << shift);
+        // Insert the current timestamp.
+        slot |= bytes32(uint32(block.timestamp)) << shift;
+        // Store the slot.
+        packedTimestamps[itemId][offset / 8] = slot;
     }
 
     /**
@@ -187,6 +212,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         revisionId = itemInfo[itemId].revisionCount++;
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][revisionId] = ipfsHash;
+        // Store the timestamp.
+        _setPackedTimestamp(itemId, revisionId - 1);
         // Log the revision.
         Publish(itemId, revisionId, ipfsHash);
     }
@@ -197,9 +224,19 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
      */
     function updateLatestRevision(bytes20 itemId, bytes32 ipfsHash) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) {
-        uint revisionId = itemInfo[itemId].revisionCount - 1;
+        // Get item info.
+        ItemInfo storage info = itemInfo[itemId];
+        // Determine the revisionId.
+        uint revisionId = info.revisionCount - 1;
         // Update the IPFS hash.
         itemRevisionIpfsHashes[itemId][revisionId] = ipfsHash;
+        // Update the timestamp.
+        if (revisionId == 0) {
+            info.timestamp = uint32(block.timestamp);
+        }
+        else {
+            _setPackedTimestamp(itemId, revisionId - 1);
+        }
         // Log the revision.
         Publish(itemId, revisionId, ipfsHash);
     }
@@ -213,8 +250,26 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         uint revisionId = --itemInfo[itemId].revisionCount;
         // Delete the IPFS hash.
         delete itemRevisionIpfsHashes[itemId][revisionId];
+        // Delete the packed timestamp slot if it is no longer required.
+        if (revisionId % 8 == 1) {
+            delete packedTimestamps[itemId][revisionId / 8];
+        }
         // Log the revision retraction.
         RetractRevision(itemId, revisionId);
+    }
+
+    /**
+     * @dev Delete all of an item's packed revision timestamps.
+     * @param itemId Id of the item.
+     */
+    function _deleteAllPackedRevisionTimestamps(bytes20 itemId) internal {
+        // Determine how many slots should be deleted.
+        // Timestamp of the first revision is stored in the item info, so the first slot only needs to be deleted if there are at least 2 revisions.
+        uint slotCount = (itemInfo[itemId].revisionCount + 6) / 8;
+        // Delete the slots.
+        for (uint i = 0; i < slotCount; i++) {
+            delete packedTimestamps[itemId][i];
+        }
     }
 
     /**
@@ -227,8 +282,12 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         for (uint i = 1; i < itemInfo[itemId].revisionCount; i++) {
             delete itemRevisionIpfsHashes[itemId][i];
         }
+        // Delete the packed revision timestamps.
+        _deleteAllPackedRevisionTimestamps(itemId);
         // Update the item state info.
         itemInfo[itemId].revisionCount = 1;
+        // Update the timestamp.
+        itemInfo[itemId].timestamp = uint32(block.timestamp);
         // Update the first IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;
         // Log the revision.
@@ -246,9 +305,10 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         }
         // Mark this item as retracted.
         itemInfo[itemId] = ItemInfo({
-            state: State.Retracted,
             flags: 0,
+            state: State.Retracted,
             revisionCount: 0,
+            timestamp: uint32(block.timestamp),
             owner: 0
         });
         // Log the item retraction.
@@ -373,19 +433,50 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
+     * @dev Get the timestamp for a specific item revision.
+     * @param itemId Id of the item.
+     * @param revisionId Id of the revision.
+     * @return timestamp Timestamp of the specified revision.
+     */
+    function _getRevisionTimestamp(bytes20 itemId, uint revisionId) internal returns (uint timestamp) {
+        if (revisionId == 0) {
+            timestamp = itemInfo[itemId].timestamp;
+        }
+        else {
+            uint offset = revisionId - 1;
+            timestamp = uint32(packedTimestamps[itemId][offset / 8] >> ((offset % 8) * 32));
+        }
+    }
+
+    /**
+     * @dev Get the timestamps for all of an item's revisions.
+     * @param itemId Id of the item.
+     * @return timestamps Revision timestamps.
+     */
+    function _getAllRevisionTimestamps(bytes20 itemId) internal returns (uint[] timestamps) {
+        uint revisionCount = itemInfo[itemId].revisionCount;
+        timestamps = new uint[](revisionCount);
+        for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
+            timestamps[revisionId] = _getRevisionTimestamp(itemId, revisionId);
+        }
+    }
+
+    /**
      * @dev Get info about an item.
      * @param itemId Id of the item.
      * @return flags Packed item settings.
      * @return owner Owner of the item.
      * @return revisionCount How many revisions the item has.
      * @return ipfsHashes IPFS hash of each revision.
+     * @return timestamps Timestamp of each revision.
      */
-    function getInfo(bytes20 itemId) external view exists(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes) {
+    function getInfo(bytes20 itemId) external view exists(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes, uint[] timestamps) {
         ItemInfo storage info = itemInfo[itemId];
         flags = info.flags;
         owner = info.owner;
         revisionCount = info.revisionCount;
         ipfsHashes = _getAllRevisionIpfsHashes(itemId);
+        timestamps = _getAllRevisionTimestamps(itemId);
     }
 
     /**
@@ -466,8 +557,27 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return IPFS hashes of all revisions of the item.
      */
-    function getAllRevisionIpfsHashes(bytes20 itemId) external view returns (bytes32[]) {
+    function getAllRevisionIpfsHashes(bytes20 itemId) external view exists(itemId) returns (bytes32[]) {
         return _getAllRevisionIpfsHashes(itemId);
+    }
+
+   /**
+     * @dev Get the timestamp for a specific item revision.
+     * @param itemId Id of the item.
+     * @param revisionId Id of the revision.
+     * @return Timestamp of the specified revision.
+     */
+    function getRevisionTimestamp(bytes20 itemId, uint revisionId) external view revisionExists(itemId, revisionId) returns (uint) {
+        return _getRevisionTimestamp(itemId, revisionId);
+    }
+
+    /**
+     * @dev Get the timestamps for all of an item's revisions.
+     * @param itemId Id of the item.
+     * @return Timestamps of all revisions of the item.
+     */
+    function getAllRevisionTimestamps(bytes20 itemId) external view exists(itemId) returns (uint[]) {
+        return _getAllRevisionTimestamps(itemId);
     }
 
 }
