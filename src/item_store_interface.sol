@@ -126,11 +126,11 @@ interface ItemStoreInterface {
     function getContractId() external view returns (bytes12);
 
     /**
-     * @dev Check if an item exists.
+     * @dev Check if an itemId is in use.
      * @param itemId Id of the item.
-     * @return True if the item exists.
+     * @return True if the itemId is in use.
      */
-    function getExists(bytes20 itemId) external view returns (bool);
+    function getInUse(bytes20 itemId) external view returns (bool);
 
     /**
      * @dev Determine if an item is updatable.

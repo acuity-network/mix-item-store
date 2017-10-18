@@ -42,7 +42,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testCreate() {
         bytes20 itemId0 = itemStore.create(0, 0x1234, 0);
-        assert(itemStore.getExists(itemId0));
+        assert(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
         assertEq(itemStore.getOwner(itemId0), this);
         assertEq(itemStore.getRevisionCount(itemId0), 1);
@@ -54,7 +54,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
 
         bytes20 itemId1 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, 0x1234, 1);
-        assert(itemStore.getExists(itemId1));
+        assert(itemStore.getInUse(itemId1));
         assertEq(itemStore.getFlags(itemId1), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS);
         assertEq(itemStore.getOwner(itemId1), 0);
         assertEq(itemStore.getRevisionCount(itemId1), 1);
@@ -66,7 +66,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
 
         bytes20 itemId2 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, 0x2345, 2);
-        assert(itemStore.getExists(itemId2));
+        assert(itemStore.getInUse(itemId2));
         assertEq(itemStore.getFlags(itemId2), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS);
         assertEq(itemStore.getOwner(itemId2), 0);
         assertEq(itemStore.getRevisionCount(itemId2), 1);
@@ -342,11 +342,17 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testRetract() {
         bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
+        assert(itemStore.getInUse(itemId));
+        assertEq(itemStore.getOwner(itemId), this);
+        assert(!itemStore.getUpdatable(itemId));
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
         itemStore.retract(itemId);
-        assert(!itemStore.getExists(itemId));
+        assert(itemStore.getInUse(itemId));
+        assertEq(itemStore.getOwner(itemId), 0);
+        assert(!itemStore.getUpdatable(itemId));
+        assertEq(itemStore.getRevisionCount(itemId), 0);
     }
 
     function testControlTransferEnableNotTransferable() {

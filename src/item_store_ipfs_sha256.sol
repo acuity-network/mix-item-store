@@ -11,20 +11,18 @@ import "./item_store_registry.sol";
  */
 contract ItemStoreIpfsSha256 is ItemStoreInterface {
 
-    enum State { Unused, Exists, Retracted }
-
     byte constant UPDATABLE = 0x01;           // True if the item is updatable. After creation can only be disabled.
     byte constant ENFORCE_REVISIONS = 0x02;   // True if the item is enforcing revisions. After creation can only be enabled.
     byte constant RETRACTABLE = 0x04;         // True if the item can be retracted. After creation can only be disabled.
     byte constant TRANSFERABLE = 0x08;        // True if the item be transfered to another user or disowned. After creation can only be disabled.
-    byte constant ANONYMOUS = 0x10;           // True if the item should not have an owner.
+    byte constant ANONYMOUS = 0x10;           // True if the item should not have an owner at time of creation.
 
     /**
      * @dev Single slot structure of item info.
      */
     struct ItemInfo {
+        bool inUse;             // Has this itemId ever been used.
         byte flags;             // Packed item settings.
-        State state;            // Unused, exists or retracted.
         uint32 revisionCount;   // Number of revisions including revision 0.
         uint32 timestamp;       // Timestamp of revision 0.
         address owner;          // Who owns this item.
@@ -64,11 +62,11 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     event Publish(bytes20 indexed itemId, uint revisionId, bytes32 ipfsHash);
 
     /**
-     * @dev Revert if the item has not been used before or it has been retracted.
+     * @dev Revert if the itemId is not in use.
      * @param itemId Id of the item.
      */
-    modifier exists(bytes20 itemId) {
-        require (itemInfo[itemId].state == State.Exists);
+    modifier inUse(bytes20 itemId) {
+        require (itemInfo[itemId].inUse);
         _;
     }
 
@@ -168,11 +166,11 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Generate the itemId.
         itemId = bytes20(keccak256(msg.sender, nonce));
         // Make sure this itemId has not been used before.
-        require (itemInfo[itemId].state == State.Unused);
+        require (!itemInfo[itemId].inUse);
         // Store item info in state.
         itemInfo[itemId] = ItemInfo({
+            inUse: true,
             flags: flags,
-            state: State.Exists,
             revisionCount: 1,
             timestamp: uint32(block.timestamp),
             owner: (flags & ANONYMOUS == 0) ? msg.sender : 0
@@ -305,10 +303,10 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         }
         // Mark this item as retracted.
         itemInfo[itemId] = ItemInfo({
+            inUse: true,
             flags: 0,
-            state: State.Retracted,
             revisionCount: 0,
-            timestamp: uint32(block.timestamp),
+            timestamp: uint32(block.timestamp),   // ?
             owner: 0
         });
         // Log the item retraction.
@@ -411,12 +409,12 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
-     * @dev Check if an item exists.
+     * @dev Check if an itemId is in use.
      * @param itemId Id of the item.
-     * @return True if the item exists.
+     * @return True if the itemId is in use.
      */
-    function getExists(bytes20 itemId) external view returns (bool) {
-        return itemInfo[itemId].state == State.Exists;
+    function getInUse(bytes20 itemId) external view returns (bool) {
+        return itemInfo[itemId].inUse;
     }
 
     /**
@@ -470,7 +468,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return ipfsHashes IPFS hash of each revision.
      * @return timestamps Timestamp of each revision.
      */
-    function getInfo(bytes20 itemId) external view exists(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes, uint[] timestamps) {
+    function getInfo(bytes20 itemId) external view inUse(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes, uint[] timestamps) {
         ItemInfo storage info = itemInfo[itemId];
         flags = info.flags;
         owner = info.owner;
@@ -484,7 +482,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return Packed item settings.
      */
-    function getFlags(bytes20 itemId) external view exists(itemId) returns (byte) {
+    function getFlags(bytes20 itemId) external view inUse(itemId) returns (byte) {
         return itemInfo[itemId].flags;
     }
 
@@ -493,7 +491,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return True if the item is updatable.
      */
-    function getUpdatable(bytes20 itemId) external view exists(itemId) returns (bool) {
+    function getUpdatable(bytes20 itemId) external view inUse(itemId) returns (bool) {
         return itemInfo[itemId].flags & UPDATABLE != 0;
     }
 
@@ -502,7 +500,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return True if the item enforces revisions.
      */
-    function getEnforceRevisions(bytes20 itemId) external view exists(itemId) returns (bool) {
+    function getEnforceRevisions(bytes20 itemId) external view inUse(itemId) returns (bool) {
         return itemInfo[itemId].flags & ENFORCE_REVISIONS != 0;
     }
 
@@ -511,7 +509,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return True if the item is item retractable.
      */
-    function getRetractable(bytes20 itemId) external view exists(itemId) returns (bool) {
+    function getRetractable(bytes20 itemId) external view inUse(itemId) returns (bool) {
         return itemInfo[itemId].flags & RETRACTABLE != 0;
     }
 
@@ -520,7 +518,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return True if the item is transferable.
      */
-    function getTransferable(bytes20 itemId) external view exists(itemId) returns (bool) {
+    function getTransferable(bytes20 itemId) external view inUse(itemId) returns (bool) {
         return itemInfo[itemId].flags & TRANSFERABLE != 0;
     }
 
@@ -529,7 +527,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return Owner of the item.
      */
-    function getOwner(bytes20 itemId) external view exists(itemId) returns (address) {
+    function getOwner(bytes20 itemId) external view inUse(itemId) returns (address) {
         return itemInfo[itemId].owner;
     }
 
@@ -538,7 +536,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return How many revisions the item has.
      */
-    function getRevisionCount(bytes20 itemId) external view exists(itemId) returns (uint) {
+    function getRevisionCount(bytes20 itemId) external view inUse(itemId) returns (uint) {
         return itemInfo[itemId].revisionCount;
     }
 
@@ -557,7 +555,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return IPFS hashes of all revisions of the item.
      */
-    function getAllRevisionIpfsHashes(bytes20 itemId) external view exists(itemId) returns (bytes32[]) {
+    function getAllRevisionIpfsHashes(bytes20 itemId) external view inUse(itemId) returns (bytes32[]) {
         return _getAllRevisionIpfsHashes(itemId);
     }
 
@@ -576,7 +574,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return Timestamps of all revisions of the item.
      */
-    function getAllRevisionTimestamps(bytes20 itemId) external view exists(itemId) returns (uint[]) {
+    function getAllRevisionTimestamps(bytes20 itemId) external view inUse(itemId) returns (uint[]) {
         return _getAllRevisionTimestamps(itemId);
     }
 

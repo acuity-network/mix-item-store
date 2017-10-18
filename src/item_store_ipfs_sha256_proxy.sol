@@ -142,12 +142,12 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
     }
 
     /**
-     * @dev Check if an item exists.
+     * @dev Check if an itemId is in use.
      * @param itemId Id of the item.
-     * @return True if the item exists.
+     * @return True if the itemId is in use.
      */
-    function getExists(bytes20 itemId) external view returns (bool) {
-        return itemStore.getExists(itemId);
+    function getInUse(bytes20 itemId) external view returns (bool) {
+        return itemStore.getInUse(itemId);
     }
 
     /**
