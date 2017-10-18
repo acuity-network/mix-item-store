@@ -17,7 +17,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @dev Constructor.
      * @param _itemStore Real ItemStore contract to proxy to.
      */
-    function ItemStoreIpfsSha256Proxy(ItemStoreIpfsSha256 _itemStore) {
+    function ItemStoreIpfsSha256Proxy(ItemStoreIpfsSha256 _itemStore) public {
         itemStore = _itemStore;
     }
 

@@ -148,7 +148,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @dev Constructor.
      * @param registry Address of ItemStoreRegistry contract to register with.
      */
-    function ItemStoreIpfsSha256(ItemStoreRegistry registry) {
+    function ItemStoreIpfsSha256(ItemStoreRegistry registry) public {
         // Create id for this contract.
         contractId = bytes12(keccak256(this, block.blockhash(block.number - 1)));
         // Register this contract.
