@@ -16,28 +16,28 @@ contract ItemStoreRegistryTest is DSTest {
     ItemStoreRegistry itemStoreRegistry;
     ItemStoreIpfsSha256 itemStore;
 
-    function setUp() {
+    function setUp() public {
         itemStoreRegistry = new ItemStoreRegistry();
         itemStore = new ItemStoreIpfsSha256(itemStoreRegistry);
     }
 
-    function testControlRegisterContractAgain() {
+    function testControlRegisterContractAgain() public {
         itemStoreRegistry.register(~itemStore.getContractId());
     }
 
-    function testFailRegisterContractAgain() {
+    function testFailRegisterContractAgain() public {
         itemStoreRegistry.register(itemStore.getContractId());
     }
 
-    function testControlItemStoreNotRegistered() {
+    function testControlItemStoreNotRegistered() public view {
         itemStoreRegistry.getItemStore(itemStore.getContractId());
     }
 
-    function testFailItemStoreNotRegistered() {
+    function testFailItemStoreNotRegistered() public view {
         itemStoreRegistry.getItemStore(0);
     }
 
-    function testGetItemStore() {
+    function testGetItemStore() public {
         assertEq(itemStoreRegistry.getItemStore(itemStore.getContractId()), itemStore);
     }
 
