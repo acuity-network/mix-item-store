@@ -56,10 +56,18 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     /**
      * @dev An item revision has been published.
      * @param itemId Id of the item.
+     * @param owner Address of the item owner.
+     * @param flags Flags the item was created with.
+     */
+    event Create(bytes20 indexed itemId, address indexed owner, byte flags);
+
+    /**
+     * @dev An item revision has been published.
+     * @param itemId Id of the item.
      * @param revisionId Id of the revision (the highest at time of logging).
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
      */
-    event Publish(bytes20 indexed itemId, uint revisionId, bytes32 ipfsHash);
+    event PublishRevision(bytes20 indexed itemId, uint revisionId, bytes32 ipfsHash);
 
     /**
      * @dev Revert if the itemId is not in use.
@@ -166,18 +174,24 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         itemId = bytes20(keccak256(msg.sender, flagsNonce));
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
+        // Extract the flags.
+        byte flags = byte(flagsNonce);
+        // Determine the owner.
+        address owner = (flags & DISOWN == 0) ? msg.sender : 0;
         // Store item state.
         itemState[itemId] = ItemState({
             inUse: true,
-            flags: byte(flagsNonce),
+            flags: flags,
             revisionCount: 1,
             timestamp: uint32(block.timestamp),
-            owner: (flagsNonce & DISOWN == 0) ? msg.sender : 0
+            owner: owner
         });
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;
+        // Log item creation.
+        Create(itemId, owner, flags);
         // Log the first revision.
-        Publish(itemId, 0, ipfsHash);
+        PublishRevision(itemId, 0, ipfsHash);
     }
 
     /**
@@ -212,7 +226,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Store the timestamp.
         _setPackedTimestamp(itemId, revisionId - 1);
         // Log the revision.
-        Publish(itemId, revisionId, ipfsHash);
+        PublishRevision(itemId, revisionId, ipfsHash);
     }
 
     /**
@@ -235,7 +249,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             _setPackedTimestamp(itemId, revisionId - 1);
         }
         // Log the revision.
-        Publish(itemId, revisionId, ipfsHash);
+        PublishRevision(itemId, revisionId, ipfsHash);
     }
 
     /**
@@ -287,7 +301,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Update the first IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;
         // Log the revision.
-        Publish(itemId, 0, ipfsHash);
+        PublishRevision(itemId, 0, ipfsHash);
     }
 
     /**
