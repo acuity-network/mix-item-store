@@ -157,23 +157,22 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
 
     /**
      * @dev Creates a new item. It is guaranteed that different users will never receive the same itemId, even before consensus has been reached. This prevents itemId sniping.
-     * @param flags Packed item settings.
+     * @param flagsNonce Nonce that this address has never passed before; first byte is creation flags.
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
-     * @param nonce Unique value that this user has never used before to create a new item.
      * @return itemId Id of the item.
      */
-    function create(byte flags, bytes32 ipfsHash, bytes32 nonce) external returns (bytes20 itemId) {
+    function create(bytes32 flagsNonce, bytes32 ipfsHash) external returns (bytes20 itemId) {
         // Generate the itemId.
-        itemId = bytes20(keccak256(msg.sender, nonce));
+        itemId = bytes20(keccak256(msg.sender, flagsNonce));
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Store item state.
         itemState[itemId] = ItemState({
             inUse: true,
-            flags: flags,
+            flags: byte(flagsNonce),
             revisionCount: 1,
             timestamp: uint32(block.timestamp),
-            owner: (flags & ANONYMOUS == 0) ? msg.sender : 0
+            owner: (flagsNonce & ANONYMOUS == 0) ? msg.sender : 0
         });
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;

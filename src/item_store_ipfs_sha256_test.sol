@@ -31,17 +31,17 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlCreateSameNonce() public {
-        itemStore.create(0, 0x1234, 0);
-        itemStore.create(0, 0x1234, 1);
+        itemStore.create(0x0000, 0x1234);
+        itemStore.create(0x0001, 0x1234);
     }
 
     function testFailCreateSameNonce() public {
-        itemStore.create(0, 0x1234, 0);
-        itemStore.create(0, 0x1234, 0);
+        itemStore.create(0x0000, 0x1234);
+        itemStore.create(0x0000, 0x1234);
     }
 
     function testCreate() public {
-        bytes20 itemId0 = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId0 = itemStore.create(0x0000, 0x1234);
         assertTrue(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
         assertEq(itemStore.getOwner(itemId0), this);
@@ -53,7 +53,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
 
-        bytes20 itemId1 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, 0x1234, 1);
+        bytes20 itemId1 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS | bytes32(0x01), 0x1234);
         assertTrue(itemStore.getInUse(itemId1));
         assertEq(itemStore.getFlags(itemId1), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS);
         assertEq(itemStore.getOwner(itemId1), 0);
@@ -65,7 +65,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
 
-        bytes20 itemId2 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, 0x2345, 2);
+        bytes20 itemId2 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS | bytes32(0x02), 0x2345);
         assertTrue(itemStore.getInUse(itemId2));
         assertEq(itemStore.getFlags(itemId2), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS);
         assertEq(itemStore.getOwner(itemId2), 0);
@@ -83,27 +83,27 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlCreateNewRevisionNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
     }
 
     function testFailCreateNewRevisionNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStoreProxy.createNewRevision(itemId, 0x2345);
     }
 
     function testControlCreateNewRevisionNotUpdatable() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
     }
 
     function testFailCreateNewRevisionNotUpdatable() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
     }
 
     function testCreateNewRevision() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0);
         uint revisionId = itemStore.createNewRevision(itemId, 1);
         assertEq(revisionId, 1);
         revisionId = itemStore.createNewRevision(itemId, 2);
@@ -162,37 +162,37 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlUpdateLatestRevisionNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.updateLatestRevision(itemId, 0x2345);
     }
 
     function testFailUpdateLatestRevisionNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStoreProxy.updateLatestRevision(itemId, 0x2345);
     }
 
     function testControlUpdateLatestRevisionNotUpdatable() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.updateLatestRevision(itemId, 0x2345);
     }
 
     function testFailUpdateLatestRevisionNotUpdatable() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         itemStore.updateLatestRevision(itemId, 0x2345);
     }
 
     function testControlUpdateLatestRevisionEnforceRevisions() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.updateLatestRevision(itemId, 0x2345);
     }
 
     function testFailUpdateLatestRevisionEnforceRevisions() public {
-        bytes20 itemId = itemStore.create(UPDATABLE | ENFORCE_REVISIONS, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE | ENFORCE_REVISIONS, 0x1234);
         itemStore.updateLatestRevision(itemId, 0x2345);
     }
 
     function testUpdateLatestRevision() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
@@ -203,55 +203,55 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlRetractLatestRevisionNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
         itemStore.retractLatestRevision(itemId);
     }
 
     function testFailRetractLatestRevisionNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
         itemStoreProxy.retractLatestRevision(itemId);
     }
 
     function testControlRetractLatestRevisionNotUpdatable() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
         itemStore.retractLatestRevision(itemId);
     }
 
     function testFailRetractLatestRevisionNotUpdatable() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
         itemStore.setNotUpdatable(itemId);
         itemStore.retractLatestRevision(itemId);
     }
 
     function testControlRetractLatestRevisionEnforceRevisions() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
         itemStore.retractLatestRevision(itemId);
     }
 
     function testFailRetractLatestRevisionEnforceRevisions() public {
-        bytes20 itemId = itemStore.create(UPDATABLE | ENFORCE_REVISIONS, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE | ENFORCE_REVISIONS, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
         itemStore.retractLatestRevision(itemId);
     }
 
     function testControlRetractLatestRevisionDoesntHaveAdditionalRevisions() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
         itemStore.retractLatestRevision(itemId);
     }
 
     function testFailRetractLatestRevisionDoesntHaveAdditionalRevisions() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.retractLatestRevision(itemId);
     }
 
     function testRetractLatestRevision() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
         itemStore.createNewRevision(itemId, 0x3456);
         assertEq(itemStore.getRevisionCount(itemId), 3);
@@ -274,37 +274,37 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlRestartNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.restart(itemId, 0x2345);
     }
 
     function testFailRestartNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStoreProxy.restart(itemId, 0x2345);
     }
 
     function testControlRestartNotUpdatable() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.restart(itemId, 0x2345);
     }
 
     function testFailRestartNotUpdatable() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         itemStore.restart(itemId, 0x2345);
     }
 
     function testControlRestartEnforceRevisions() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.restart(itemId, 0x2345);
     }
 
     function testFailRestartEnforceRevisions() public {
-        bytes20 itemId = itemStore.create(UPDATABLE | ENFORCE_REVISIONS, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE | ENFORCE_REVISIONS, 0x1234);
         itemStore.restart(itemId, 0x2345);
     }
 
     function testRestart() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.createNewRevision(itemId, 0x2345);
         itemStore.createNewRevision(itemId, 0x3456);
         assertEq(itemStore.getRevisionCount(itemId), 3);
@@ -321,27 +321,27 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlRetractNotOwner() public {
-        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234);
         itemStore.retract(itemId);
     }
 
     function testFailRetractNotOwner() public {
-        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234);
         itemStoreProxy.retract(itemId);
     }
 
     function testControlRetractNotRetractable() public {
-        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234);
         itemStore.retract(itemId);
     }
 
     function testFailRetractNotRetractable() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         itemStore.retract(itemId);
     }
 
     function testRetract() public {
-        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234);
         assertTrue(itemStore.getInUse(itemId));
         assertEq(itemStore.getOwner(itemId), this);
         assertTrue(!itemStore.getUpdatable(itemId));
@@ -356,64 +356,64 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlTransferEnableNotTransferable() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStoreProxy.transferEnable(itemId);
     }
 
     function testFailTransferEnableNotTransferable() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         itemStoreProxy.transferEnable(itemId);
     }
 
     function testControlTransferDisableNotEnabled() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStoreProxy.transferEnable(itemId);
         itemStoreProxy.transferDisable(itemId);
     }
 
     function testFailTransferDisableNotEnabled() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStoreProxy.transferDisable(itemId);
     }
 
     function testControlTransferNotTransferable() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStoreProxy.transferEnable(itemId);
         itemStore.transfer(itemId, itemStoreProxy);
     }
 
     function testFailTransferNotTransferable() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         itemStoreProxy.transferEnable(itemId);
         itemStore.transfer(itemId, itemStoreProxy);
     }
 
     function testControlTransferNotEnabled() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStoreProxy.transferEnable(itemId);
         itemStore.transfer(itemId, itemStoreProxy);
     }
 
     function testFailTransferNotEnabled() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStore.transfer(itemId, itemStoreProxy);
     }
 
     function testControlTransferDisabled() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStoreProxy.transferEnable(itemId);
         itemStore.transfer(itemId, itemStoreProxy);
     }
 
     function testFailTransferDisabled() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStoreProxy.transferEnable(itemId);
         itemStoreProxy.transferDisable(itemId);
         itemStore.transfer(itemId, itemStoreProxy);
     }
 
     function testTransfer() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         assertEq(itemStore.getOwner(itemId), this);
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
@@ -427,95 +427,95 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlDisownNotOwner() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStore.disown(itemId);
     }
 
     function testFailDisownNotOwner() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStoreProxy.disown(itemId);
     }
 
     function testControlDisownNotTransferable() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStore.disown(itemId);
     }
 
     function testFailDisownNotTransferable() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         itemStore.disown(itemId);
     }
 
     function testDisown() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         assertEq(itemStore.getOwner(itemId), this);
         itemStore.disown(itemId);
         assertEq(itemStore.getOwner(itemId), 0);
     }
 
     function testControlSetNotUpdatableNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStore.setNotUpdatable(itemId);
     }
 
     function testFailSetNotUpdatableNotOwner() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         itemStoreProxy.setNotUpdatable(itemId);
     }
 
     function testSetNotUpdatable() public {
-        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(UPDATABLE, 0x1234);
         assertTrue(itemStore.getUpdatable(itemId));
         itemStore.setNotUpdatable(itemId);
         assertTrue(!itemStore.getUpdatable(itemId));
     }
 
     function testControlSetEnforceRevisionsNotOwner() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         itemStore.setEnforceRevisions(itemId);
     }
 
     function testFailSetEnforceRevisionsNotOwner() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         itemStoreProxy.setEnforceRevisions(itemId);
     }
 
     function testSetEnforceRevisions() public {
-        bytes20 itemId = itemStore.create(0, 0x1234, 0);
+        bytes20 itemId = itemStore.create(0, 0x1234);
         assertTrue(!itemStore.getEnforceRevisions(itemId));
         itemStore.setEnforceRevisions(itemId);
         assertTrue(itemStore.getEnforceRevisions(itemId));
     }
 
     function testControlSetNotRetractableNotOwner() public {
-        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234);
         itemStore.setNotRetractable(itemId);
     }
 
     function testFailSetNotRetractableNotOwner() public {
-        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234);
         itemStoreProxy.setNotRetractable(itemId);
     }
 
     function testSetNotRetractable() public {
-        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234);
         assertTrue(itemStore.getRetractable(itemId));
         itemStore.setNotRetractable(itemId);
         assertTrue(!itemStore.getRetractable(itemId));
     }
 
     function testControlSetNotTransferableNotOwner() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStore.setNotTransferable(itemId);
     }
 
     function testFailSetNotTransferableNotOwner() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         itemStoreProxy.setNotTransferable(itemId);
     }
 
     function testSetNotTransferable() public {
-        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
+        bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234);
         assertTrue(itemStore.getTransferable(itemId));
         itemStore.setNotTransferable(itemId);
         assertTrue(!itemStore.getTransferable(itemId));
