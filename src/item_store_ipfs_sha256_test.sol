@@ -42,44 +42,44 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testCreate() public {
         bytes20 itemId0 = itemStore.create(0, 0x1234, 0);
-        assert(itemStore.getInUse(itemId0));
+        assertTrue(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
         assertEq(itemStore.getOwner(itemId0), this);
         assertEq(itemStore.getRevisionCount(itemId0), 1);
-        assert(!itemStore.getUpdatable(itemId0));
-        assert(!itemStore.getEnforceRevisions(itemId0));
-        assert(!itemStore.getRetractable(itemId0));
-        assert(!itemStore.getTransferable(itemId0));
+        assertTrue(!itemStore.getUpdatable(itemId0));
+        assertTrue(!itemStore.getEnforceRevisions(itemId0));
+        assertTrue(!itemStore.getRetractable(itemId0));
+        assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
 
         bytes20 itemId1 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, 0x1234, 1);
-        assert(itemStore.getInUse(itemId1));
+        assertTrue(itemStore.getInUse(itemId1));
         assertEq(itemStore.getFlags(itemId1), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS);
         assertEq(itemStore.getOwner(itemId1), 0);
         assertEq(itemStore.getRevisionCount(itemId1), 1);
-        assert(itemStore.getUpdatable(itemId1));
-        assert(itemStore.getEnforceRevisions(itemId1));
-        assert(itemStore.getRetractable(itemId1));
-        assert(itemStore.getTransferable(itemId1));
+        assertTrue(itemStore.getUpdatable(itemId1));
+        assertTrue(itemStore.getEnforceRevisions(itemId1));
+        assertTrue(itemStore.getRetractable(itemId1));
+        assertTrue(itemStore.getTransferable(itemId1));
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
 
         bytes20 itemId2 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS, 0x2345, 2);
-        assert(itemStore.getInUse(itemId2));
+        assertTrue(itemStore.getInUse(itemId2));
         assertEq(itemStore.getFlags(itemId2), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS);
         assertEq(itemStore.getOwner(itemId2), 0);
         assertEq(itemStore.getRevisionCount(itemId2), 1);
-        assert(itemStore.getUpdatable(itemId2));
-        assert(itemStore.getEnforceRevisions(itemId2));
-        assert(itemStore.getRetractable(itemId2));
-        assert(itemStore.getTransferable(itemId2));
+        assertTrue(itemStore.getUpdatable(itemId2));
+        assertTrue(itemStore.getEnforceRevisions(itemId2));
+        assertTrue(itemStore.getRetractable(itemId2));
+        assertTrue(itemStore.getTransferable(itemId2));
         assertEq(itemStore.getRevisionIpfsHash(itemId2, 0), 0x2345);
         assertEq(itemStore.getRevisionTimestamp(itemId2, 0), block.timestamp);
 
-        assert(itemId0 != itemId1);
-        assert(itemId0 != itemId2);
-        assert(itemId1 != itemId2);
+        assertTrue(itemId0 != itemId1);
+        assertTrue(itemId0 != itemId2);
+        assertTrue(itemId1 != itemId2);
     }
 
     function testControlCreateNewRevisionNotOwner() public {
@@ -342,16 +342,16 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testRetract() public {
         bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
-        assert(itemStore.getInUse(itemId));
+        assertTrue(itemStore.getInUse(itemId));
         assertEq(itemStore.getOwner(itemId), this);
-        assert(!itemStore.getUpdatable(itemId));
+        assertTrue(!itemStore.getUpdatable(itemId));
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
         itemStore.retract(itemId);
-        assert(itemStore.getInUse(itemId));
+        assertTrue(itemStore.getInUse(itemId));
         assertEq(itemStore.getOwner(itemId), 0);
-        assert(!itemStore.getUpdatable(itemId));
+        assertTrue(!itemStore.getUpdatable(itemId));
         assertEq(itemStore.getRevisionCount(itemId), 0);
     }
 
@@ -465,9 +465,9 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testSetNotUpdatable() public {
         bytes20 itemId = itemStore.create(UPDATABLE, 0x1234, 0);
-        assert(itemStore.getUpdatable(itemId));
+        assertTrue(itemStore.getUpdatable(itemId));
         itemStore.setNotUpdatable(itemId);
-        assert(!itemStore.getUpdatable(itemId));
+        assertTrue(!itemStore.getUpdatable(itemId));
     }
 
     function testControlSetEnforceRevisionsNotOwner() public {
@@ -482,9 +482,9 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testSetEnforceRevisions() public {
         bytes20 itemId = itemStore.create(0, 0x1234, 0);
-        assert(!itemStore.getEnforceRevisions(itemId));
+        assertTrue(!itemStore.getEnforceRevisions(itemId));
         itemStore.setEnforceRevisions(itemId);
-        assert(itemStore.getEnforceRevisions(itemId));
+        assertTrue(itemStore.getEnforceRevisions(itemId));
     }
 
     function testControlSetNotRetractableNotOwner() public {
@@ -499,9 +499,9 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testSetNotRetractable() public {
         bytes20 itemId = itemStore.create(RETRACTABLE, 0x1234, 0);
-        assert(itemStore.getRetractable(itemId));
+        assertTrue(itemStore.getRetractable(itemId));
         itemStore.setNotRetractable(itemId);
-        assert(!itemStore.getRetractable(itemId));
+        assertTrue(!itemStore.getRetractable(itemId));
     }
 
     function testControlSetNotTransferableNotOwner() public {
@@ -516,9 +516,9 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testSetNotTransferable() public {
         bytes20 itemId = itemStore.create(TRANSFERABLE, 0x1234, 0);
-        assert(itemStore.getTransferable(itemId));
+        assertTrue(itemStore.getTransferable(itemId));
         itemStore.setNotTransferable(itemId);
-        assert(!itemStore.getTransferable(itemId));
+        assertTrue(!itemStore.getTransferable(itemId));
     }
 
 }
