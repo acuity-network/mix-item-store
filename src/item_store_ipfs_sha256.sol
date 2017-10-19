@@ -15,7 +15,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     byte constant ENFORCE_REVISIONS = 0x02;   // True if the item is enforcing revisions. After creation can only be enabled.
     byte constant RETRACTABLE = 0x04;         // True if the item can be retracted. After creation can only be disabled.
     byte constant TRANSFERABLE = 0x08;        // True if the item be transfered to another user or disowned. After creation can only be disabled.
-    byte constant ANONYMOUS = 0x10;           // True if the item should not have an owner at time of creation.
+    byte constant DISOWN = 0x10;              // True if the item should not have an owner.
 
     /**
      * @dev Single slot structure of item state.
@@ -172,7 +172,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             flags: byte(flagsNonce),
             revisionCount: 1,
             timestamp: uint32(block.timestamp),
-            owner: (flagsNonce & ANONYMOUS == 0) ? msg.sender : 0
+            owner: (flagsNonce & DISOWN == 0) ? msg.sender : 0
         });
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;

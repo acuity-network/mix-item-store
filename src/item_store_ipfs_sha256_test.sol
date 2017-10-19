@@ -18,7 +18,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
     byte constant ENFORCE_REVISIONS = 0x02;   // True if the item is enforcing revisions. After creation can only be enabled.
     byte constant RETRACTABLE = 0x04;         // True if the item can be retracted. After creation can only be disabled.
     byte constant TRANSFERABLE = 0x08;        // True if the item be transfered to another user or disowned. After creation can only be disabled.
-    byte constant ANONYMOUS = 0x10;           // True if the item should not have an owner.
+    byte constant DISOWN = 0x10;              // True if the item should not have an owner.
 
     ItemStoreRegistry itemStoreRegistry;
     ItemStoreIpfsSha256 itemStore;
@@ -53,9 +53,9 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
 
-        bytes20 itemId1 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS | bytes32(0x01), 0x1234);
+        bytes20 itemId1 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN | bytes32(0x01), 0x1234);
         assertTrue(itemStore.getInUse(itemId1));
-        assertEq(itemStore.getFlags(itemId1), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS);
+        assertEq(itemStore.getFlags(itemId1), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN);
         assertEq(itemStore.getOwner(itemId1), 0);
         assertEq(itemStore.getRevisionCount(itemId1), 1);
         assertTrue(itemStore.getUpdatable(itemId1));
@@ -65,9 +65,9 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
 
-        bytes20 itemId2 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS | bytes32(0x02), 0x2345);
+        bytes20 itemId2 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN | bytes32(0x02), 0x2345);
         assertTrue(itemStore.getInUse(itemId2));
-        assertEq(itemStore.getFlags(itemId2), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | ANONYMOUS);
+        assertEq(itemStore.getFlags(itemId2), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN);
         assertEq(itemStore.getOwner(itemId2), 0);
         assertEq(itemStore.getRevisionCount(itemId2), 1);
         assertTrue(itemStore.getUpdatable(itemId2));
