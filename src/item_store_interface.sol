@@ -9,6 +9,13 @@ pragma solidity ^0.4.18;
 interface ItemStoreInterface {
 
     /**
+     * @dev A child item has been attached to this item.
+     * @param parent itemId of the parent.
+     * @param child itemId of the new child.
+     */
+    event AddChild(bytes32 indexed parent, bytes32 child);
+
+    /**
      * @dev A revision has been retracted.
      * @param itemId Id of the item.
      * @param revisionId Id of the revision.
@@ -57,6 +64,13 @@ interface ItemStoreInterface {
      * @param itemId Id of the item.
      */
     event SetNotTransferable(bytes32 indexed itemId);
+
+    /**
+     * @dev Add a child from another item store contract.
+     * @param itemId itemId of parent.
+     * @param child itemId of child.
+     */
+    function addForeignChild(bytes32 itemId, bytes32 child) external;
 
     /**
      * @dev Retract an item's latest revision. Revision 0 cannot be retracted.
@@ -130,7 +144,7 @@ interface ItemStoreInterface {
      * @param itemId Id of the item.
      * @return True if the itemId is in use.
      */
-    function getInUse(bytes32 itemId) external view returns (bool);
+    function getInUse(bytes32 itemId) public view returns (bool);
 
     /**
      * @dev Determine if an item is updatable.
@@ -159,6 +173,12 @@ interface ItemStoreInterface {
      * @return True if the item is transferable.
      */
     function getTransferable(bytes32 itemId) external view returns (bool);
+
+    /**
+     * @dev Get all an items parent.
+     * @return itemId of parent.
+     */
+    function getParent(bytes32 itemId) external view returns (bytes32);
 
     /**
      * @dev Get the owner of an item.

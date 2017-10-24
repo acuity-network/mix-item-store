@@ -22,6 +22,15 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
     }
 
     /**
+     * @dev Add a child from another item store contract.
+     * @param itemId itemId of parent.
+     * @param child itemId of child.
+     */
+    function addForeignChild(bytes32 itemId, bytes32 child) external {
+        itemStore.addForeignChild(itemId, child);
+    }
+
+    /**
      * @dev Create a new item revision.
      * @param itemId Id of the item.
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
@@ -146,7 +155,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return True if the itemId is in use.
      */
-    function getInUse(bytes32 itemId) external view returns (bool) {
+    function getInUse(bytes32 itemId) public view returns (bool) {
         return itemStore.getInUse(itemId);
     }
 
@@ -193,6 +202,15 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      */
     function getOwner(bytes32 itemId) external view returns (address) {
         return itemStore.getOwner(itemId);
+    }
+
+    /**
+     * @dev Get all an items parent.
+     * @param itemId Id of the item.
+     * @return itemId of parent.
+     */
+    function getParent(bytes32 itemId) external view returns (bytes32) {
+        return itemStore.getParent(itemId);
     }
 
     /**

@@ -23,7 +23,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     struct ItemState {
         bool inUse;             // Has this itemId ever been used.
         byte flags;             // Packed item settings.
-        uint32 revisionCount;   // Number of revisions including revision 0.
+        uint24 revisionCount;   // Number of revisions including revision 0.
+        uint24 childCount;      // Number of children.
         uint32 timestamp;       // Timestamp of revision 0.
         address owner;          // Who owns this item.
     }
@@ -44,9 +45,24 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     mapping (bytes32 => mapping (uint => bytes32)) itemRevisionIpfsHashes;
 
     /**
+     * @dev Mapping of itemId to parent itemId.
+     */
+    mapping (bytes32 => bytes32) itemParent;
+
+    /**
+     * @dev Mapping of itemId to mapping of index to child itemId.
+     */
+    mapping (bytes32 => mapping(uint => bytes32)) itemChildren;
+
+    /**
      * @dev Mapping of itemId to mapping of transfer recipient addresses to enabled.
      */
     mapping (bytes32 => mapping (address => bool)) enabledTransfers;
+
+    /**
+     * @dev Item Store Registry contract.
+     */
+    ItemStoreRegistry itemStoreRegistry;
 
     /**
      * @dev Id of this instance of ItemStore. Unique across all blockchains.
@@ -56,10 +72,11 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     /**
      * @dev An item revision has been published.
      * @param itemId Id of the item.
+     * @param parent Optional itemId of the parent.
      * @param owner Address of the item owner.
      * @param flags Flags the item was created with.
      */
-    event Create(bytes32 indexed itemId, address indexed owner, bytes32 flags);
+    event Create(bytes32 indexed itemId, bytes32 indexed parent, address indexed owner, bytes32 flags);
 
     /**
      * @dev An item revision has been published.
@@ -153,25 +170,37 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
-     * @dev Constructor.
-     * @param registry Address of ItemStoreRegistry contract to register with.
+     * @dev Revert if a specific item child does not exist.
+     * @param itemId Id of the item.
+     * @param i Index of the child.
      */
-    function ItemStoreIpfsSha256(ItemStoreRegistry registry) public {
+    modifier childExists(bytes32 itemId, uint i) {
+        require (i < itemState[itemId].childCount);
+        _;
+    }
+
+    /**
+     * @dev Constructor.
+     * @param _itemStoreRegistry Address of ItemStoreRegistry contract to register with.
+     */
+    function ItemStoreIpfsSha256(ItemStoreRegistry _itemStoreRegistry) public {
+        // Store the addresses of the contracts.
+        itemStoreRegistry = _itemStoreRegistry;
         // Create id for this contract.
         contractId = bytes12(keccak256(this, block.blockhash(block.number - 1)));
         // Register this contract.
-        registry.register(contractId);
+        itemStoreRegistry.register(contractId);
     }
 
     /**
      * @dev Creates a new item. It is guaranteed that different users will never receive the same itemId, even before consensus has been reached. This prevents itemId sniping.
      * @param flagsNonce Nonce that this address has never passed before; first byte is creation flags.
-     * @param ipfsHash Hash of the IPFS object where the item revision is stored.
+     * @param ipfsHash Hash of the IPFS object where revision 0 is stored.
      * @return itemId Id of the item.
      */
     function create(bytes32 flagsNonce, bytes32 ipfsHash) external returns (bytes32 itemId) {
         // Generate the itemId.
-        itemId = bytes20(keccak256(msg.sender, flagsNonce));
+        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint160(-1)));
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.
@@ -182,6 +211,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         itemState[itemId] = ItemState({
             inUse: true,
             flags: byte(flags),
+            childCount: 0,
             revisionCount: 1,
             timestamp: uint32(block.timestamp),
             owner: owner
@@ -189,9 +219,72 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;
         // Log item creation.
-        Create(itemId, owner, flags);
+        Create(itemId, 0, owner, flags);
         // Log the first revision.
         PublishRevision(itemId, 0, ipfsHash);
+    }
+
+    /**
+     * @dev Creates a new item. It is guaranteed that different users will never receive the same itemId, even before consensus has been reached. This prevents itemId sniping.
+     * @param flagsNonce Nonce that this address has never passed before; first byte is creation flags.
+     * @param ipfsHash Hash of the IPFS object where revision 0 is stored.
+     * @param parent Optional itemId of parent.
+     * @return itemId Id of the item.
+     */
+    function createWithParent(bytes32 flagsNonce, bytes32 ipfsHash, bytes32 parent) external returns (bytes32 itemId) {
+        // Generate the itemId.
+        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint160(-1)));
+        // Make sure this itemId has not been used before.
+        require (!itemState[itemId].inUse);
+        // Ensure child and parent are not the same.
+        require (itemId != parent);
+        // Extract the flags.
+        bytes32 flags = byte(flagsNonce);
+        // Determine the owner.
+        address owner = (flags & DISOWN == 0) ? msg.sender : 0;
+        // Store item state.
+        itemState[itemId] = ItemState({
+            inUse: true,
+            flags: byte(flags),
+            childCount: 0,
+            revisionCount: 1,
+            timestamp: uint32(block.timestamp),
+            owner: owner
+        });
+        // Store the parent.
+        itemParent[itemId] = parent;
+        // Is the parent in this item store contract?
+        if (bytes12(parent) == contractId) {
+            // Ensure the parent exists.
+            require (getInUse(parent));
+            // Attach the item to the parent.
+            itemChildren[parent][itemState[parent].childCount++] = itemId;
+            // Log the child.
+            AddChild(parent, itemId);
+        }
+        else {
+            itemStoreRegistry.getItemStore(bytes12(parent)).addForeignChild(parent, itemId);
+        }
+        // Store the IPFS hash.
+        itemRevisionIpfsHashes[itemId][0] = ipfsHash;
+        // Log item creation.
+        Create(itemId, parent, owner, flags);
+        // Log the first revision.
+        PublishRevision(itemId, 0, ipfsHash);
+    }
+
+    /**
+     * @dev Add a child from another item store contract.
+     * @param itemId itemId of parent.
+     * @param child itemId of child.
+     */
+    function addForeignChild(bytes32 itemId, bytes32 child) external inUse(itemId) {
+        // Ensure the child has recorded the parent.
+        require (itemStoreRegistry.getItemStore(bytes12(child)).getParent(child) == itemId);
+        // Store the new child.
+        itemChildren[itemId][itemState[itemId].childCount++] = child;
+        // Log the child.
+        AddChild(itemId, child);
     }
 
     /**
@@ -317,6 +410,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         itemState[itemId] = ItemState({
             inUse: true,
             flags: 0,
+            childCount: itemState[itemId].childCount,
             revisionCount: 0,
             timestamp: 0,
             owner: 0
@@ -425,7 +519,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId Id of the item.
      * @return True if the itemId is in use.
      */
-    function getInUse(bytes32 itemId) external view returns (bool) {
+    function getInUse(bytes32 itemId) public view returns (bool) {
         return itemState[itemId].inUse;
     }
 
@@ -464,10 +558,23 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return timestamps Revision timestamps.
      */
     function _getAllRevisionTimestamps(bytes32 itemId) internal view returns (uint[] timestamps) {
-        uint revisionCount = itemState[itemId].revisionCount;
-        timestamps = new uint[](revisionCount);
-        for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
+        uint count = itemState[itemId].revisionCount;
+        timestamps = new uint[](count);
+        for (uint revisionId = 0; revisionId < count; revisionId++) {
             timestamps[revisionId] = _getRevisionTimestamp(itemId, revisionId);
+        }
+    }
+
+    /**
+     * @dev Get all of an item's children.
+     * @param itemId Id of the item.
+     * @return children itemIds of the children.
+     */
+    function _getAllChildren(bytes32 itemId) internal view returns (bytes32[] children) {
+        uint count = itemState[itemId].childCount;
+        children = new bytes32[](count);
+        for (uint i = 0; i < count; i++) {
+            children[i] = itemChildren[itemId][i];
         }
     }
 
@@ -480,13 +587,15 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return ipfsHashes IPFS hash of each revision.
      * @return timestamps Timestamp of each revision.
      */
-    function getState(bytes32 itemId) external view inUse(itemId) returns (bytes32 flags, address owner, uint revisionCount, bytes32[] ipfsHashes, uint[] timestamps) {
+    function getState(bytes32 itemId) external view inUse(itemId) returns (bytes32 flags, address owner, uint revisionCount, bytes32[] ipfsHashes, uint[] timestamps, bytes32 parent, bytes32[] children) {
         ItemState storage state = itemState[itemId];
         flags = state.flags;
         owner = state.owner;
         revisionCount = state.revisionCount;
         ipfsHashes = _getAllRevisionIpfsHashes(itemId);
         timestamps = _getAllRevisionTimestamps(itemId);
+        parent = itemParent[itemId];
+        children = _getAllChildren(itemId);
     }
 
     /**
@@ -553,11 +662,11 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
    /**
-     * @dev Get the IPFS hash for a specific item revision.
-     * @param itemId Id of the item.
-     * @param revisionId Id of the revision.
-     * @return IPFS hash of the specified revision.
-     */
+    * @dev Get the IPFS hash for a specific item revision.
+    * @param itemId Id of the item.
+    * @param revisionId Id of the revision.
+    * @return IPFS hash of the specified revision.
+    */
     function getRevisionIpfsHash(bytes32 itemId, uint revisionId) external view revisionExists(itemId, revisionId) returns (bytes32) {
         return itemRevisionIpfsHashes[itemId][revisionId];
     }
@@ -571,7 +680,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         return _getAllRevisionIpfsHashes(itemId);
     }
 
-   /**
+    /**
      * @dev Get the timestamp for a specific item revision.
      * @param itemId Id of the item.
      * @param revisionId Id of the revision.
@@ -588,6 +697,43 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function getAllRevisionTimestamps(bytes32 itemId) external view inUse(itemId) returns (uint[]) {
         return _getAllRevisionTimestamps(itemId);
+    }
+
+    /**
+     * @dev Get all an items parent.
+     * @param itemId Id of the item.
+     * @return itemId of parent.
+     */
+    function getParent(bytes32 itemId) external view inUse(itemId) returns (bytes32) {
+        return itemParent[itemId];
+    }
+
+    /**
+     * @dev Get the number of children an item has.
+     * @param itemId Id of the item.
+     * @return How many children the item has.
+     */
+    function getChildCount(bytes32 itemId) external view inUse(itemId) returns (uint) {
+        return itemState[itemId].childCount;
+    }
+
+    /**
+     * @dev Get a specific child
+     * @param itemId Id of the item.
+     * @param i Index of the child.
+     * @return itemId of the child.
+     */
+    function getChild(bytes32 itemId, uint i) external view childExists(itemId, i) returns (bytes32) {
+        return itemChildren[itemId][i];
+    }
+
+    /**
+     * @dev Get all of an item's children.
+     * @param itemId Id of the item.
+     * @return itemIds of the children.
+     */
+    function getAllChildren(bytes32 itemId) external view inUse(itemId) returns (bytes32[]) {
+        return _getAllChildren(itemId);
     }
 
 }
