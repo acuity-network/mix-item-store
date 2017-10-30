@@ -30,12 +30,12 @@ contract ItemStoreIpfsSha256Test is DSTest {
         itemStoreProxy = new ItemStoreIpfsSha256Proxy(itemStore);
     }
 
-    function testControlCreateSameNonce() public {
+    function testControlCreateSameItemId() public {
         itemStore.create(0x0000, 0x1234);
         itemStore.create(0x0001, 0x1234);
     }
 
-    function testFailCreateSameNonce() public {
+    function testFailCreateSameItemId() public {
         itemStore.create(0x0000, 0x1234);
         itemStore.create(0x0000, 0x1234);
     }
@@ -52,7 +52,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
-        assertEq(itemStore.getParent(itemId0), 0);
+        assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getRevisionCount(itemId0), 1);
 
         bytes32 itemId1 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN | bytes32(0x01), 0x1234);
@@ -66,7 +66,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getTransferable(itemId1));
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
-        assertEq(itemStore.getParent(itemId1), 0);
+        assertEq(itemStore.getParentCount(itemId1), 0);
         assertEq(itemStore.getRevisionCount(itemId1), 1);
 
         bytes32 itemId2 = itemStore.create(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN | bytes32(0x02), 0x2345);
@@ -81,7 +81,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getTransferable(itemId2));
         assertEq(itemStore.getRevisionIpfsHash(itemId2, 0), 0x2345);
         assertEq(itemStore.getRevisionTimestamp(itemId2, 0), block.timestamp);
-        assertEq(itemStore.getParent(itemId2), 0);
+        assertEq(itemStore.getParentCount(itemId2), 0);
         assertEq(itemStore.getRevisionCount(itemId2), 1);
 
         assertTrue(itemId0 != itemId1);
@@ -89,31 +89,33 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemId1 != itemId2);
     }
 
-    function testControlCreateWithParentSameNonce() public {
-        itemStore.create(0x0000, 0x1234);
-        itemStore.create(0x0001, 0x1234);
-    }
-
-    function testFailCreateWithParentSameNonce() public {
-        itemStore.create(0x0000, 0x1234);
-        itemStore.create(0x0000, 0x1234);
-    }
-
     function testControlCreateWithParentSameItemId() public {
-        bytes32 parent = itemStore.create(0x0000, 0x1234);
-        itemStore.createWithParent(0x0001, 0x1234, parent);
+        itemStore.create(0x0000, 0x1234);
+        bytes32 parent = itemStore.create(0x0001, 0x1234);
+        itemStore.createWithParent(0x0002, 0x1234, parent);
     }
 
     function testFailCreateWithParentSameItemId() public {
-        itemStore.createWithParent(0x0001, 0x1234, 0x27f0627239c077bd4a85416f92f30529ad279852466bfc94c449a2ef0a72f358);
+        itemStore.create(0x0000, 0x1234);
+        bytes32 parent = itemStore.create(0x0001, 0x1234);
+        itemStore.createWithParent(0x0000, 0x1234, parent);
     }
 
-    function testControlCreateWithParentNotInUse() public {
+    function testControlCreateWithParentParentSameItemId() public {
         bytes32 parent = itemStore.create(0x0000, 0x1234);
         itemStore.createWithParent(0x0001, 0x1234, parent);
     }
 
-    function testFailCreateWithParentNotInUse() public {
+    function testFailCreateWithParentParentSameItemId() public {
+        itemStore.createWithParent(0x0001, 0x1234, 0x27f0627239c077bd4a85416f92f30529ad279852466bfc94c449a2ef0a72f358);
+    }
+
+    function testControlCreateWithParentParentNotInUse() public {
+        bytes32 parent = itemStore.create(0x0000, 0x1234);
+        itemStore.createWithParent(0x0001, 0x1234, parent);
+    }
+
+    function testFailCreateWithParentParentNotInUse() public {
         itemStore.createWithParent(0x0001, 0x1234, itemStore.getContractId());
     }
 
@@ -129,7 +131,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
-        assertEq(itemStore.getParent(itemId0), 0);
+        assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 0);
 
         bytes32 itemId1 = itemStore.createWithParent(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN | bytes32(0x01), 0x1234, itemId0);
@@ -143,7 +145,8 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getTransferable(itemId1));
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
-        assertEq(itemStore.getParent(itemId1), itemId0);
+        assertEq(itemStore.getParentCount(itemId1), 1);
+        assertEq(itemStore.getParent(itemId1, 0), itemId0);
         assertEq(itemStore.getChildCount(itemId1), 0);
         assertEq(itemStore.getChildCount(itemId0), 1);
         assertEq(itemStore.getChild(itemId0, 0), itemId1);
@@ -160,7 +163,8 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getTransferable(itemId2));
         assertEq(itemStore.getRevisionIpfsHash(itemId2, 0), 0x2345);
         assertEq(itemStore.getRevisionTimestamp(itemId2, 0), block.timestamp);
-        assertEq(itemStore.getParent(itemId2), itemId0);
+        assertEq(itemStore.getParentCount(itemId2), 1);
+        assertEq(itemStore.getParent(itemId2, 0), itemId0);
         assertEq(itemStore.getChildCount(itemId2), 0);
         assertEq(itemStore.getChildCount(itemId0), 2);
         assertEq(itemStore.getChild(itemId0, 1), itemId2);
@@ -170,18 +174,18 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemId1 != itemId2);
     }
 
-    function testControlCreateWithForeignParentNotInUse() public {
+    function testControlCreateWithParentForeignNotInUse() public {
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
         bytes32 parent = itemStore2.create(0x0000, 0x1234);
         itemStore.createWithParent(0x0001, 0x1234, parent);
     }
 
-    function testFailCreateWithForeignParentNotInUse() public {
+    function testFailCreateWithParentForeignNotInUse() public {
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
         itemStore.createWithParent(0x0000, 0x1234, itemStore2.getContractId());
     }
 
-    function testCreateWithForeignParent() public {
+    function testCreateWithParentForeign() public {
         bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
         assertTrue(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
@@ -193,7 +197,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
-        assertEq(itemStore.getParent(itemId0), 0);
+        assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 0);
 
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
@@ -208,12 +212,353 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore2.getTransferable(itemId1));
         assertEq(itemStore2.getRevisionIpfsHash(itemId1, 0), 0x1234);
         assertEq(itemStore2.getRevisionTimestamp(itemId1, 0), block.timestamp);
-        assertEq(itemStore2.getParent(itemId1), itemId0);
+        assertEq(itemStore2.getParentCount(itemId1), 1);
+        assertEq(itemStore2.getParent(itemId1, 0), itemId0);
         assertEq(itemStore2.getChildCount(itemId1), 0);
 
-        assertEq(itemStore.getParent(itemId0), 0);
+        assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 1);
         assertEq(itemStore.getChild(itemId0, 0), itemId1);
+    }
+
+    function testControlCreateWithParentsSameItemId() public {
+        itemStore.create(0x0000, 0x1234);
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore.create(0x0001, 0x1234);
+        parents[1] = itemStore.create(0x0002, 0x1234);
+        itemStore.createWithParents(0x0003, 0x1234, parents);
+    }
+
+    function testFailCreateWithParentsSameItemId() public {
+        itemStore.create(0x0000, 0x1234);
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore.create(0x0001, 0x1234);
+        parents[1] = itemStore.create(0x0002, 0x1234);
+        itemStore.createWithParents(0x0000, 0x1234, parents);
+    }
+
+    function testControlCreateWithParentsParentSameItemId() public {
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore.create(0x0000, 0x1234);
+        parents[1] = itemStore.create(0x0001, 0x1234);
+        itemStore.createWithParents(0x0002, 0x1234, parents);
+    }
+
+    function testFailCreateWithParentsParentSameItemId0() public {
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = 0x27f0627239c077bd4a85416f92f30529ad279852466bfc94c449a2ef0a72f358;
+        parents[1] = itemStore.create(0x0002, 0x1234);
+        itemStore.createWithParents(0x0001, 0x1234, parents);
+    }
+
+    function testFailCreateWithParentsParentSameItemId1() public {
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore.create(0x0002, 0x1234);
+        parents[1] = 0x27f0627239c077bd4a85416f92f30529ad279852466bfc94c449a2ef0a72f358;
+        itemStore.createWithParents(0x0001, 0x1234, parents);
+    }
+
+    function testControlCreateWithParentsParentNotInUse() public {
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore.create(0x0000, 0x1234);
+        parents[1] = itemStore.create(0x0001, 0x1234);
+        itemStore.createWithParents(0x0002, 0x1234, parents);
+    }
+
+    function testFailCreateWithParentsParentNotInUse0() public {
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore.getContractId();
+        parents[1] = itemStore.create(0x0001, 0x1234);
+        itemStore.createWithParents(0x0002, 0x1234, parents);
+    }
+
+    function testFailCreateWithParentsParentNotInUse1() public {
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore.create(0x0000, 0x1234);
+        parents[1] = itemStore.getContractId();
+        itemStore.createWithParents(0x0002, 0x1234, parents);
+    }
+
+    function testCreateWithParents() public {
+        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        assertTrue(itemStore.getInUse(itemId0));
+        assertEq(itemStore.getFlags(itemId0), 0);
+        assertEq(itemStore.getOwner(itemId0), this);
+        assertEq(itemStore.getRevisionCount(itemId0), 1);
+        assertTrue(!itemStore.getUpdatable(itemId0));
+        assertTrue(!itemStore.getEnforceRevisions(itemId0));
+        assertTrue(!itemStore.getRetractable(itemId0));
+        assertTrue(!itemStore.getTransferable(itemId0));
+        assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
+        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore.getParentCount(itemId0), 0);
+        assertEq(itemStore.getChildCount(itemId0), 0);
+
+        bytes32 itemId1 = itemStore.create(0x0001, 0x1234);
+        assertTrue(itemStore.getInUse(itemId1));
+        assertEq(itemStore.getFlags(itemId1), 0);
+        assertEq(itemStore.getOwner(itemId1), this);
+        assertEq(itemStore.getRevisionCount(itemId1), 1);
+        assertTrue(!itemStore.getUpdatable(itemId1));
+        assertTrue(!itemStore.getEnforceRevisions(itemId1));
+        assertTrue(!itemStore.getRetractable(itemId1));
+        assertTrue(!itemStore.getTransferable(itemId1));
+        assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
+        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore.getParentCount(itemId1), 0);
+        assertEq(itemStore.getChildCount(itemId1), 0);
+
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemId0;
+        parents[1] = itemId1;
+        bytes32 itemId2 = itemStore.createWithParents(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN | bytes32(0x01), 0x1234, parents);
+        assertTrue(itemStore.getInUse(itemId2));
+        assertEq(itemStore.getFlags(itemId2), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN);
+        assertEq(itemStore.getOwner(itemId2), 0);
+        assertEq(itemStore.getRevisionCount(itemId2), 1);
+        assertTrue(itemStore.getUpdatable(itemId2));
+        assertTrue(itemStore.getEnforceRevisions(itemId2));
+        assertTrue(itemStore.getRetractable(itemId2));
+        assertTrue(itemStore.getTransferable(itemId2));
+        assertEq(itemStore.getRevisionIpfsHash(itemId2, 0), 0x1234);
+        assertEq(itemStore.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore.getParentCount(itemId2), 2);
+        assertEq(itemStore.getParent(itemId2, 0), itemId0);
+        assertEq(itemStore.getParent(itemId2, 1), itemId1);
+        assertEq(itemStore.getChildCount(itemId0), 1);
+        assertEq(itemStore.getChildCount(itemId1), 1);
+        assertEq(itemStore.getChildCount(itemId2), 0);
+        assertEq(itemStore.getChild(itemId0, 0), itemId2);
+        assertEq(itemStore.getChild(itemId1, 0), itemId2);
+
+        bytes32 itemId3 = itemStore.createWithParents(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN | bytes32(0x02), 0x2345, parents);
+        assertTrue(itemStore.getInUse(itemId3));
+        assertEq(itemStore.getFlags(itemId3), UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN);
+        assertEq(itemStore.getOwner(itemId3), 0);
+        assertEq(itemStore.getChildCount(itemId3), 0);
+        assertEq(itemStore.getRevisionCount(itemId3), 1);
+        assertTrue(itemStore.getUpdatable(itemId3));
+        assertTrue(itemStore.getEnforceRevisions(itemId3));
+        assertTrue(itemStore.getRetractable(itemId3));
+        assertTrue(itemStore.getTransferable(itemId3));
+        assertEq(itemStore.getRevisionIpfsHash(itemId3, 0), 0x2345);
+        assertEq(itemStore.getRevisionTimestamp(itemId3, 0), block.timestamp);
+        assertEq(itemStore.getParentCount(itemId3), 2);
+        assertEq(itemStore.getParent(itemId3, 0), itemId0);
+        assertEq(itemStore.getParent(itemId3, 1), itemId1);
+        assertEq(itemStore.getChildCount(itemId0), 2);
+        assertEq(itemStore.getChildCount(itemId1), 2);
+        assertEq(itemStore.getChildCount(itemId2), 0);
+        assertEq(itemStore.getChildCount(itemId3), 0);
+        assertEq(itemStore.getChild(itemId0, 0), itemId2);
+        assertEq(itemStore.getChild(itemId1, 0), itemId2);
+        assertEq(itemStore.getChild(itemId0, 1), itemId3);
+        assertEq(itemStore.getChild(itemId1, 1), itemId3);
+
+        assertTrue(itemId0 != itemId1);
+        assertTrue(itemId0 != itemId2);
+        assertTrue(itemId0 != itemId3);
+        assertTrue(itemId1 != itemId2);
+        assertTrue(itemId1 != itemId3);
+        assertTrue(itemId2 != itemId3);
+    }
+
+    function testControlCreateWithParentsForeignNotInUse() public {
+        ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore2.create(0x0000, 0x1234);
+        parents[1] = itemStore2.create(0x0001, 0x1234);
+        itemStore.createWithParents(0x0002, 0x1234, parents);
+    }
+
+    function testFailCreateWithParentsForeignNotInUse0() public {
+        ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore2.getContractId();
+        parents[1] = itemStore2.create(0x0001, 0x1234);
+        itemStore.createWithParents(0x0002, 0x1234, parents);
+    }
+
+    function testFailCreateWithParentsForeignNotInUse1() public {
+        ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemStore2.create(0x0000, 0x1234);
+        parents[1] = itemStore2.getContractId();
+        itemStore.createWithParents(0x0002, 0x1234, parents);
+    }
+
+    function testCreateWithParentsForeign0() public {
+        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        assertTrue(itemStore.getInUse(itemId0));
+        assertEq(itemStore.getFlags(itemId0), 0);
+        assertEq(itemStore.getOwner(itemId0), this);
+        assertEq(itemStore.getRevisionCount(itemId0), 1);
+        assertTrue(!itemStore.getUpdatable(itemId0));
+        assertTrue(!itemStore.getEnforceRevisions(itemId0));
+        assertTrue(!itemStore.getRetractable(itemId0));
+        assertTrue(!itemStore.getTransferable(itemId0));
+        assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
+        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore.getParentCount(itemId0), 0);
+        assertEq(itemStore.getChildCount(itemId0), 0);
+
+        bytes32 itemId1 = itemStore.create(0x0001, 0x1234);
+        assertTrue(itemStore.getInUse(itemId1));
+        assertEq(itemStore.getFlags(itemId1), 0);
+        assertEq(itemStore.getOwner(itemId1), this);
+        assertEq(itemStore.getRevisionCount(itemId1), 1);
+        assertTrue(!itemStore.getUpdatable(itemId1));
+        assertTrue(!itemStore.getEnforceRevisions(itemId1));
+        assertTrue(!itemStore.getRetractable(itemId1));
+        assertTrue(!itemStore.getTransferable(itemId1));
+        assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
+        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore.getParentCount(itemId1), 0);
+        assertEq(itemStore.getChildCount(itemId1), 0);
+
+        ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemId0;
+        parents[1] = itemId1;
+        bytes32 itemId2 = itemStore2.createWithParents(0x0000, 0x1234, parents);
+        assertTrue(itemStore2.getInUse(itemId2));
+        assertEq(itemStore2.getFlags(itemId2), 0);
+        assertEq(itemStore2.getOwner(itemId2), this);
+        assertEq(itemStore2.getRevisionCount(itemId2), 1);
+        assertTrue(!itemStore2.getUpdatable(itemId2));
+        assertTrue(!itemStore2.getEnforceRevisions(itemId2));
+        assertTrue(!itemStore2.getRetractable(itemId2));
+        assertTrue(!itemStore2.getTransferable(itemId2));
+        assertEq(itemStore2.getRevisionIpfsHash(itemId2, 0), 0x1234);
+        assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore2.getParentCount(itemId2), 2);
+        assertEq(itemStore2.getParent(itemId2, 0), itemId0);
+        assertEq(itemStore2.getParent(itemId2, 1), itemId1);
+        assertEq(itemStore2.getChildCount(itemId2), 0);
+
+        assertEq(itemStore.getParentCount(itemId0), 0);
+        assertEq(itemStore.getChildCount(itemId0), 1);
+        assertEq(itemStore.getChild(itemId0, 0), itemId2);
+
+        assertEq(itemStore.getParentCount(itemId1), 0);
+        assertEq(itemStore.getChildCount(itemId1), 1);
+        assertEq(itemStore.getChild(itemId1, 0), itemId2);
+    }
+
+    function testCreateWithParentsForeign1() public {
+        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        assertTrue(itemStore.getInUse(itemId0));
+        assertEq(itemStore.getFlags(itemId0), 0);
+        assertEq(itemStore.getOwner(itemId0), this);
+        assertEq(itemStore.getRevisionCount(itemId0), 1);
+        assertTrue(!itemStore.getUpdatable(itemId0));
+        assertTrue(!itemStore.getEnforceRevisions(itemId0));
+        assertTrue(!itemStore.getRetractable(itemId0));
+        assertTrue(!itemStore.getTransferable(itemId0));
+        assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
+        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore.getParentCount(itemId0), 0);
+        assertEq(itemStore.getChildCount(itemId0), 0);
+
+        ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
+        bytes32 itemId1 = itemStore2.create(0x0001, 0x1234);
+        assertTrue(itemStore2.getInUse(itemId1));
+        assertEq(itemStore2.getFlags(itemId1), 0);
+        assertEq(itemStore2.getOwner(itemId1), this);
+        assertEq(itemStore2.getRevisionCount(itemId1), 1);
+        assertTrue(!itemStore2.getUpdatable(itemId1));
+        assertTrue(!itemStore2.getEnforceRevisions(itemId1));
+        assertTrue(!itemStore2.getRetractable(itemId1));
+        assertTrue(!itemStore2.getTransferable(itemId1));
+        assertEq(itemStore2.getRevisionIpfsHash(itemId1, 0), 0x1234);
+        assertEq(itemStore2.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore2.getParentCount(itemId1), 0);
+        assertEq(itemStore2.getChildCount(itemId1), 0);
+
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemId0;
+        parents[1] = itemId1;
+        bytes32 itemId2 = itemStore2.createWithParents(0x0000, 0x1234, parents);
+        assertTrue(itemStore2.getInUse(itemId2));
+        assertEq(itemStore2.getFlags(itemId2), 0);
+        assertEq(itemStore2.getOwner(itemId2), this);
+        assertEq(itemStore2.getRevisionCount(itemId2), 1);
+        assertTrue(!itemStore2.getUpdatable(itemId2));
+        assertTrue(!itemStore2.getEnforceRevisions(itemId2));
+        assertTrue(!itemStore2.getRetractable(itemId2));
+        assertTrue(!itemStore2.getTransferable(itemId2));
+        assertEq(itemStore2.getRevisionIpfsHash(itemId2, 0), 0x1234);
+        assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore2.getParentCount(itemId2), 2);
+        assertEq(itemStore2.getParent(itemId2, 0), itemId0);
+        assertEq(itemStore2.getParent(itemId2, 1), itemId1);
+        assertEq(itemStore2.getChildCount(itemId2), 0);
+
+        assertEq(itemStore.getParentCount(itemId0), 0);
+        assertEq(itemStore.getChildCount(itemId0), 1);
+        assertEq(itemStore.getChild(itemId0, 0), itemId2);
+
+        assertEq(itemStore2.getParentCount(itemId1), 0);
+        assertEq(itemStore2.getChildCount(itemId1), 1);
+        assertEq(itemStore2.getChild(itemId1, 0), itemId2);
+    }
+
+    function testCreateWithParentsForeign2() public {
+        ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
+        bytes32 itemId0 = itemStore2.create(0x0001, 0x1234);
+        assertTrue(itemStore2.getInUse(itemId0));
+        assertEq(itemStore2.getFlags(itemId0), 0);
+        assertEq(itemStore2.getOwner(itemId0), this);
+        assertEq(itemStore2.getRevisionCount(itemId0), 1);
+        assertTrue(!itemStore2.getUpdatable(itemId0));
+        assertTrue(!itemStore2.getEnforceRevisions(itemId0));
+        assertTrue(!itemStore2.getRetractable(itemId0));
+        assertTrue(!itemStore2.getTransferable(itemId0));
+        assertEq(itemStore2.getRevisionIpfsHash(itemId0, 0), 0x1234);
+        assertEq(itemStore2.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore2.getParentCount(itemId0), 0);
+        assertEq(itemStore2.getChildCount(itemId0), 0);
+
+        bytes32 itemId1 = itemStore.create(0x0001, 0x1234);
+        assertTrue(itemStore.getInUse(itemId1));
+        assertEq(itemStore.getFlags(itemId1), 0);
+        assertEq(itemStore.getOwner(itemId1), this);
+        assertEq(itemStore.getRevisionCount(itemId1), 1);
+        assertTrue(!itemStore.getUpdatable(itemId1));
+        assertTrue(!itemStore.getEnforceRevisions(itemId1));
+        assertTrue(!itemStore.getRetractable(itemId1));
+        assertTrue(!itemStore.getTransferable(itemId1));
+        assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
+        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore.getParentCount(itemId1), 0);
+        assertEq(itemStore.getChildCount(itemId1), 0);
+
+        bytes32[] memory parents = new bytes32[](2);
+        parents[0] = itemId0;
+        parents[1] = itemId1;
+        bytes32 itemId2 = itemStore2.createWithParents(0x0000, 0x1234, parents);
+        assertTrue(itemStore2.getInUse(itemId2));
+        assertEq(itemStore2.getFlags(itemId2), 0);
+        assertEq(itemStore2.getOwner(itemId2), this);
+        assertEq(itemStore2.getRevisionCount(itemId2), 1);
+        assertTrue(!itemStore2.getUpdatable(itemId2));
+        assertTrue(!itemStore2.getEnforceRevisions(itemId2));
+        assertTrue(!itemStore2.getRetractable(itemId2));
+        assertTrue(!itemStore2.getTransferable(itemId2));
+        assertEq(itemStore2.getRevisionIpfsHash(itemId2, 0), 0x1234);
+        assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore2.getParentCount(itemId2), 2);
+        assertEq(itemStore2.getParent(itemId2, 0), itemId0);
+        assertEq(itemStore2.getParent(itemId2, 1), itemId1);
+        assertEq(itemStore2.getChildCount(itemId2), 0);
+
+        assertEq(itemStore2.getParentCount(itemId0), 0);
+        assertEq(itemStore2.getChildCount(itemId0), 1);
+        assertEq(itemStore2.getChild(itemId0, 0), itemId2);
+
+        assertEq(itemStore.getParentCount(itemId1), 0);
+        assertEq(itemStore.getChildCount(itemId1), 1);
+        assertEq(itemStore.getChild(itemId1, 0), itemId2);
     }
 
     function testFailAddForeignChildNotInUse() public {

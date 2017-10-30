@@ -205,21 +205,68 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
     }
 
     /**
-     * @dev Get all an items parent.
-     * @param itemId Id of the item.
-     * @return itemId of parent.
-     */
-    function getParent(bytes32 itemId) external view returns (bytes32) {
-        return itemStore.getParent(itemId);
-    }
-
-    /**
      * @dev Get the number of revisions an item has.
      * @param itemId Id of the item.
      * @return How many revisions the item has.
      */
     function getRevisionCount(bytes32 itemId) external view returns (uint) {
         return itemStore.getRevisionCount(itemId);
+    }
+
+    /**
+     * @dev Get the number of parents an item has.
+     * @param itemId Id of the item.
+     * @return How many parents the item has.
+     */
+    function getParentCount(bytes32 itemId) external view returns (uint) {
+        return itemStore.getParentCount(itemId);
+    }
+
+    /**
+     * @dev Get a specific parent
+     * @param itemId Id of the item.
+     * @param i Index of the parent.
+     * @return itemId of the parent.
+     */
+    function getParent(bytes32 itemId, uint i) external view returns (bytes32) {
+        return itemStore.getParent(itemId, i);
+    }
+
+    /**
+     * @dev Get all of an item's parents.
+     * @param itemId Id of the item.
+     * @return itemIds of the parents.
+     */
+    function getAllParents(bytes32 itemId) external view returns (bytes32[]) {
+        itemId;
+    }
+
+    /**
+     * @dev Get the number of children an item has.
+     * @param itemId Id of the item.
+     * @return How many children the item has.
+     */
+    function getChildCount(bytes32 itemId) external view returns (uint) {
+        return itemStore.getChildCount(itemId);
+    }
+
+    /**
+     * @dev Get a specific child
+     * @param itemId Id of the item.
+     * @param i Index of the child.
+     * @return itemId of the child.
+     */
+    function getChild(bytes32 itemId, uint i) external view returns (bytes32) {
+        return itemStore.getChild(itemId, i);
+    }
+
+    /**
+     * @dev Get all of an item's children.
+     * @param itemId Id of the item.
+     * @return itemIds of the children.
+     */
+    function getAllChildren(bytes32 itemId) external view returns (bytes32[]) {
+        itemId;
     }
 
 }
