@@ -32,7 +32,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Create a new item revision.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
      * @return revisionId The new revisionId.
      */
@@ -42,7 +42,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Update an item's latest revision.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
      */
     function updateLatestRevision(bytes32 itemId, bytes32 ipfsHash) external {
@@ -51,7 +51,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Retract an item's latest revision. Revision 0 cannot be retracted.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      */
     function retractLatestRevision(bytes32 itemId) external {
         itemStore.retractLatestRevision(itemId);
@@ -59,7 +59,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Delete all an item's revisions and replace it with a new item.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
      */
     function restart(bytes32 itemId, bytes32 ipfsHash) external {
@@ -68,7 +68,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Retract an item.
-     * @param itemId Id of the item. This itemId can never be used again.
+     * @param itemId itemId of the item. This itemId can never be used again.
      */
     function retract(bytes32 itemId) external {
         itemStore.retract(itemId);
@@ -76,7 +76,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Transfer an item to a new user.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @param recipient Address of the user to transfer to item to.
      */
     function transfer(bytes32 itemId, address recipient) external {
@@ -85,7 +85,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Disown an item.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      */
     function disown(bytes32 itemId) external {
         itemStore.disown(itemId);
@@ -93,7 +93,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Set an item to enforce revisions.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      */
     function setEnforceRevisions(bytes32 itemId) external {
         itemStore.setEnforceRevisions(itemId);
@@ -101,7 +101,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Set an item to not be retractable.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      */
     function setNotRetractable(bytes32 itemId) external {
         itemStore.setNotRetractable(itemId);
@@ -109,7 +109,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Set an item to not be transferable.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      */
     function setNotTransferable(bytes32 itemId) external {
         itemStore.setNotTransferable(itemId);
@@ -117,7 +117,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Enable transfer of an item to the current user.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      */
     function transferEnable(bytes32 itemId) external {
         itemStore.transferEnable(itemId);
@@ -125,7 +125,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Disable transfer of an item to the current user.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      */
     function transferDisable(bytes32 itemId) external {
         itemStore.transferDisable(itemId);
@@ -133,7 +133,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Set an item as not updatable.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      */
     function setNotUpdatable(bytes32 itemId) external {
         itemStore.setNotUpdatable(itemId);
@@ -152,7 +152,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Check if an itemId is in use.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @return True if the itemId is in use.
      */
     function getInUse(bytes32 itemId) public view returns (bool) {
@@ -161,7 +161,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Determine if an item is updatable.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @return True if the item is updatable.
      */
     function getUpdatable(bytes32 itemId) external view returns (bool) {
@@ -170,7 +170,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Determine if an item enforces revisions.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @return True if the item enforces revisions.
      */
     function getEnforceRevisions(bytes32 itemId) external view returns (bool) {
@@ -179,7 +179,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Determine if an item is retractable.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @return True if the item is item retractable.
      */
     function getRetractable(bytes32 itemId) external view returns (bool) {
@@ -188,7 +188,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Determine if an item is transferable.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @return True if the item is transferable.
      */
     function getTransferable(bytes32 itemId) external view returns (bool) {
@@ -197,7 +197,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Get the owner of an item.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @return Owner of the item.
      */
     function getOwner(bytes32 itemId) external view returns (address) {
@@ -206,7 +206,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Get the number of revisions an item has.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @return How many revisions the item has.
      */
     function getRevisionCount(bytes32 itemId) external view returns (uint) {
@@ -215,7 +215,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Get the number of parents an item has.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @return How many parents the item has.
      */
     function getParentCount(bytes32 itemId) external view returns (uint) {
@@ -224,26 +224,17 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Get a specific parent
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @param i Index of the parent.
      * @return itemId of the parent.
      */
-    function getParent(bytes32 itemId, uint i) external view returns (bytes32) {
-        return itemStore.getParent(itemId, i);
-    }
-
-    /**
-     * @dev Get all of an item's parents.
-     * @param itemId Id of the item.
-     * @return itemIds of the parents.
-     */
-    function getAllParents(bytes32 itemId) external view returns (bytes32[]) {
-        itemId;
+    function getParentId(bytes32 itemId, uint i) external view returns (bytes32) {
+        return itemStore.getParentId(itemId, i);
     }
 
     /**
      * @dev Get the number of children an item has.
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @return How many children the item has.
      */
     function getChildCount(bytes32 itemId) external view returns (uint) {
@@ -252,21 +243,12 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     /**
      * @dev Get a specific child
-     * @param itemId Id of the item.
+     * @param itemId itemId of the item.
      * @param i Index of the child.
      * @return itemId of the child.
      */
-    function getChild(bytes32 itemId, uint i) external view returns (bytes32) {
-        return itemStore.getChild(itemId, i);
-    }
-
-    /**
-     * @dev Get all of an item's children.
-     * @param itemId Id of the item.
-     * @return itemIds of the children.
-     */
-    function getAllChildren(bytes32 itemId) external view returns (bytes32[]) {
-        itemId;
+    function getChildId(bytes32 itemId, uint i) external view returns (bytes32) {
+        return itemStore.getChildId(itemId, i);
     }
 
 }

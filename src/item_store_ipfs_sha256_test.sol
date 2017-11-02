@@ -146,10 +146,10 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
         assertEq(itemStore.getParentCount(itemId1), 1);
-        assertEq(itemStore.getParent(itemId1, 0), itemId0);
+        assertEq(itemStore.getParentId(itemId1, 0), itemId0);
         assertEq(itemStore.getChildCount(itemId1), 0);
         assertEq(itemStore.getChildCount(itemId0), 1);
-        assertEq(itemStore.getChild(itemId0, 0), itemId1);
+        assertEq(itemStore.getChildId(itemId0, 0), itemId1);
 
         bytes32 itemId2 = itemStore.createWithParent(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN | bytes32(0x02), 0x2345, itemId0);
         assertTrue(itemStore.getInUse(itemId2));
@@ -164,10 +164,10 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId2, 0), 0x2345);
         assertEq(itemStore.getRevisionTimestamp(itemId2, 0), block.timestamp);
         assertEq(itemStore.getParentCount(itemId2), 1);
-        assertEq(itemStore.getParent(itemId2, 0), itemId0);
+        assertEq(itemStore.getParentId(itemId2, 0), itemId0);
         assertEq(itemStore.getChildCount(itemId2), 0);
         assertEq(itemStore.getChildCount(itemId0), 2);
-        assertEq(itemStore.getChild(itemId0, 1), itemId2);
+        assertEq(itemStore.getChildId(itemId0, 1), itemId2);
 
         assertTrue(itemId0 != itemId1);
         assertTrue(itemId0 != itemId2);
@@ -213,12 +213,12 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore2.getRevisionIpfsHash(itemId1, 0), 0x1234);
         assertEq(itemStore2.getRevisionTimestamp(itemId1, 0), block.timestamp);
         assertEq(itemStore2.getParentCount(itemId1), 1);
-        assertEq(itemStore2.getParent(itemId1, 0), itemId0);
+        assertEq(itemStore2.getParentId(itemId1, 0), itemId0);
         assertEq(itemStore2.getChildCount(itemId1), 0);
 
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 1);
-        assertEq(itemStore.getChild(itemId0, 0), itemId1);
+        assertEq(itemStore.getChildId(itemId0, 0), itemId1);
     }
 
     function testControlCreateWithParentsSameItemId() public {
@@ -323,13 +323,13 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId2, 0), 0x1234);
         assertEq(itemStore.getRevisionTimestamp(itemId2, 0), block.timestamp);
         assertEq(itemStore.getParentCount(itemId2), 2);
-        assertEq(itemStore.getParent(itemId2, 0), itemId0);
-        assertEq(itemStore.getParent(itemId2, 1), itemId1);
+        assertEq(itemStore.getParentId(itemId2, 0), itemId0);
+        assertEq(itemStore.getParentId(itemId2, 1), itemId1);
         assertEq(itemStore.getChildCount(itemId0), 1);
         assertEq(itemStore.getChildCount(itemId1), 1);
         assertEq(itemStore.getChildCount(itemId2), 0);
-        assertEq(itemStore.getChild(itemId0, 0), itemId2);
-        assertEq(itemStore.getChild(itemId1, 0), itemId2);
+        assertEq(itemStore.getChildId(itemId0, 0), itemId2);
+        assertEq(itemStore.getChildId(itemId1, 0), itemId2);
 
         bytes32 itemId3 = itemStore.createWithParents(UPDATABLE | ENFORCE_REVISIONS | RETRACTABLE | TRANSFERABLE | DISOWN | bytes32(0x02), 0x2345, parents);
         assertTrue(itemStore.getInUse(itemId3));
@@ -344,16 +344,16 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId3, 0), 0x2345);
         assertEq(itemStore.getRevisionTimestamp(itemId3, 0), block.timestamp);
         assertEq(itemStore.getParentCount(itemId3), 2);
-        assertEq(itemStore.getParent(itemId3, 0), itemId0);
-        assertEq(itemStore.getParent(itemId3, 1), itemId1);
+        assertEq(itemStore.getParentId(itemId3, 0), itemId0);
+        assertEq(itemStore.getParentId(itemId3, 1), itemId1);
         assertEq(itemStore.getChildCount(itemId0), 2);
         assertEq(itemStore.getChildCount(itemId1), 2);
         assertEq(itemStore.getChildCount(itemId2), 0);
         assertEq(itemStore.getChildCount(itemId3), 0);
-        assertEq(itemStore.getChild(itemId0, 0), itemId2);
-        assertEq(itemStore.getChild(itemId1, 0), itemId2);
-        assertEq(itemStore.getChild(itemId0, 1), itemId3);
-        assertEq(itemStore.getChild(itemId1, 1), itemId3);
+        assertEq(itemStore.getChildId(itemId0, 0), itemId2);
+        assertEq(itemStore.getChildId(itemId1, 0), itemId2);
+        assertEq(itemStore.getChildId(itemId0, 1), itemId3);
+        assertEq(itemStore.getChildId(itemId1, 1), itemId3);
 
         assertTrue(itemId0 != itemId1);
         assertTrue(itemId0 != itemId2);
@@ -432,17 +432,17 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore2.getRevisionIpfsHash(itemId2, 0), 0x1234);
         assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), block.timestamp);
         assertEq(itemStore2.getParentCount(itemId2), 2);
-        assertEq(itemStore2.getParent(itemId2, 0), itemId0);
-        assertEq(itemStore2.getParent(itemId2, 1), itemId1);
+        assertEq(itemStore2.getParentId(itemId2, 0), itemId0);
+        assertEq(itemStore2.getParentId(itemId2, 1), itemId1);
         assertEq(itemStore2.getChildCount(itemId2), 0);
 
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 1);
-        assertEq(itemStore.getChild(itemId0, 0), itemId2);
+        assertEq(itemStore.getChildId(itemId0, 0), itemId2);
 
         assertEq(itemStore.getParentCount(itemId1), 0);
         assertEq(itemStore.getChildCount(itemId1), 1);
-        assertEq(itemStore.getChild(itemId1, 0), itemId2);
+        assertEq(itemStore.getChildId(itemId1, 0), itemId2);
     }
 
     function testCreateWithParentsForeign1() public {
@@ -490,17 +490,17 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore2.getRevisionIpfsHash(itemId2, 0), 0x1234);
         assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), block.timestamp);
         assertEq(itemStore2.getParentCount(itemId2), 2);
-        assertEq(itemStore2.getParent(itemId2, 0), itemId0);
-        assertEq(itemStore2.getParent(itemId2, 1), itemId1);
+        assertEq(itemStore2.getParentId(itemId2, 0), itemId0);
+        assertEq(itemStore2.getParentId(itemId2, 1), itemId1);
         assertEq(itemStore2.getChildCount(itemId2), 0);
 
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 1);
-        assertEq(itemStore.getChild(itemId0, 0), itemId2);
+        assertEq(itemStore.getChildId(itemId0, 0), itemId2);
 
         assertEq(itemStore2.getParentCount(itemId1), 0);
         assertEq(itemStore2.getChildCount(itemId1), 1);
-        assertEq(itemStore2.getChild(itemId1, 0), itemId2);
+        assertEq(itemStore2.getChildId(itemId1, 0), itemId2);
     }
 
     function testCreateWithParentsForeign2() public {
@@ -548,17 +548,17 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore2.getRevisionIpfsHash(itemId2, 0), 0x1234);
         assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), block.timestamp);
         assertEq(itemStore2.getParentCount(itemId2), 2);
-        assertEq(itemStore2.getParent(itemId2, 0), itemId0);
-        assertEq(itemStore2.getParent(itemId2, 1), itemId1);
+        assertEq(itemStore2.getParentId(itemId2, 0), itemId0);
+        assertEq(itemStore2.getParentId(itemId2, 1), itemId1);
         assertEq(itemStore2.getChildCount(itemId2), 0);
 
         assertEq(itemStore2.getParentCount(itemId0), 0);
         assertEq(itemStore2.getChildCount(itemId0), 1);
-        assertEq(itemStore2.getChild(itemId0, 0), itemId2);
+        assertEq(itemStore2.getChildId(itemId0, 0), itemId2);
 
         assertEq(itemStore.getParentCount(itemId1), 0);
         assertEq(itemStore.getChildCount(itemId1), 1);
-        assertEq(itemStore.getChild(itemId1, 0), itemId2);
+        assertEq(itemStore.getChildId(itemId1, 0), itemId2);
     }
 
     function testFailAddForeignChildNotInUse() public {
