@@ -194,12 +194,10 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param _itemStoreRegistry Address of ItemStoreRegistry contract to register with.
      */
     function ItemStoreIpfsSha256(ItemStoreRegistry _itemStoreRegistry) public {
-        // Store the addresses of the contracts.
+        // Store the address of the ItemStoreRegistry contract.
         itemStoreRegistry = _itemStoreRegistry;
-        // Create id for this contract.
-        contractId = bytes12(keccak256(this, block.blockhash(block.number - 1)));
         // Register this contract.
-        itemStoreRegistry.register(contractId);
+        contractId = itemStoreRegistry.register();
     }
 
     /**
@@ -210,7 +208,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function create(bytes32 flagsNonce, bytes32 ipfsHash) external returns (bytes32 itemId) {
         // Generate the itemId.
-        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint160(-1)));
+        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint192(-1)));
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.
@@ -244,7 +242,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Ensure child and parent are not the same.
         require (itemId != parentId);
         // Is the parent in this item store contract?
-        if (bytes12(parentId) == contractId) {
+        if (bytes8(parentId) == contractId) {
             // Ensure the parent exists.
             require (getInUse(parentId));
             // Attach the item to the parent.
@@ -254,7 +252,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         }
         else {
             // Inform the item store contract of the parent that we are its child.
-            itemStoreRegistry.getItemStore(bytes12(parentId)).addForeignChild(parentId, itemId);
+            itemStoreRegistry.getItemStore(bytes8(parentId)).addForeignChild(parentId, itemId);
         }
     }
 
@@ -267,7 +265,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function createWithParent(bytes32 flagsNonce, bytes32 ipfsHash, bytes32 parentId) external returns (bytes32 itemId) {
         // Generate the itemId.
-        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint160(-1)));
+        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint192(-1)));
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.
@@ -304,7 +302,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] parentIds) external returns (bytes32 itemId) {
         // Generate the itemId.
-        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint160(-1)));
+        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint192(-1)));
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.
@@ -345,7 +343,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function addForeignChild(bytes32 itemId, bytes32 childId) external inUse(itemId) {
         // Get the item store of the child.
-        ItemStoreInterface itemStore = itemStoreRegistry.getItemStore(bytes12(childId));
+        ItemStoreInterface itemStore = itemStoreRegistry.getItemStore(bytes8(childId));
         // Ensure the call is coming from the item store of the child.
         require (itemStore == msg.sender);
         // Store the childId.

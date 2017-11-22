@@ -21,12 +21,13 @@ contract ItemStoreRegistryTest is DSTest {
         itemStore = new ItemStoreIpfsSha256(itemStoreRegistry);
     }
 
-    function testControlRegisterContractAgain() public {
-        itemStoreRegistry.register(~itemStore.getContractId());
+    function testControlRegisterContractIdAgain() public {
+        itemStoreRegistry.register();
     }
 
-    function testFailRegisterContractAgain() public {
-        itemStoreRegistry.register(itemStore.getContractId());
+    function testFailRegisterContractIdAgain() public {
+        itemStoreRegistry.register();
+        itemStoreRegistry.register();
     }
 
     function testControlItemStoreNotRegistered() public view {

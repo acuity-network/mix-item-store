@@ -23,15 +23,6 @@ contract ItemStoreRegistry {
     event Register(bytes32 indexed contractId, ItemStoreInterface indexed contractAddress);
 
     /**
-     * @dev Throw if contract is registered.
-     * @param contractId Id of the contract.
-     */
-    modifier isNotRegistered(bytes32 contractId) {
-        require (address(contracts[contractId]) == 0);
-        _;
-    }
-
-    /**
      * @dev Throw if contract is not registered.
      * @param contractId Id of the contract.
      */
@@ -42,9 +33,13 @@ contract ItemStoreRegistry {
 
     /**
      * @dev Register the calling ItemStore contract.
-     * @param contractId Id of the ItemStore contract.
+     * @return contractId Id of the ItemStore contract.
      */
-    function register(bytes32 contractId) external isNotRegistered(contractId) {
+    function register() external returns (bytes32 contractId) {
+        // Create contractId.
+        contractId = bytes8(msg.sender);
+        // Make sure this contractId has not been used before (highly unlikely).
+        require (contracts[contractId] == ItemStoreInterface(0));
         // Record the calling contract address.
         contracts[contractId] = ItemStoreInterface(msg.sender);
         // Log the registration.
