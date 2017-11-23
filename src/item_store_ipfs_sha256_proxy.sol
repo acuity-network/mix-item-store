@@ -141,6 +141,13 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
 
 
+    /**
+     * @dev Get the ABI version for this ItemStore contract.
+     * @return ABI version.
+     */
+    function getAbiVersion() external view returns (uint) {
+        return itemStore.getAbiVersion();
+    }
 
     /**
      * @dev Get the id for this ItemStore contract.

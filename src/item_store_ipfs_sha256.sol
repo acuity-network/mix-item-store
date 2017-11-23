@@ -17,6 +17,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     byte constant TRANSFERABLE = 0x08;        // True if the item can be transfered to another user or disowned. After creation can only be disabled.
     byte constant DISOWN = 0x10;              // True if the item should not have an owner at creation.
 
+    uint constant ABI_VERSION = 0;
+
     /**
      * @dev Single slot structure of item state.
      */
@@ -570,6 +572,14 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         itemState[itemId].flags &= ~TRANSFERABLE;
         // Log that the item is not transferable.
         SetNotTransferable(itemId);
+    }
+
+    /**
+     * @dev Get the ABI version for this ItemStore contract.
+     * @return ABI version.
+     */
+    function getAbiVersion() external view returns (uint) {
+        return ABI_VERSION;
     }
 
     /**

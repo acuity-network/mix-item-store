@@ -134,6 +134,12 @@ interface ItemStoreInterface {
     function setNotTransferable(bytes32 itemId) external;
 
     /**
+     * @dev Get the ABI version for this ItemStore contract.
+     * @return ABI version.
+     */
+    function getAbiVersion() external view returns (uint);
+
+    /**
      * @dev Get the id for this ItemStore contract.
      * @return Id of the contract.
      */
@@ -217,4 +223,5 @@ interface ItemStoreInterface {
      * @return itemId of the child.
      */
     function getChildId(bytes32 itemId, uint i) external view returns (bytes32);
+
 }

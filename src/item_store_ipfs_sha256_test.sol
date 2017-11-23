@@ -1013,4 +1013,8 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getTransferable(itemId));
     }
 
+    function testGetAbiVersion() public {
+        assertEq(itemStore.getAbiVersion(), 0);
+    }
+
 }
