@@ -193,7 +193,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
 
     /**
      * @dev Constructor.
-     * @param _itemStoreRegistry Address of ItemStoreRegistry contract to register with.
+     * @param _itemStoreRegistry Address of the ItemStoreRegistry contract.
      */
     function ItemStoreIpfsSha256(ItemStoreRegistry _itemStoreRegistry) public {
         // Store the address of the ItemStoreRegistry contract.
@@ -254,7 +254,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         }
         else {
             // Inform the item store contract of the parent that we are its child.
-            itemStoreRegistry.getItemStore(bytes8(parentId)).addForeignChild(parentId, itemId);
+            itemStoreRegistry.getItemStore(parentId).addForeignChild(parentId, itemId);
         }
     }
 
@@ -345,7 +345,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function addForeignChild(bytes32 itemId, bytes32 childId) external inUse(itemId) {
         // Get the item store of the child.
-        ItemStoreInterface itemStore = itemStoreRegistry.getItemStore(bytes8(childId));
+        ItemStoreInterface itemStore = itemStoreRegistry.getItemStore(childId);
         // Ensure the call is coming from the item store of the child.
         require (itemStore == msg.sender);
         // Store the childId.

@@ -11,7 +11,7 @@ import "./item_store_interface.sol";
 contract ItemStoreRegistry {
 
     /**
-     * @dev Mapping of contract id to contract addresses.
+     * @dev Mapping of contractIds to contract addresses.
      */
     mapping (bytes32 => ItemStoreInterface) contracts;
 
@@ -21,15 +21,6 @@ contract ItemStoreRegistry {
      * @param contractAddress Address of the contract.
      */
     event Register(bytes32 indexed contractId, ItemStoreInterface indexed contractAddress);
-
-    /**
-     * @dev Throw if contract is not registered.
-     * @param contractId Id of the contract.
-     */
-    modifier isRegistered(bytes32 contractId) {
-        require (address(contracts[contractId]) != 0);
-        _;
-    }
 
     /**
      * @dev Register the calling ItemStore contract.
@@ -47,12 +38,13 @@ contract ItemStoreRegistry {
     }
 
     /**
-     * @dev Get a ItemStore contract.
-     * @param contractId Id of the contract.
-     * @return The ItemStore contract.
+     * @dev Lookup the itemStore contract for an item.
+     * @param itemId itemId of the item to determine the itemStore contract of.
+     * @return itemStore itemStore contract of the item.
      */
-    function getItemStore(bytes32 contractId) external view isRegistered(contractId) returns (ItemStoreInterface) {
-        return contracts[contractId];
+    function getItemStore(bytes32 itemId) external view returns (ItemStoreInterface itemStore) {
+        itemStore = contracts[bytes8(itemId)];
+        require (address(itemStore) != 0);
     }
 
 }
