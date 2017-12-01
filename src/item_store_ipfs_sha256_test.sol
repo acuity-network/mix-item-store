@@ -31,17 +31,17 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlCreateSameItemId() public {
-        itemStore.create(0x0000, 0x1234);
-        itemStore.create(0x0001, 0x1234);
+        itemStore.create(bytes2(0x0000), 0x1234);
+        itemStore.create(bytes2(0x0001), 0x1234);
     }
 
     function testFailCreateSameItemId() public {
-        itemStore.create(0x0000, 0x1234);
-        itemStore.create(0x0000, 0x1234);
+        itemStore.create(bytes2(0x0000), 0x1234);
+        itemStore.create(bytes2(0x0000), 0x1234);
     }
 
     function testCreate() public {
-        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        bytes32 itemId0 = itemStore.create(bytes2(0x0000), 0x1234);
         assertTrue(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
         assertEq(itemStore.getOwner(itemId0), this);
@@ -90,37 +90,37 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlCreateWithParentSameItemId() public {
-        itemStore.create(0x0000, 0x1234);
-        bytes32 parent = itemStore.create(0x0001, 0x1234);
-        itemStore.createWithParent(0x0002, 0x1234, parent);
+        itemStore.create(bytes2(0x0000), 0x1234);
+        bytes32 parent = itemStore.create(bytes2(0x0001), 0x1234);
+        itemStore.createWithParent(bytes2(0x0002), 0x1234, parent);
     }
 
     function testFailCreateWithParentSameItemId() public {
-        itemStore.create(0x0000, 0x1234);
-        bytes32 parent = itemStore.create(0x0001, 0x1234);
-        itemStore.createWithParent(0x0000, 0x1234, parent);
+        itemStore.create(bytes2(0x0000), 0x1234);
+        bytes32 parent = itemStore.create(bytes2(0x0001), 0x1234);
+        itemStore.createWithParent(bytes2(0x0000), 0x1234, parent);
     }
 
     function testControlCreateWithParentParentSameItemId() public {
-        bytes32 parent = itemStore.create(0x0000, 0x1234);
-        itemStore.createWithParent(0x0001, 0x1234, parent);
+        bytes32 parent = itemStore.create(bytes2(0x0000), 0x1234);
+        itemStore.createWithParent(bytes2(0x0001), 0x1234, parent);
     }
 
     function testFailCreateWithParentParentSameItemId() public {
-        itemStore.createWithParent(0x0001, 0x1234, 0x27f0627239c077bd4a85416f92f30529ad279852466bfc94c449a2ef0a72f358);
+        itemStore.createWithParent(bytes2(0x0001), 0x1234, 0x27f0627239c077bd4a85416f92f30529ad279852466bfc94c449a2ef0a72f358);
     }
 
     function testControlCreateWithParentParentNotInUse() public {
-        bytes32 parent = itemStore.create(0x0000, 0x1234);
-        itemStore.createWithParent(0x0001, 0x1234, parent);
+        bytes32 parent = itemStore.create(bytes2(0x0000), 0x1234);
+        itemStore.createWithParent(bytes2(0x0001), 0x1234, parent);
     }
 
     function testFailCreateWithParentParentNotInUse() public {
-        itemStore.createWithParent(0x0001, 0x1234, itemStore.getContractId());
+        itemStore.createWithParent(bytes2(0x0001), 0x1234, itemStore.getContractId());
     }
 
     function testCreateWithParent() public {
-        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        bytes32 itemId0 = itemStore.create(bytes2(0x0000), 0x1234);
         assertTrue(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
         assertEq(itemStore.getOwner(itemId0), this);
@@ -176,17 +176,17 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testControlCreateWithParentForeignNotInUse() public {
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
-        bytes32 parent = itemStore2.create(0x0000, 0x1234);
-        itemStore.createWithParent(0x0001, 0x1234, parent);
+        bytes32 parent = itemStore2.create(bytes2(0x0000), 0x1234);
+        itemStore.createWithParent(bytes2(0x0001), 0x1234, parent);
     }
 
     function testFailCreateWithParentForeignNotInUse() public {
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
-        itemStore.createWithParent(0x0000, 0x1234, itemStore2.getContractId());
+        itemStore.createWithParent(bytes2(0x0000), 0x1234, itemStore2.getContractId());
     }
 
     function testCreateWithParentForeign() public {
-        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        bytes32 itemId0 = itemStore.create(bytes2(0x0000), 0x1234);
         assertTrue(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
         assertEq(itemStore.getOwner(itemId0), this);
@@ -201,7 +201,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getChildCount(itemId0), 0);
 
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
-        bytes32 itemId1 = itemStore2.createWithParent(0x0000, 0x1234, itemId0);
+        bytes32 itemId1 = itemStore2.createWithParent(bytes2(0x0000), 0x1234, itemId0);
         assertTrue(itemStore2.getInUse(itemId1));
         assertEq(itemStore2.getFlags(itemId1), 0);
         assertEq(itemStore2.getOwner(itemId1), this);
@@ -222,65 +222,65 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testControlCreateWithParentsSameItemId() public {
-        itemStore.create(0x0000, 0x1234);
+        itemStore.create(bytes2(0x0000), 0x1234);
         bytes32[] memory parents = new bytes32[](2);
-        parents[0] = itemStore.create(0x0001, 0x1234);
-        parents[1] = itemStore.create(0x0002, 0x1234);
-        itemStore.createWithParents(0x0003, 0x1234, parents);
+        parents[0] = itemStore.create(bytes2(0x0001), 0x1234);
+        parents[1] = itemStore.create(bytes2(0x0002), 0x1234);
+        itemStore.createWithParents(bytes2(0x0003), 0x1234, parents);
     }
 
     function testFailCreateWithParentsSameItemId() public {
-        itemStore.create(0x0000, 0x1234);
+        itemStore.create(bytes2(0x0000), 0x1234);
         bytes32[] memory parents = new bytes32[](2);
-        parents[0] = itemStore.create(0x0001, 0x1234);
-        parents[1] = itemStore.create(0x0002, 0x1234);
-        itemStore.createWithParents(0x0000, 0x1234, parents);
+        parents[0] = itemStore.create(bytes2(0x0001), 0x1234);
+        parents[1] = itemStore.create(bytes2(0x0002), 0x1234);
+        itemStore.createWithParents(bytes2(0x0000), 0x1234, parents);
     }
 
     function testControlCreateWithParentsParentSameItemId() public {
         bytes32[] memory parents = new bytes32[](2);
-        parents[0] = itemStore.create(0x0000, 0x1234);
-        parents[1] = itemStore.create(0x0001, 0x1234);
-        itemStore.createWithParents(0x0002, 0x1234, parents);
+        parents[0] = itemStore.create(bytes2(0x0000), 0x1234);
+        parents[1] = itemStore.create(bytes2(0x0001), 0x1234);
+        itemStore.createWithParents(bytes2(0x0002), 0x1234, parents);
     }
 
     function testFailCreateWithParentsParentSameItemId0() public {
         bytes32[] memory parents = new bytes32[](2);
         parents[0] = 0x27f0627239c077bd4a85416f92f30529ad279852466bfc94c449a2ef0a72f358;
-        parents[1] = itemStore.create(0x0002, 0x1234);
-        itemStore.createWithParents(0x0001, 0x1234, parents);
+        parents[1] = itemStore.create(bytes2(0x0002), 0x1234);
+        itemStore.createWithParents(bytes2(0x0001), 0x1234, parents);
     }
 
     function testFailCreateWithParentsParentSameItemId1() public {
         bytes32[] memory parents = new bytes32[](2);
-        parents[0] = itemStore.create(0x0002, 0x1234);
+        parents[0] = itemStore.create(bytes2(0x0002), 0x1234);
         parents[1] = 0x27f0627239c077bd4a85416f92f30529ad279852466bfc94c449a2ef0a72f358;
-        itemStore.createWithParents(0x0001, 0x1234, parents);
+        itemStore.createWithParents(bytes2(0x0001), 0x1234, parents);
     }
 
     function testControlCreateWithParentsParentNotInUse() public {
         bytes32[] memory parents = new bytes32[](2);
-        parents[0] = itemStore.create(0x0000, 0x1234);
-        parents[1] = itemStore.create(0x0001, 0x1234);
-        itemStore.createWithParents(0x0002, 0x1234, parents);
+        parents[0] = itemStore.create(bytes2(0x0000), 0x1234);
+        parents[1] = itemStore.create(bytes2(0x0001), 0x1234);
+        itemStore.createWithParents(bytes2(0x0002), 0x1234, parents);
     }
 
     function testFailCreateWithParentsParentNotInUse0() public {
         bytes32[] memory parents = new bytes32[](2);
         parents[0] = itemStore.getContractId();
-        parents[1] = itemStore.create(0x0001, 0x1234);
-        itemStore.createWithParents(0x0002, 0x1234, parents);
+        parents[1] = itemStore.create(bytes2(0x0001), 0x1234);
+        itemStore.createWithParents(bytes2(0x0002), 0x1234, parents);
     }
 
     function testFailCreateWithParentsParentNotInUse1() public {
         bytes32[] memory parents = new bytes32[](2);
-        parents[0] = itemStore.create(0x0000, 0x1234);
+        parents[0] = itemStore.create(bytes2(0x0000), 0x1234);
         parents[1] = itemStore.getContractId();
-        itemStore.createWithParents(0x0002, 0x1234, parents);
+        itemStore.createWithParents(bytes2(0x0002), 0x1234, parents);
     }
 
     function testCreateWithParents() public {
-        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        bytes32 itemId0 = itemStore.create(bytes2(0x0000), 0x1234);
         assertTrue(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
         assertEq(itemStore.getOwner(itemId0), this);
@@ -294,7 +294,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 0);
 
-        bytes32 itemId1 = itemStore.create(0x0001, 0x1234);
+        bytes32 itemId1 = itemStore.create(bytes2(0x0001), 0x1234);
         assertTrue(itemStore.getInUse(itemId1));
         assertEq(itemStore.getFlags(itemId1), 0);
         assertEq(itemStore.getOwner(itemId1), this);
@@ -366,29 +366,29 @@ contract ItemStoreIpfsSha256Test is DSTest {
     function testControlCreateWithParentsForeignNotInUse() public {
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
         bytes32[] memory parents = new bytes32[](2);
-        parents[0] = itemStore2.create(0x0000, 0x1234);
-        parents[1] = itemStore2.create(0x0001, 0x1234);
-        itemStore.createWithParents(0x0002, 0x1234, parents);
+        parents[0] = itemStore2.create(bytes2(0x0000), 0x1234);
+        parents[1] = itemStore2.create(bytes2(0x0001), 0x1234);
+        itemStore.createWithParents(bytes2(0x0002), 0x1234, parents);
     }
 
     function testFailCreateWithParentsForeignNotInUse0() public {
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
         bytes32[] memory parents = new bytes32[](2);
         parents[0] = itemStore2.getContractId();
-        parents[1] = itemStore2.create(0x0001, 0x1234);
-        itemStore.createWithParents(0x0002, 0x1234, parents);
+        parents[1] = itemStore2.create(bytes2(0x0001), 0x1234);
+        itemStore.createWithParents(bytes2(0x0002), 0x1234, parents);
     }
 
     function testFailCreateWithParentsForeignNotInUse1() public {
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
         bytes32[] memory parents = new bytes32[](2);
-        parents[0] = itemStore2.create(0x0000, 0x1234);
+        parents[0] = itemStore2.create(bytes2(0x0000), 0x1234);
         parents[1] = itemStore2.getContractId();
-        itemStore.createWithParents(0x0002, 0x1234, parents);
+        itemStore.createWithParents(bytes2(0x0002), 0x1234, parents);
     }
 
     function testCreateWithParentsForeign0() public {
-        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        bytes32 itemId0 = itemStore.create(bytes2(0x0000), 0x1234);
         assertTrue(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
         assertEq(itemStore.getOwner(itemId0), this);
@@ -402,7 +402,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 0);
 
-        bytes32 itemId1 = itemStore.create(0x0001, 0x1234);
+        bytes32 itemId1 = itemStore.create(bytes2(0x0001), 0x1234);
         assertTrue(itemStore.getInUse(itemId1));
         assertEq(itemStore.getFlags(itemId1), 0);
         assertEq(itemStore.getOwner(itemId1), this);
@@ -420,7 +420,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         bytes32[] memory parents = new bytes32[](2);
         parents[0] = itemId0;
         parents[1] = itemId1;
-        bytes32 itemId2 = itemStore2.createWithParents(0x0000, 0x1234, parents);
+        bytes32 itemId2 = itemStore2.createWithParents(bytes2(0x0000), 0x1234, parents);
         assertTrue(itemStore2.getInUse(itemId2));
         assertEq(itemStore2.getFlags(itemId2), 0);
         assertEq(itemStore2.getOwner(itemId2), this);
@@ -446,7 +446,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testCreateWithParentsForeign1() public {
-        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        bytes32 itemId0 = itemStore.create(bytes2(0x0000), 0x1234);
         assertTrue(itemStore.getInUse(itemId0));
         assertEq(itemStore.getFlags(itemId0), 0);
         assertEq(itemStore.getOwner(itemId0), this);
@@ -461,7 +461,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getChildCount(itemId0), 0);
 
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
-        bytes32 itemId1 = itemStore2.create(0x0001, 0x1234);
+        bytes32 itemId1 = itemStore2.create(bytes2(0x0001), 0x1234);
         assertTrue(itemStore2.getInUse(itemId1));
         assertEq(itemStore2.getFlags(itemId1), 0);
         assertEq(itemStore2.getOwner(itemId1), this);
@@ -478,7 +478,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         bytes32[] memory parents = new bytes32[](2);
         parents[0] = itemId0;
         parents[1] = itemId1;
-        bytes32 itemId2 = itemStore2.createWithParents(0x0000, 0x1234, parents);
+        bytes32 itemId2 = itemStore2.createWithParents(bytes2(0x0000), 0x1234, parents);
         assertTrue(itemStore2.getInUse(itemId2));
         assertEq(itemStore2.getFlags(itemId2), 0);
         assertEq(itemStore2.getOwner(itemId2), this);
@@ -505,7 +505,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
 
     function testCreateWithParentsForeign2() public {
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
-        bytes32 itemId0 = itemStore2.create(0x0001, 0x1234);
+        bytes32 itemId0 = itemStore2.create(bytes2(0x0001), 0x1234);
         assertTrue(itemStore2.getInUse(itemId0));
         assertEq(itemStore2.getFlags(itemId0), 0);
         assertEq(itemStore2.getOwner(itemId0), this);
@@ -519,7 +519,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore2.getParentCount(itemId0), 0);
         assertEq(itemStore2.getChildCount(itemId0), 0);
 
-        bytes32 itemId1 = itemStore.create(0x0001, 0x1234);
+        bytes32 itemId1 = itemStore.create(bytes2(0x0001), 0x1234);
         assertTrue(itemStore.getInUse(itemId1));
         assertEq(itemStore.getFlags(itemId1), 0);
         assertEq(itemStore.getOwner(itemId1), this);
@@ -536,7 +536,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         bytes32[] memory parents = new bytes32[](2);
         parents[0] = itemId0;
         parents[1] = itemId1;
-        bytes32 itemId2 = itemStore2.createWithParents(0x0000, 0x1234, parents);
+        bytes32 itemId2 = itemStore2.createWithParents(bytes2(0x0000), 0x1234, parents);
         assertTrue(itemStore2.getInUse(itemId2));
         assertEq(itemStore2.getFlags(itemId2), 0);
         assertEq(itemStore2.getOwner(itemId2), this);
@@ -562,15 +562,15 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testFailAddForeignChildNotInUse() public {
-        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        bytes32 itemId0 = itemStore.create(bytes2(0x0000), 0x1234);
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
         itemStore.addForeignChild(itemId0, itemStore2.getContractId());
     }
 
     function testFailAddForeignChildNotChild() public {
-        bytes32 itemId0 = itemStore.create(0x0000, 0x1234);
+        bytes32 itemId0 = itemStore.create(bytes2(0x0000), 0x1234);
         ItemStoreIpfsSha256 itemStore2 = new ItemStoreIpfsSha256(itemStoreRegistry);
-        bytes32 itemId1 = itemStore2.create(0x0000, 0x1234);
+        bytes32 itemId1 = itemStore2.create(bytes2(0x0000), 0x1234);
         itemStore.addForeignChild(itemId0, itemId1);
     }
 
