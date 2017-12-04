@@ -203,6 +203,15 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
+     * @dev Determines the itemId from the sender and nonce.
+     * @param nonce Nonce that this sender has never used before.
+     * @return itemId itemId of the item with this sender and nonce.
+     */
+    function calculateItemId(bytes32 nonce) public view returns (bytes32) {
+        return contractId | (keccak256(msg.sender, nonce) & bytes32(uint192(-1)));
+    }
+
+    /**
      * @dev Creates an item with no parents. It is guaranteed that different users will never receive the same itemId, even before consensus has been reached. This prevents itemId sniping.
      * @param flagsNonce Nonce that this address has never passed before; first byte is creation flags.
      * @param ipfsHash Hash of the IPFS object where revision 0 is stored.
@@ -210,7 +219,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function create(bytes32 flagsNonce, bytes32 ipfsHash) external returns (bytes32 itemId) {
         // Generate the itemId.
-        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint192(-1)));
+        itemId = calculateItemId(flagsNonce);
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.
@@ -267,7 +276,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function createWithParent(bytes32 flagsNonce, bytes32 ipfsHash, bytes32 parentId) external returns (bytes32 itemId) {
         // Generate the itemId.
-        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint192(-1)));
+        itemId = calculateItemId(flagsNonce);
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.
@@ -304,7 +313,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] parentIds) external returns (bytes32 itemId) {
         // Generate the itemId.
-        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint192(-1)));
+        itemId = calculateItemId(flagsNonce);
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.

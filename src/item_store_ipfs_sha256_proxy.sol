@@ -22,6 +22,15 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
     }
 
     /**
+     * @dev Determines the itemId from the sender and nonce.
+     * @param nonce Nonce that this sender has never used before.
+     * @return itemId itemId of the item with this sender and nonce.
+     */
+    function calculateItemId(bytes32 nonce) public view returns (bytes32) {
+        itemStore.calculateItemId(nonce);
+    }
+
+    /**
      * @dev Add a child from another item store contract.
      * @param itemId itemId of parent.
      * @param child itemId of child.

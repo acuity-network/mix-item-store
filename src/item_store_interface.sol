@@ -66,6 +66,13 @@ interface ItemStoreInterface {
     event SetNotTransferable(bytes32 indexed itemId);
 
     /**
+     * @dev Determines the itemId from the sender and nonce.
+     * @param nonce Nonce that this sender has never used before.
+     * @return itemId itemId of the item with this sender and nonce.
+     */
+    function calculateItemId(bytes32 nonce) public view returns (bytes32);
+
+    /**
      * @dev Add a child from another item store contract.
      * @param itemId itemId of parent.
      * @param childId itemId of child.
