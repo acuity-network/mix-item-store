@@ -83,20 +83,6 @@
 	"stateMutability": "nonpayable",
 	"type": "function"
 }, {
-	"constant": true,
-	"inputs": [{
-		"name": "nonce",
-		"type": "bytes32"
-	}],
-	"name": "calculateItemId",
-	"outputs": [{
-		"name": "",
-		"type": "bytes32"
-	}],
-	"payable": false,
-	"stateMutability": "view",
-	"type": "function"
-}, {
 	"constant": false,
 	"inputs": [{
 		"name": "itemId",
@@ -158,7 +144,7 @@
 	"name": "getFlags",
 	"outputs": [{
 		"name": "",
-		"type": "bytes32"
+		"type": "bytes1"
 	}],
 	"payable": false,
 	"stateMutability": "view",
@@ -228,7 +214,7 @@
 	"name": "getContractId",
 	"outputs": [{
 		"name": "",
-		"type": "bytes32"
+		"type": "bytes8"
 	}],
 	"payable": false,
 	"stateMutability": "view",
@@ -243,6 +229,20 @@
 	"outputs": [{
 		"name": "",
 		"type": "bool"
+	}],
+	"payable": false,
+	"stateMutability": "view",
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "nonce",
+		"type": "bytes32"
+	}],
+	"name": "getNewItemId",
+	"outputs": [{
+		"name": "itemId",
+		"type": "bytes32"
 	}],
 	"payable": false,
 	"stateMutability": "view",
@@ -422,7 +422,7 @@
 	"name": "getItem",
 	"outputs": [{
 		"name": "flags",
-		"type": "bytes32"
+		"type": "bytes1"
 	}, {
 		"name": "owner",
 		"type": "address"
@@ -580,7 +580,7 @@
 	}, {
 		"indexed": false,
 		"name": "flags",
-		"type": "bytes32"
+		"type": "bytes1"
 	}],
 	"name": "Create",
 	"type": "event"

@@ -4,7 +4,7 @@
 	"name": "register",
 	"outputs": [{
 		"name": "contractId",
-		"type": "bytes32"
+		"type": "bytes8"
 	}],
 	"payable": false,
 	"stateMutability": "nonpayable",
@@ -28,7 +28,7 @@
 	"inputs": [{
 		"indexed": true,
 		"name": "contractId",
-		"type": "bytes32"
+		"type": "bytes8"
 	}, {
 		"indexed": true,
 		"name": "contractAddress",

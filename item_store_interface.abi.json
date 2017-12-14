@@ -35,20 +35,6 @@
 	"stateMutability": "nonpayable",
 	"type": "function"
 }, {
-	"constant": true,
-	"inputs": [{
-		"name": "nonce",
-		"type": "bytes32"
-	}],
-	"name": "calculateItemId",
-	"outputs": [{
-		"name": "",
-		"type": "bytes32"
-	}],
-	"payable": false,
-	"stateMutability": "view",
-	"type": "function"
-}, {
 	"constant": false,
 	"inputs": [{
 		"name": "itemId",
@@ -118,7 +104,7 @@
 	"name": "getContractId",
 	"outputs": [{
 		"name": "",
-		"type": "bytes32"
+		"type": "bytes8"
 	}],
 	"payable": false,
 	"stateMutability": "view",
@@ -133,6 +119,20 @@
 	"outputs": [{
 		"name": "",
 		"type": "bool"
+	}],
+	"payable": false,
+	"stateMutability": "view",
+	"type": "function"
+}, {
+	"constant": true,
+	"inputs": [{
+		"name": "nonce",
+		"type": "bytes32"
+	}],
+	"name": "getNewItemId",
+	"outputs": [{
+		"name": "itemId",
+		"type": "bytes32"
 	}],
 	"payable": false,
 	"stateMutability": "view",
