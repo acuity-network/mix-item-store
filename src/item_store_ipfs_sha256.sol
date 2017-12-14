@@ -68,7 +68,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     ItemStoreRegistry itemStoreRegistry;
 
     /**
-     * @dev Id of this instance of ItemStore. Unique across all blockchains.
+     * @dev Id of this instance of ItemStore. Stored as bytes32 instead of bytes8 to reduce gas usage.
      */
     bytes32 contractId;
 
@@ -78,7 +78,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param owner Address of the item owner.
      * @param flags Flags the item was created with.
      */
-    event Create(bytes32 indexed itemId, address indexed owner, bytes32 flags);
+    event Create(bytes32 indexed itemId, address indexed owner, byte flags);
 
     /**
      * @dev An item revision has been published.
@@ -223,13 +223,13 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.
-        bytes32 flags = byte(flagsNonce);
+        byte flags = byte(flagsNonce);
         // Determine the owner.
         address owner = (flags & DISOWN == 0) ? msg.sender : 0;
         // Store item state.
         itemState[itemId] = ItemState({
             inUse: true,
-            flags: byte(flags),
+            flags: flags,
             parentCount: 0,
             childCount: 0,
             revisionCount: 1,
@@ -280,13 +280,13 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.
-        bytes32 flags = byte(flagsNonce);
+        byte flags = byte(flagsNonce);
         // Determine the owner.
         address owner = (flags & DISOWN == 0) ? msg.sender : 0;
         // Store item state.
         itemState[itemId] = ItemState({
             inUse: true,
-            flags: byte(flags),
+            flags: flags,
             parentCount: 1,
             childCount: 0,
             revisionCount: 1,
@@ -317,7 +317,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
         // Extract the flags.
-        bytes32 flags = byte(flagsNonce);
+        byte flags = byte(flagsNonce);
         // Get parent count.
         uint parentCount = parentIds.length;
         // Determine the owner.
@@ -325,7 +325,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Store item state.
         itemState[itemId] = ItemState({
             inUse: true,
-            flags: byte(flags),
+            flags: flags,
             parentCount: uint16(parentCount),
             childCount: 0,
             revisionCount: 1,
@@ -595,8 +595,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @dev Get the id for this ItemStore contract.
      * @return Id of the contract.
      */
-    function getContractId() external view returns (bytes32) {
-        return contractId;
+    function getContractId() external view returns (bytes8) {
+        return bytes8(contractId);
     }
 
     /**
@@ -687,7 +687,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return parentIds itemIds of all parents.
      * @return childIds itemIds of all children.
      */
-    function getItem(bytes32 itemId) external view inUse(itemId) returns (bytes32 flags, address owner, uint revisionCount, bytes32[] ipfsHashes, uint[] timestamps, bytes32[] parentIds, bytes32[] childIds) {
+    function getItem(bytes32 itemId) external view inUse(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes, uint[] timestamps, bytes32[] parentIds, bytes32[] childIds) {
         ItemState storage state = itemState[itemId];
         flags = state.flags;
         owner = state.owner;
@@ -703,7 +703,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return Packed item settings.
      */
-    function getFlags(bytes32 itemId) external view inUse(itemId) returns (bytes32) {
+    function getFlags(bytes32 itemId) external view inUse(itemId) returns (byte) {
         return itemState[itemId].flags;
     }
 

@@ -162,7 +162,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
      * @dev Get the id for this ItemStore contract.
      * @return Id of the contract.
      */
-    function getContractId() external view returns (bytes32) {
+    function getContractId() external view returns (bytes8) {
         return itemStore.getContractId();
     }
 

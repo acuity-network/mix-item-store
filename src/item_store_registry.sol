@@ -13,20 +13,20 @@ contract ItemStoreRegistry {
     /**
      * @dev Mapping of contractIds to contract addresses.
      */
-    mapping (bytes32 => ItemStoreInterface) contracts;
+    mapping (bytes8 => ItemStoreInterface) contracts;
 
     /**
      * @dev A ItemStore contract has been registered.
      * @param contractId Id of the contract.
      * @param contractAddress Address of the contract.
      */
-    event Register(bytes32 indexed contractId, ItemStoreInterface indexed contractAddress);
+    event Register(bytes8 indexed contractId, ItemStoreInterface indexed contractAddress);
 
     /**
      * @dev Register the calling ItemStore contract.
      * @return contractId Id of the ItemStore contract.
      */
-    function register() external returns (bytes32 contractId) {
+    function register() external returns (bytes8 contractId) {
         // Create contractId.
         contractId = bytes8(msg.sender);
         // Make sure this contractId has not been used before (highly unlikely).
