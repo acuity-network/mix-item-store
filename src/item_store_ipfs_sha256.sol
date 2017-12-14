@@ -203,12 +203,15 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
-     * @dev Determines the itemId from the sender and nonce.
+     * @dev Generates an itemId from sender and nonce and checks that it is unused.
      * @param nonce Nonce that this sender has never used before.
      * @return itemId itemId of the item with this sender and nonce.
      */
-    function calculateItemId(bytes32 nonce) public view returns (bytes32) {
-        return contractId | (keccak256(msg.sender, nonce) & bytes32(uint192(-1)));
+    function getNewItemId(bytes32 nonce) public view returns (bytes32 itemId) {
+        // Combine contractId with hash of sender and nonce.
+        itemId = contractId | (keccak256(msg.sender, nonce) & bytes32(uint192(-1)));
+        // Make sure this itemId has not been used before.
+        require (!itemState[itemId].inUse);
     }
 
     /**
@@ -218,10 +221,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return itemId itemId of the new item.
      */
     function create(bytes32 flagsNonce, bytes32 ipfsHash) external returns (bytes32 itemId) {
-        // Generate the itemId.
-        itemId = calculateItemId(flagsNonce);
-        // Make sure this itemId has not been used before.
-        require (!itemState[itemId].inUse);
+        // Determine the itemId.
+        itemId = getNewItemId(flagsNonce);
         // Extract the flags.
         byte flags = byte(flagsNonce);
         // Determine the owner.
@@ -275,10 +276,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return itemId itemId of the new item.
      */
     function createWithParent(bytes32 flagsNonce, bytes32 ipfsHash, bytes32 parentId) external returns (bytes32 itemId) {
-        // Generate the itemId.
-        itemId = calculateItemId(flagsNonce);
-        // Make sure this itemId has not been used before.
-        require (!itemState[itemId].inUse);
+        // Determine the itemId.
+        itemId = getNewItemId(flagsNonce);
         // Extract the flags.
         byte flags = byte(flagsNonce);
         // Determine the owner.
@@ -312,10 +311,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return itemId itemId of the new item.
      */
     function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] parentIds) external returns (bytes32 itemId) {
-        // Generate the itemId.
-        itemId = calculateItemId(flagsNonce);
-        // Make sure this itemId has not been used before.
-        require (!itemState[itemId].inUse);
+        // Determine the itemId.
+        itemId = getNewItemId(flagsNonce);
         // Extract the flags.
         byte flags = byte(flagsNonce);
         // Get parent count.

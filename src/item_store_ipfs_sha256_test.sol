@@ -30,21 +30,21 @@ contract ItemStoreIpfsSha256Test is DSTest {
         itemStoreProxy = new ItemStoreIpfsSha256Proxy(itemStore);
     }
 
-    function testCalculateItemId() public {
-        assertEq(itemStore.calculateItemId(0x1234) & bytes32(uint64(-1)) << 192, itemStore.getContractId());
-        assertEq(itemStore.calculateItemId(0x1234), itemStore.calculateItemId(0x1234));
-        assertTrue(itemStore.calculateItemId(0x1234) != itemStore.calculateItemId(0x2345));
-        assertTrue(itemStore.calculateItemId(0x1234) != itemStoreProxy.calculateItemId(0x1234));
-    }
-
     function testControlCreateSameItemId() public {
-        itemStore.create(bytes2(0x0000), 0x1234);
-        itemStore.create(bytes2(0x0001), 0x1234);
+        itemStore.create(0x1234, 0x1234);
+        itemStore.getNewItemId(0x2345);
     }
 
     function testFailCreateSameItemId() public {
-        itemStore.create(bytes2(0x0000), 0x1234);
-        itemStore.create(bytes2(0x0000), 0x1234);
+        itemStore.create(0x1234, 0x1234);
+        itemStore.getNewItemId(0x1234);
+    }
+
+    function testGetNewItemId() public {
+        assertEq(itemStore.getNewItemId(0x1234) & bytes32(uint64(-1)) << 192, itemStore.getContractId());
+        assertEq(itemStore.getNewItemId(0x1234), itemStore.getNewItemId(0x1234));
+        assertTrue(itemStore.getNewItemId(0x1234) != itemStore.getNewItemId(0x2345));
+        assertTrue(itemStore.getNewItemId(0x1234) != itemStoreProxy.getNewItemId(0x1234));
     }
 
     function testCreate() public {
