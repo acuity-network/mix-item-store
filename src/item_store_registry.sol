@@ -34,7 +34,7 @@ contract ItemStoreRegistry {
         // Record the calling contract address.
         contracts[contractId] = ItemStoreInterface(msg.sender);
         // Log the registration.
-        Register(contractId, ItemStoreInterface(msg.sender));
+        emit Register(contractId, ItemStoreInterface(msg.sender));
     }
 
     /**
