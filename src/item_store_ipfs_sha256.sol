@@ -206,7 +206,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param nonce Nonce that this sender has never used before.
      * @return itemId itemId of the item with this sender and nonce.
      */
-    function getNewItemId(bytes32 nonce) external view returns (bytes32 itemId) {
+    function getNewItemId(bytes32 nonce) public view returns (bytes32 itemId) {
         // Combine contractId with hash of sender and nonce.
         itemId = contractId | (keccak256(msg.sender, nonce) & bytes32(uint192(-1)));
         // Make sure this itemId has not been used before.
@@ -220,10 +220,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return itemId itemId of the new item.
      */
     function create(bytes32 flagsNonce, bytes32 ipfsHash) external returns (bytes32 itemId) {
-        // Combine contractId with hash of sender and nonce.
-        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint192(-1)));
-        // Make sure this itemId has not been used before.
-        require (!itemState[itemId].inUse);
+        // Determine the itemId.
+        itemId = getNewItemId(flagsNonce);
         // Extract the flags.
         byte flags = byte(flagsNonce);
         // Determine the owner.
@@ -257,7 +255,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Is the parent in this item store contract?
         if (bytes8(parentId) == contractId) {
             // Ensure the parent exists.
-            require (itemState[parentId].inUse);
+            require (getInUse(parentId));
             // Attach the item to the parent.
             itemChildIds[parentId][itemState[parentId].childCount++] = itemId;
             // Log the child.
@@ -277,10 +275,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return itemId itemId of the new item.
      */
     function createWithParent(bytes32 flagsNonce, bytes32 ipfsHash, bytes32 parentId) external returns (bytes32 itemId) {
-        // Combine contractId with hash of sender and nonce.
-        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint192(-1)));
-        // Make sure this itemId has not been used before.
-        require (!itemState[itemId].inUse);
+        // Determine the itemId.
+        itemId = getNewItemId(flagsNonce);
         // Extract the flags.
         byte flags = byte(flagsNonce);
         // Determine the owner.
@@ -314,10 +310,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return itemId itemId of the new item.
      */
     function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] parentIds) external returns (bytes32 itemId) {
-        // Combine contractId with hash of sender and nonce.
-        itemId = contractId | (keccak256(msg.sender, flagsNonce) & bytes32(uint192(-1)));
-        // Make sure this itemId has not been used before.
-        require (!itemState[itemId].inUse);
+        // Determine the itemId.
+        itemId = getNewItemId(flagsNonce);
         // Extract the flags.
         byte flags = byte(flagsNonce);
         // Get parent count.
@@ -606,7 +600,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return True if the itemId is in use.
      */
-    function getInUse(bytes32 itemId) external view returns (bool) {
+    function getInUse(bytes32 itemId) public view returns (bool) {
         return itemState[itemId].inUse;
     }
 
