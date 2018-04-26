@@ -192,10 +192,9 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
-     * @dev Constructor.
      * @param _itemStoreRegistry Address of the ItemStoreRegistry contract.
      */
-    function ItemStoreIpfsSha256(ItemStoreRegistry _itemStoreRegistry) public {
+    constructor(ItemStoreRegistry _itemStoreRegistry) public {
         // Store the address of the ItemStoreRegistry contract.
         itemStoreRegistry = _itemStoreRegistry;
         // Register this contract.
