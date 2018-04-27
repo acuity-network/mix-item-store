@@ -70,7 +70,7 @@ interface ItemStoreInterface {
      * @param nonce Nonce that this sender has never used before.
      * @return itemId itemId of the item with this sender and nonce.
      */
-    function getNewItemId(bytes32 nonce) public view returns (bytes32 itemId);
+    function getNewItemId(bytes32 nonce) external view returns (bytes32 itemId);
 
     /**
      * @dev Add a child from another item store contract.

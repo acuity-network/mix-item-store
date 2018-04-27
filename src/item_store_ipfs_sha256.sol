@@ -255,7 +255,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Is the parent in this item store contract?
         if (bytes8(parentId) == contractId) {
             // Ensure the parent exists.
-            require (getInUse(parentId));
+            require (itemState[parentId].inUse);
             // Attach the item to the parent.
             itemChildIds[parentId][itemState[parentId].childCount++] = itemId;
             // Log the child.
@@ -600,7 +600,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return True if the itemId is in use.
      */
-    function getInUse(bytes32 itemId) public view returns (bool) {
+    function getInUse(bytes32 itemId) external view returns (bool) {
         return itemState[itemId].inUse;
     }
 
