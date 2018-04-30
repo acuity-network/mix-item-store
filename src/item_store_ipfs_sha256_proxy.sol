@@ -7,7 +7,7 @@ import "./item_store_ipfs_sha256.sol";
 /**
  * @title ItemStoreIpfsSha256Proxy
  * @author Jonathan Brown <jbrown@mix-blockchain.org>
- * @dev Proxy contract for accessing a ItemStoreIpfsSha256Proxy contract from a different address for testing purposes.
+ * @dev Proxy contract for accessing a ItemStoreIpfsSha256 contract from a different address for testing purposes.
  */
 contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
