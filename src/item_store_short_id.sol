@@ -1,5 +1,6 @@
 pragma solidity ^0.4.23;
 
+
 /**
  * @title ItemStoreShortId
  * @author Jonathan Brown <jbrown@mix-blockchain.org>
@@ -18,16 +19,28 @@ contract ItemStoreShortId {
     mapping (bytes4 => bytes32) shortIdItemId;
 
     /**
-     * @dev
+     * @dev Revert if the itemId already has a shortId.
      * @param itemId itemId of the item.
-     * @param nonce Extra parameter to change the shortId if it is already taken.
-     * @return shortId
      */
-    function createShortId(bytes32 itemId, bytes32 nonce) external returns (bytes4 shortId) {
+    modifier noShortId(bytes32 itemId) {
+        require (itemIdShortId[itemId] == 0);
+        _;
+    }
+
+    /**
+     * @dev Create a 4 byte shortId for a 32 byte itemId.
+     * @param itemId itemId of the item.
+     * @return shortId New 4 byte shortId.
+     */
+    function createShortId(bytes32 itemId) external noShortId(itemId) returns (bytes4 shortId) {
         // Caluculate the shortId.
-        shortId = bytes4(keccak256(itemId, nonce));
+        bytes32 hash = keccak256(itemId);
+        shortId = bytes4(hash);
         // Make sure it hasn't been used before.
-        assert(shortIdItemId[shortId] == 0);
+        while(shortIdItemId[shortId] != 0) {
+            hash = keccak256(hash);
+            shortId = bytes4(hash);
+        }
         // Store the mappings.
         itemIdShortId[itemId] = shortId;
         shortIdItemId[shortId] = itemId;
