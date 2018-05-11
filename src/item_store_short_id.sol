@@ -19,6 +19,13 @@ contract ItemStoreShortId {
     mapping (bytes4 => bytes32) shortIdItemId;
 
     /**
+     * @dev A new shortId has been created.
+     * @param itemId itemId of the item.
+     * @param shortId shortId of the item
+     */
+    event CreateShortId(bytes32 indexed itemId, bytes32 shortId);
+
+    /**
      * @dev Revert if the itemId already has a shortId.
      * @param itemId itemId of the item.
      */
@@ -44,6 +51,8 @@ contract ItemStoreShortId {
         // Store the mappings.
         itemIdShortId[itemId] = shortId;
         shortIdItemId[shortId] = itemId;
+        // Log the event.
+        emit CreateShortId(itemId, shortId);
     }
 
     /**
