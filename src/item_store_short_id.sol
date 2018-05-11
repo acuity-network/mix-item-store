@@ -40,11 +40,10 @@ contract ItemStoreShortId {
      * @return shortId New 4 byte shortId.
      */
     function createShortId(bytes32 itemId) external noShortId(itemId) returns (bytes4 shortId) {
-        // Caluculate the shortId.
+        // Find a shortId that hasn't been used before.
         bytes32 hash = keccak256(itemId);
         shortId = bytes4(hash);
-        // Make sure it hasn't been used before.
-        while(shortIdItemId[shortId] != 0) {
+        while (shortIdItemId[shortId] != 0) {
             hash = keccak256(hash);
             shortId = bytes4(hash);
         }
