@@ -209,7 +209,7 @@ interface ItemStoreInterface {
     function getParentCount(bytes32 itemId) external view returns (uint);
 
     /**
-     * @dev Get a specific parent
+     * @dev Get a specific parent.
      * @param itemId itemId of the item.
      * @param i Index of the parent.
      * @return itemId of the parent.
@@ -224,7 +224,7 @@ interface ItemStoreInterface {
     function getChildCount(bytes32 itemId) external view returns (uint);
 
     /**
-     * @dev Get a specific child
+     * @dev Get a specific child.
      * @param itemId itemId of the item.
      * @param i Index of the child.
      * @return itemId of the child.

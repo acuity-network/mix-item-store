@@ -805,7 +805,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
-     * @dev Get a specific parent
+     * @dev Get a specific parent.
      * @param itemId itemId of the item.
      * @param i Index of the parent.
      * @return itemId of the parent.
@@ -833,7 +833,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
-     * @dev Get a specific child
+     * @dev Get a specific child.
      * @param itemId itemId of the item.
      * @param i Index of the child.
      * @return itemId of the child.
