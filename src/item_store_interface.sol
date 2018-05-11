@@ -11,9 +11,10 @@ interface ItemStoreInterface {
     /**
      * @dev A child item has been attached to this item.
      * @param itemId itemId of the parent.
-     * @param child itemId of the new child.
+     * @param childId itemId of the new child.
+     * @param i Index of the new child.
      */
-    event AddChild(bytes32 indexed itemId, bytes32 child);
+    event AddChild(bytes32 indexed itemId, bytes32 childId, uint i);
 
     /**
      * @dev A revision has been retracted.

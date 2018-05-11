@@ -254,12 +254,18 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         require (itemId != parentId);
         // Is the parent in this item store contract?
         if (bytes8(parentId) == contractId) {
+            // Get item state of the parent.
+            ItemState storage parentState = itemState[parentId];
             // Ensure the parent exists.
-            require (itemState[parentId].inUse);
+            require (parentState.inUse);
+            // Get the index of the new child.
+            uint i = parentState.childCount;
             // Attach the item to the parent.
-            itemChildIds[parentId][itemState[parentId].childCount++] = itemId;
+            itemChildIds[parentId][i] = itemId;
+            // Increment the child count.
+            parentState.childCount = uint16(i + 1);
             // Log the child.
-            emit AddChild(parentId, itemId);
+            emit AddChild(parentId, itemId, i);
         }
         else {
             // Inform the item store contract of the parent that we are its child.
@@ -353,10 +359,16 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         ItemStoreInterface itemStore = itemStoreRegistry.getItemStore(childId);
         // Ensure the call is coming from the item store of the child.
         require (itemStore == msg.sender);
+        // Get item state.
+        ItemState storage state = itemState[itemId];
+        // Get the index of the new child.
+        uint i = state.childCount;
         // Store the childId.
-        itemChildIds[itemId][itemState[itemId].childCount++] = childId;
-        // Log the childId.
-        emit AddChild(itemId, childId);
+        itemChildIds[itemId][i] = childId;
+        // Increment the child count.
+        state.childCount = uint16(i + 1);
+        // Log the child.
+        emit AddChild(itemId, childId, i);
     }
 
     /**
