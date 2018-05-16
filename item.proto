@@ -7,8 +7,8 @@
 syntax = "proto3";
 
 message Mixin {
-  bytes mixin_item_id = 1;    // itemId of the mixin schema. Can be shortId.
-  bytes payload = 2;          // Protobuf encoded mixin contents.
+  fixed32 mixin_id = 1; // Short itemId of the mixin schema.
+  bytes payload = 2;    // Protobuf encoded mixin contents.
 }
 
 message Item {

@@ -60,7 +60,7 @@ proto.Mixin.prototype.toObject = function(opt_includeInstance) {
  */
 proto.Mixin.toObject = function(includeInstance, msg) {
   var f, obj = {
-    mixinItemId: msg.getMixinItemId_asB64(),
+    mixinId: jspb.Message.getFieldWithDefault(msg, 1, 0),
     payload: msg.getPayload_asB64()
   };
 
@@ -99,8 +99,8 @@ proto.Mixin.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!Uint8Array} */ (reader.readBytes());
-      msg.setMixinItemId(value);
+      var value = /** @type {number} */ (reader.readFixed32());
+      msg.setMixinId(value);
       break;
     case 2:
       var value = /** @type {!Uint8Array} */ (reader.readBytes());
@@ -135,9 +135,9 @@ proto.Mixin.prototype.serializeBinary = function() {
  */
 proto.Mixin.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getMixinItemId_asU8();
-  if (f.length > 0) {
-    writer.writeBytes(
+  f = message.getMixinId();
+  if (f !== 0) {
+    writer.writeFixed32(
       1,
       f
     );
@@ -153,41 +153,17 @@ proto.Mixin.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional bytes mixin_item_id = 1;
- * @return {!(string|Uint8Array)}
+ * optional fixed32 mixin_id = 1;
+ * @return {number}
  */
-proto.Mixin.prototype.getMixinItemId = function() {
-  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+proto.Mixin.prototype.getMixinId = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
 };
 
 
-/**
- * optional bytes mixin_item_id = 1;
- * This is a type-conversion wrapper around `getMixinItemId()`
- * @return {string}
- */
-proto.Mixin.prototype.getMixinItemId_asB64 = function() {
-  return /** @type {string} */ (jspb.Message.bytesAsB64(
-      this.getMixinItemId()));
-};
-
-
-/**
- * optional bytes mixin_item_id = 1;
- * Note that Uint8Array is not supported on all browsers.
- * @see http://caniuse.com/Uint8Array
- * This is a type-conversion wrapper around `getMixinItemId()`
- * @return {!Uint8Array}
- */
-proto.Mixin.prototype.getMixinItemId_asU8 = function() {
-  return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
-      this.getMixinItemId()));
-};
-
-
-/** @param {!(string|Uint8Array)} value */
-proto.Mixin.prototype.setMixinItemId = function(value) {
-  jspb.Message.setProto3BytesField(this, 1, value);
+/** @param {number} value */
+proto.Mixin.prototype.setMixinId = function(value) {
+  jspb.Message.setProto3IntField(this, 1, value);
 };
 
 
