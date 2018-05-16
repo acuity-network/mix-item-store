@@ -609,8 +609,12 @@
 		"type": "bytes32"
 	}, {
 		"indexed": false,
-		"name": "child",
+		"name": "childId",
 		"type": "bytes32"
+	}, {
+		"indexed": false,
+		"name": "i",
+		"type": "uint256"
 	}],
 	"name": "AddChild",
 	"type": "event"
