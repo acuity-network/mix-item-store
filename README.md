@@ -4,14 +4,14 @@ Pluggable smart contract system for storing revisionable MIX content items.
 
 ## Deployment info
 
-Git tag 4.0.0
+Git tag 5.0.0
 
-Solidity 0.4.23 with optmizations
+Solidity 0.4.24 with --optimize
 
-ItemStoreRegistry: `0x0bc03d7a3ff3e7a7813a683325818f8e9ad0ed40`
+ItemStoreRegistry: `0xa46adddd3105715fa0ea0d4a883d4be99452c3f6`
 
-ItemStoreIpfsSha256: `0x37c3a126dc26f0e95c91905bfe14a6ac3b354db0`
+ItemStoreIpfsSha256: `0xe059665fe0d226f00c72e3982d54bddf4be19c6c`
 
-ItemStoreIpfsSha256 contractId: `0xfe14a6ac3b354db0`
+ItemStoreIpfsSha256 contractId: `0x2d54bddf4be19c6c`
 
-ItemStoreShortId: `0xaf09556c29795e17de1300708cd34cce3bc87aea`
+ItemStoreShortId: `0xd02ee768718b41a8cea9350d7c4c443727da5c7b`
