@@ -41,10 +41,10 @@ contract ItemStoreShortId {
      */
     function createShortId(bytes32 itemId) external noShortId(itemId) returns (bytes4 shortId) {
         // Find a shortId that hasn't been used before.
-        bytes32 hash = keccak256(itemId);
+        bytes32 hash = keccak256(abi.encodePacked(itemId));
         shortId = bytes4(hash);
         while (shortIdItemId[shortId] != 0) {
-            hash = keccak256(hash);
+            hash = keccak256(abi.encodePacked(hash));
             shortId = bytes4(hash);
         }
         // Store the mappings.
