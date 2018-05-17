@@ -1,0 +1,2 @@
+export ETH_RPC_URL=http://127.0.0.1:8645
+export ETH_KEYSTORE=~/.mix-geth/keystore/
