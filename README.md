@@ -6,7 +6,7 @@ Pluggable smart contract system for storing revisionable MIX content items.
 
 Git tag 5.0.0
 
-Solidity 0.4.24 with --optimize
+Solidity 0.4.24 with --optimize --evm-version homestead
 
 ItemStoreRegistry: `0xa46adddd3105715fa0ea0d4a883d4be99452c3f6`
 
