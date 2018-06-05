@@ -505,21 +505,25 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     }
 
     /**
-     * @dev Enable transfer of the item to the current user.
+     * @dev Enable transfer of an item to the current user.
      * @param itemId itemId of the item.
      */
     function transferEnable(bytes32 itemId) external isTransferable(itemId) {
         // Record in state that the current user will accept this item.
         itemTransferEnabled[itemId][msg.sender] = true;
+        // Log that transfer to this user is enabled.
+        emit EnableTransfer(itemId, msg.sender);
     }
 
     /**
-     * @dev Disable transfer of the item to the current user.
+     * @dev Disable transfer of an item to the current user.
      * @param itemId itemId of the item.
      */
     function transferDisable(bytes32 itemId) external isTransferEnabled(itemId, msg.sender) {
         // Record in state that the current user will not accept this item.
         itemTransferEnabled[itemId][msg.sender] = false;
+        // Log that transfer to this user is disabled.
+        emit DisableTransfer(itemId, msg.sender);
     }
 
     /**
