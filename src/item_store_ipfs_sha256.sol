@@ -208,7 +208,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function getNewItemId(bytes32 nonce) public view returns (bytes32 itemId) {
         // Combine contractId with hash of sender and nonce.
-        itemId = (keccak256(abi.encodePacked(msg.sender, nonce)) & (bytes32(uint192(-1)) << 64)) | contractId;
+        itemId = (keccak256(abi.encodePacked(address(this), msg.sender, nonce)) & (bytes32(uint192(-1)) << 64)) | contractId;
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
     }
