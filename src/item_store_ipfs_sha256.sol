@@ -208,7 +208,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function getNewItemId(bytes32 nonce) public view returns (bytes32 itemId) {
         // Combine contractId with hash of sender and nonce.
-        itemId = contractId | (keccak256(abi.encodePacked(msg.sender, nonce)) & bytes32(uint192(-1)));
+        itemId = (keccak256(abi.encodePacked(msg.sender, nonce)) & (bytes32(uint192(-1)) << 64)) | contractId;
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
     }
@@ -253,7 +253,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Ensure child and parent are not the same.
         require (itemId != parentId);
         // Is the parent in this item store contract?
-        if (bytes8(parentId) == contractId) {
+        if (parentId & bytes32(uint64(-1)) == contractId) {
             // Get item state of the parent.
             ItemState storage parentState = itemState[parentId];
             // Ensure the parent exists.
@@ -608,7 +608,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return Id of the contract.
      */
     function getContractId() external view returns (bytes8) {
-        return bytes8(contractId);
+        return bytes8(contractId << 192);
     }
 
     /**

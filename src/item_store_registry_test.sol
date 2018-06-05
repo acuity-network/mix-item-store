@@ -31,7 +31,7 @@ contract ItemStoreRegistryTest is DSTest {
     }
 
     function testControlItemStoreNotRegistered() public view {
-        itemStoreRegistry.getItemStore(itemStore.getContractId());
+        itemStoreRegistry.getItemStore(bytes32(itemStore.getContractId()) >> 192);
     }
 
     function testFailItemStoreNotRegistered() public view {
@@ -39,7 +39,7 @@ contract ItemStoreRegistryTest is DSTest {
     }
 
     function testGetItemStore() public {
-        assertEq(itemStoreRegistry.getItemStore(itemStore.getContractId()), itemStore);
+        assertEq(itemStoreRegistry.getItemStore(bytes32(itemStore.getContractId()) >> 192), itemStore);
     }
 
 }

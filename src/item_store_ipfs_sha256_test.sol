@@ -41,7 +41,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
     }
 
     function testGetNewItemId() public {
-        assertEq(itemStore.getNewItemId(0x1234) & bytes32(uint64(-1)) << 192, itemStore.getContractId());
+        assertEq((itemStore.getNewItemId(0x1234) & bytes32(uint64(-1))) << 192, itemStore.getContractId());
         assertEq(itemStore.getNewItemId(0x1234), itemStore.getNewItemId(0x1234));
         assertTrue(itemStore.getNewItemId(0x1234) != itemStore.getNewItemId(0x2345));
         assertTrue(itemStore.getNewItemId(0x1234) != itemStoreProxy.getNewItemId(0x1234));

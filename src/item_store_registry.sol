@@ -13,7 +13,7 @@ contract ItemStoreRegistry {
     /**
      * @dev Mapping of contractIds to contract addresses.
      */
-    mapping (bytes8 => ItemStoreInterface) contracts;
+    mapping (bytes32 => ItemStoreInterface) contracts;
 
     /**
      * @dev A ItemStore contract has been registered.
@@ -26,15 +26,15 @@ contract ItemStoreRegistry {
      * @dev Register the calling ItemStore contract.
      * @return contractId Id of the ItemStore contract.
      */
-    function register() external returns (bytes8 contractId) {
+    function register() external returns (bytes32 contractId) {
         // Create contractId.
-        contractId = bytes8(msg.sender);
+        contractId = keccak256(abi.encodePacked(msg.sender)) & bytes32(uint64(-1));
         // Make sure this contractId has not been used before (highly unlikely).
         require (contracts[contractId] == ItemStoreInterface(0));
         // Record the calling contract address.
         contracts[contractId] = ItemStoreInterface(msg.sender);
         // Log the registration.
-        emit Register(contractId, ItemStoreInterface(msg.sender));
+        emit Register(bytes8(contractId << 192), ItemStoreInterface(msg.sender));
     }
 
     /**
@@ -43,7 +43,7 @@ contract ItemStoreRegistry {
      * @return itemStore itemStore contract of the item.
      */
     function getItemStore(bytes32 itemId) external view returns (ItemStoreInterface itemStore) {
-        itemStore = contracts[bytes8(itemId)];
+        itemStore = contracts[itemId & bytes32(uint64(-1))];
         require (address(itemStore) != 0);
     }
 
