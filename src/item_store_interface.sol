@@ -32,19 +32,19 @@ interface ItemStoreInterface {
     /**
      * @dev Transfering ownership of an item to a specific account has been enabled.
      * @param itemId itemId of the item.
-     * @param recipient The account that the item can be transfered to.
+     * @param recipient The account that the item can be transferred to.
      */
     event EnableTransfer(bytes32 indexed itemId, address recipient);
 
     /**
      * @dev Transfering ownership of an item to a specific account has been disabled.
      * @param itemId itemId of the item.
-     * @param recipient The account that the item cannot be transfered to.
+     * @param recipient The account that the item cannot be transferred to.
      */
     event DisableTransfer(bytes32 indexed itemId, address recipient);
 
     /**
-     * @dev An item has been transfered to a new owner.
+     * @dev An item has been transferred to a new owner.
      * @param itemId itemId of the item.
      * @param recipient The account that now owns the item.
      */

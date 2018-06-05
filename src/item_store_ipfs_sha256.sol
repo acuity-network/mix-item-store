@@ -14,7 +14,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     byte constant UPDATABLE = 0x01;           // True if the item is updatable. After creation can only be disabled.
     byte constant ENFORCE_REVISIONS = 0x02;   // True if the item is enforcing revisions. After creation can only be enabled.
     byte constant RETRACTABLE = 0x04;         // True if the item can be retracted. After creation can only be disabled.
-    byte constant TRANSFERABLE = 0x08;        // True if the item can be transfered to another user or disowned. After creation can only be disabled.
+    byte constant TRANSFERABLE = 0x08;        // True if the item can be transferred to another user or disowned. After creation can only be disabled.
     byte constant DISOWN = 0x10;              // True if the item should not have an owner at creation.
 
     uint constant ABI_VERSION = 0;
