@@ -24,6 +24,18 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
         itemId = itemStore.getNewItemId(nonce);
     }
 
+    function create(bytes32 flagsNonce, bytes32 ipfsHash) external returns (bytes32 itemId) {
+        itemId = itemStore.create(flagsNonce, ipfsHash);
+    }
+
+    function createWithParent(bytes32 flagsNonce, bytes32 ipfsHash, bytes32 parentId) external returns (bytes32 itemId) {
+        itemId = itemStore.createWithParent(flagsNonce, ipfsHash, parentId);
+    }
+
+    function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] parentIds) external returns (bytes32 itemId) {
+        itemId = itemStore.createWithParents(flagsNonce, ipfsHash, parentIds);
+    }
+
     function addForeignChild(bytes32 itemId, bytes32 child) external {
         itemStore.addForeignChild(itemId, child);
     }
