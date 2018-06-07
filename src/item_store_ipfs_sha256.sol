@@ -470,7 +470,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         for (uint i = 1; i < itemState[itemId].revisionCount; i++) {
             delete itemRevisionIpfsHashes[itemId][i];
         }
-        // Delete the packed revision timestamps.
+        // Delete all the packed revision timestamps.
         _deleteAllPackedRevisionTimestamps(itemId);
         // Update the item state.
         itemState[itemId].revisionCount = 1;
@@ -490,6 +490,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         for (uint i = 0; i < itemState[itemId].revisionCount; i++) {
             delete itemRevisionIpfsHashes[itemId][i];
         }
+        // Delete all the packed revision timestamps.
+        _deleteAllPackedRevisionTimestamps(itemId);
         // Mark this item as retracted.
         itemState[itemId] = ItemState({
             inUse: true,
