@@ -58,7 +58,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getRetractable(itemId0));
         assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), 0);
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getRevisionCount(itemId0), 1);
 
@@ -72,7 +72,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getRetractable(itemId1));
         assertTrue(itemStore.getTransferable(itemId1));
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), 0);
         assertEq(itemStore.getParentCount(itemId1), 0);
         assertEq(itemStore.getRevisionCount(itemId1), 1);
 
@@ -87,7 +87,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getRetractable(itemId2));
         assertTrue(itemStore.getTransferable(itemId2));
         assertEq(itemStore.getRevisionIpfsHash(itemId2, 0), 0x2345);
-        assertEq(itemStore.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId2, 0), 0);
         assertEq(itemStore.getParentCount(itemId2), 0);
         assertEq(itemStore.getRevisionCount(itemId2), 1);
 
@@ -137,7 +137,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getRetractable(itemId0));
         assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), 0);
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 0);
 
@@ -151,7 +151,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getRetractable(itemId1));
         assertTrue(itemStore.getTransferable(itemId1));
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), 0);
         assertEq(itemStore.getParentCount(itemId1), 1);
         assertEq(itemStore.getParentId(itemId1, 0), itemId0);
         assertEq(itemStore.getChildCount(itemId1), 0);
@@ -169,7 +169,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getRetractable(itemId2));
         assertTrue(itemStore.getTransferable(itemId2));
         assertEq(itemStore.getRevisionIpfsHash(itemId2, 0), 0x2345);
-        assertEq(itemStore.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId2, 0), 0);
         assertEq(itemStore.getParentCount(itemId2), 1);
         assertEq(itemStore.getParentId(itemId2, 0), itemId0);
         assertEq(itemStore.getChildCount(itemId2), 0);
@@ -203,7 +203,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getRetractable(itemId0));
         assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), 0);
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 0);
 
@@ -218,7 +218,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore2.getRetractable(itemId1));
         assertTrue(!itemStore2.getTransferable(itemId1));
         assertEq(itemStore2.getRevisionIpfsHash(itemId1, 0), 0x1234);
-        assertEq(itemStore2.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore2.getRevisionTimestamp(itemId1, 0), 0);
         assertEq(itemStore2.getParentCount(itemId1), 1);
         assertEq(itemStore2.getParentId(itemId1, 0), itemId0);
         assertEq(itemStore2.getChildCount(itemId1), 0);
@@ -297,7 +297,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getRetractable(itemId0));
         assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), 0);
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 0);
 
@@ -311,7 +311,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getRetractable(itemId1));
         assertTrue(!itemStore.getTransferable(itemId1));
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), 0);
         assertEq(itemStore.getParentCount(itemId1), 0);
         assertEq(itemStore.getChildCount(itemId1), 0);
 
@@ -328,7 +328,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getRetractable(itemId2));
         assertTrue(itemStore.getTransferable(itemId2));
         assertEq(itemStore.getRevisionIpfsHash(itemId2, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId2, 0), 0);
         assertEq(itemStore.getParentCount(itemId2), 2);
         assertEq(itemStore.getParentId(itemId2, 0), itemId0);
         assertEq(itemStore.getParentId(itemId2, 1), itemId1);
@@ -349,7 +349,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(itemStore.getRetractable(itemId3));
         assertTrue(itemStore.getTransferable(itemId3));
         assertEq(itemStore.getRevisionIpfsHash(itemId3, 0), 0x2345);
-        assertEq(itemStore.getRevisionTimestamp(itemId3, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId3, 0), 0);
         assertEq(itemStore.getParentCount(itemId3), 2);
         assertEq(itemStore.getParentId(itemId3, 0), itemId0);
         assertEq(itemStore.getParentId(itemId3, 1), itemId1);
@@ -405,7 +405,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getRetractable(itemId0));
         assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), 0);
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 0);
 
@@ -419,7 +419,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getRetractable(itemId1));
         assertTrue(!itemStore.getTransferable(itemId1));
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), 0);
         assertEq(itemStore.getParentCount(itemId1), 0);
         assertEq(itemStore.getChildCount(itemId1), 0);
 
@@ -437,7 +437,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore2.getRetractable(itemId2));
         assertTrue(!itemStore2.getTransferable(itemId2));
         assertEq(itemStore2.getRevisionIpfsHash(itemId2, 0), 0x1234);
-        assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), 0);
         assertEq(itemStore2.getParentCount(itemId2), 2);
         assertEq(itemStore2.getParentId(itemId2, 0), itemId0);
         assertEq(itemStore2.getParentId(itemId2, 1), itemId1);
@@ -463,7 +463,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getRetractable(itemId0));
         assertTrue(!itemStore.getTransferable(itemId0));
         assertEq(itemStore.getRevisionIpfsHash(itemId0, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId0, 0), 0);
         assertEq(itemStore.getParentCount(itemId0), 0);
         assertEq(itemStore.getChildCount(itemId0), 0);
 
@@ -478,7 +478,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore2.getRetractable(itemId1));
         assertTrue(!itemStore2.getTransferable(itemId1));
         assertEq(itemStore2.getRevisionIpfsHash(itemId1, 0), 0x1234);
-        assertEq(itemStore2.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore2.getRevisionTimestamp(itemId1, 0), 0);
         assertEq(itemStore2.getParentCount(itemId1), 0);
         assertEq(itemStore2.getChildCount(itemId1), 0);
 
@@ -495,7 +495,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore2.getRetractable(itemId2));
         assertTrue(!itemStore2.getTransferable(itemId2));
         assertEq(itemStore2.getRevisionIpfsHash(itemId2, 0), 0x1234);
-        assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), 0);
         assertEq(itemStore2.getParentCount(itemId2), 2);
         assertEq(itemStore2.getParentId(itemId2, 0), itemId0);
         assertEq(itemStore2.getParentId(itemId2, 1), itemId1);
@@ -522,7 +522,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore2.getRetractable(itemId0));
         assertTrue(!itemStore2.getTransferable(itemId0));
         assertEq(itemStore2.getRevisionIpfsHash(itemId0, 0), 0x1234);
-        assertEq(itemStore2.getRevisionTimestamp(itemId0, 0), block.timestamp);
+        assertEq(itemStore2.getRevisionTimestamp(itemId0, 0), 0);
         assertEq(itemStore2.getParentCount(itemId0), 0);
         assertEq(itemStore2.getChildCount(itemId0), 0);
 
@@ -536,7 +536,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getRetractable(itemId1));
         assertTrue(!itemStore.getTransferable(itemId1));
         assertEq(itemStore.getRevisionIpfsHash(itemId1, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId1, 0), 0);
         assertEq(itemStore.getParentCount(itemId1), 0);
         assertEq(itemStore.getChildCount(itemId1), 0);
 
@@ -553,7 +553,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore2.getRetractable(itemId2));
         assertTrue(!itemStore2.getTransferable(itemId2));
         assertEq(itemStore2.getRevisionIpfsHash(itemId2, 0), 0x1234);
-        assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), block.timestamp);
+        assertEq(itemStore2.getRevisionTimestamp(itemId2, 0), 0);
         assertEq(itemStore2.getParentCount(itemId2), 2);
         assertEq(itemStore2.getParentId(itemId2, 0), itemId0);
         assertEq(itemStore2.getParentId(itemId2, 1), itemId1);
@@ -644,20 +644,20 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId, 11), 11);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 12), 12);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 13), 13);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 1), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 2), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 3), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 4), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 5), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 6), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 7), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 8), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 9), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 10), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 11), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 12), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 13), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 1), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 2), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 3), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 4), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 5), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 6), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 7), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 8), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 9), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 10), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 11), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 12), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 13), 0);
     }
 
     function testControlUpdateLatestRevisionNotOwner() public {
@@ -694,11 +694,11 @@ contract ItemStoreIpfsSha256Test is DSTest {
         bytes32 itemId = itemStore.create(UPDATABLE, 0x1234);
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
         itemStore.updateLatestRevision(itemId, 0x2345);
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x2345);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
     }
 
     function testControlRetractLatestRevisionNotOwner() public {
@@ -757,19 +757,19 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 1), 0x2345);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 2), 0x3456);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 1), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 2), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 1), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 2), 0);
         itemStore.retractLatestRevision(itemId);
         assertEq(itemStore.getRevisionCount(itemId), 2);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 1), 0x2345);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 1), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 1), 0);
         itemStore.retractLatestRevision(itemId);
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
     }
 
     function testControlRestartNotOwner() public {
@@ -810,13 +810,13 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 1), 0x2345);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 2), 0x3456);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 1), block.timestamp);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 2), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 1), 0);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 2), 0);
         itemStore.restart(itemId, 0x4567);
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x4567);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
     }
 
     function testControlRetractNotOwner() public {
@@ -846,7 +846,7 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertTrue(!itemStore.getUpdatable(itemId));
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
         itemStore.retract(itemId);
         assertTrue(itemStore.getInUse(itemId));
         assertEq(itemStore.getOwner(itemId), 0);
@@ -916,13 +916,13 @@ contract ItemStoreIpfsSha256Test is DSTest {
         assertEq(itemStore.getOwner(itemId), this);
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
         itemStoreProxy.transferEnable(itemId);
         itemStore.transfer(itemId, itemStoreProxy);
         assertEq(itemStore.getOwner(itemId), itemStoreProxy);
         assertEq(itemStore.getRevisionCount(itemId), 1);
         assertEq(itemStore.getRevisionIpfsHash(itemId, 0), 0x1234);
-        assertEq(itemStore.getRevisionTimestamp(itemId, 0), block.timestamp);
+        assertEq(itemStore.getRevisionTimestamp(itemId, 0), 0);
     }
 
     function testControlDisownNotOwner() public {

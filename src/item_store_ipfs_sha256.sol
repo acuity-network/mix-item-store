@@ -639,7 +639,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @dev Get the timestamp for a specific item revision.
      * @param itemId itemId of the item.
      * @param revisionId Id of the revision.
-     * @return timestamp Timestamp of the specified revision.
+     * @return timestamp Timestamp of the specified revision or 0 for unconfirmed.
      */
     function _getRevisionTimestamp(bytes32 itemId, uint revisionId) internal view returns (uint timestamp) {
         if (revisionId == 0) {
@@ -648,6 +648,10 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         else {
             uint offset = revisionId - 1;
             timestamp = uint32(itemPackedTimestamps[itemId][offset / 8] >> ((offset % 8) * 32));
+        }
+        // Check if the revision has been confirmed yet.
+        if (timestamp == block.timestamp) {
+            timestamp = 0;
         }
     }
 
