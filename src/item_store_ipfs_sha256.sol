@@ -86,7 +86,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param revisionId Id of the revision (the highest at time of logging).
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
      */
-    event PublishRevision(bytes32 indexed itemId, uint revisionId, bytes32 ipfsHash);
+    event PublishRevision(bytes32 indexed itemId, address indexed owner, uint revisionId, bytes32 ipfsHash);
 
     /**
      * @dev Revert if the itemId is not in use.
@@ -241,7 +241,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Log item creation.
         emit Create(itemId, owner, flags);
         // Log the first revision.
-        emit PublishRevision(itemId, 0, ipfsHash);
+        emit PublishRevision(itemId, owner, 0, ipfsHash);
     }
 
     /**
@@ -265,7 +265,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             // Increment the child count.
             parentState.childCount = uint16(i + 1);
             // Log the child.
-            emit AddChild(parentId, itemId, i);
+            emit AddChild(parentId, parentState.owner, itemId, i);
         }
         else {
             // Inform the item store contract of the parent that we are its child.
@@ -305,7 +305,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Log item creation.
         emit Create(itemId, owner, flags);
         // Log the first revision.
-        emit PublishRevision(itemId, 0, ipfsHash);
+        emit PublishRevision(itemId, owner, 0, ipfsHash);
     }
 
     /**
@@ -346,7 +346,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Log item creation.
         emit Create(itemId, owner, flags);
         // Log the first revision.
-        emit PublishRevision(itemId, 0, ipfsHash);
+        emit PublishRevision(itemId, owner, 0, ipfsHash);
     }
 
     /**
@@ -368,7 +368,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Increment the child count.
         state.childCount = uint16(i + 1);
         // Log the child.
-        emit AddChild(itemId, childId, i);
+        emit AddChild(itemId, state.owner, childId, i);
     }
 
     /**
@@ -396,14 +396,16 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return revisionId The revisionId of the new revision.
      */
     function createNewRevision(bytes32 itemId, bytes32 ipfsHash) external isOwner(itemId) isUpdatable(itemId) returns (uint revisionId) {
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Increment the number of revisions.
-        revisionId = itemState[itemId].revisionCount++;
+        revisionId = state.revisionCount++;
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][revisionId] = ipfsHash;
         // Store the timestamp.
         _setPackedTimestamp(itemId, revisionId - 1);
         // Log the revision.
-        emit PublishRevision(itemId, revisionId, ipfsHash);
+        emit PublishRevision(itemId, state.owner, revisionId, ipfsHash);
     }
 
     /**
@@ -426,7 +428,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             _setPackedTimestamp(itemId, revisionId - 1);
         }
         // Log the revision.
-        emit PublishRevision(itemId, revisionId, ipfsHash);
+        emit PublishRevision(itemId, state.owner, revisionId, ipfsHash);
     }
 
     /**
@@ -434,8 +436,10 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      */
     function retractLatestRevision(bytes32 itemId) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) hasAdditionalRevisions(itemId) {
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Decrement the number of revisions.
-        uint revisionId = --itemState[itemId].revisionCount;
+        uint revisionId = --state.revisionCount;
         // Delete the IPFS hash.
         delete itemRevisionIpfsHashes[itemId][revisionId];
         // Delete the packed timestamp slot if it is no longer required.
@@ -443,7 +447,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             delete itemPackedTimestamps[itemId][revisionId / 8];
         }
         // Log the revision retraction.
-        emit RetractRevision(itemId, revisionId);
+        emit RetractRevision(itemId, state.owner, revisionId);
     }
 
     /**
@@ -466,19 +470,21 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
      */
     function restart(bytes32 itemId, bytes32 ipfsHash) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) {
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Delete all the IPFS hashes except the first one.
-        for (uint i = 1; i < itemState[itemId].revisionCount; i++) {
+        for (uint i = 1; i < state.revisionCount; i++) {
             delete itemRevisionIpfsHashes[itemId][i];
         }
         // Delete all the packed revision timestamps.
         _deleteAllPackedRevisionTimestamps(itemId);
         // Update the item state.
-        itemState[itemId].revisionCount = 1;
-        itemState[itemId].timestamp = uint32(block.timestamp);
+        state.revisionCount = 1;
+        state.timestamp = uint32(block.timestamp);
         // Update the first IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;
         // Log the revision.
-        emit PublishRevision(itemId, 0, ipfsHash);
+        emit PublishRevision(itemId, state.owner, 0, ipfsHash);
     }
 
     /**
@@ -486,12 +492,16 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item. This itemId can never be used again.
      */
     function retract(bytes32 itemId) external isOwner(itemId) isRetractable(itemId) {
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Delete all the IPFS hashes.
-        for (uint i = 0; i < itemState[itemId].revisionCount; i++) {
+        for (uint i = 0; i < state.revisionCount; i++) {
             delete itemRevisionIpfsHashes[itemId][i];
         }
         // Delete all the packed revision timestamps.
         _deleteAllPackedRevisionTimestamps(itemId);
+        // Log the item retraction.
+        emit Retract(itemId, state.owner);
         // Mark this item as retracted.
         itemState[itemId] = ItemState({
             inUse: true,
@@ -502,8 +512,6 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             timestamp: 0,
             owner: 0
         });
-        // Log the item retraction.
-        emit Retract(itemId);
     }
 
     /**
@@ -514,7 +522,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Record in state that the current user will accept this item.
         itemTransferEnabled[itemId][msg.sender] = true;
         // Log that transfer to this user is enabled.
-        emit EnableTransfer(itemId, msg.sender);
+        emit EnableTransfer(itemId, itemState[itemId].owner, msg.sender);
     }
 
     /**
@@ -525,7 +533,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Record in state that the current user will not accept this item.
         itemTransferEnabled[itemId][msg.sender] = false;
         // Log that transfer to this user is disabled.
-        emit DisableTransfer(itemId, msg.sender);
+        emit DisableTransfer(itemId, itemState[itemId].owner, msg.sender);
     }
 
     /**
@@ -534,12 +542,14 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param recipient Address of the user to transfer to item to.
      */
     function transfer(bytes32 itemId, address recipient) external isOwner(itemId) isTransferable(itemId) isTransferEnabled(itemId, recipient) {
+        // Get item state.
+        ItemState storage state = itemState[itemId];
+        // Log the transfer.
+        emit Transfer(itemId, state.owner, recipient);
         // Update ownership of the item.
-        itemState[itemId].owner = recipient;
+        state.owner = recipient;
         // Disable this transfer in future and free up the slot.
         itemTransferEnabled[itemId][recipient] = false;
-        // Log the transfer.
-        emit Transfer(itemId, recipient);
     }
 
     /**
@@ -547,10 +557,12 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      */
     function disown(bytes32 itemId) external isOwner(itemId) isTransferable(itemId) {
-        // Remove the owner from the item's state.
-        delete itemState[itemId].owner;
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Log that the item has been disowned.
-        emit Disown(itemId);
+        emit Disown(itemId, state.owner);
+        // Remove the owner from the item's state.
+        delete state.owner;
     }
 
     /**
@@ -558,10 +570,12 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      */
     function setNotUpdatable(bytes32 itemId) external isOwner(itemId) {
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Record in state that the item is not updatable.
-        itemState[itemId].flags &= ~UPDATABLE;
+        state.flags &= ~UPDATABLE;
         // Log that the item is not updatable.
-        emit SetNotUpdatable(itemId);
+        emit SetNotUpdatable(itemId, state.owner);
     }
 
     /**
@@ -569,10 +583,12 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      */
     function setEnforceRevisions(bytes32 itemId) external isOwner(itemId) {
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Record in state that all changes to this item must be new revisions.
-        itemState[itemId].flags |= ENFORCE_REVISIONS;
+        state.flags |= ENFORCE_REVISIONS;
         // Log that the item now enforces new revisions.
-        emit SetEnforceRevisions(itemId);
+        emit SetEnforceRevisions(itemId, state.owner);
     }
 
     /**
@@ -580,10 +596,12 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      */
     function setNotRetractable(bytes32 itemId) external isOwner(itemId) {
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Record in state that the item is not retractable.
-        itemState[itemId].flags &= ~RETRACTABLE;
+        state.flags &= ~RETRACTABLE;
         // Log that the item is not retractable.
-        emit SetNotRetractable(itemId);
+        emit SetNotRetractable(itemId, state.owner);
     }
 
     /**
@@ -591,10 +609,12 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      */
     function setNotTransferable(bytes32 itemId) external isOwner(itemId) {
+        // Get item state.
+        ItemState storage state = itemState[itemId];
         // Record in state that the item is not transferable.
-        itemState[itemId].flags &= ~TRANSFERABLE;
+        state.flags &= ~TRANSFERABLE;
         // Log that the item is not transferable.
-        emit SetNotTransferable(itemId);
+        emit SetNotTransferable(itemId, state.owner);
     }
 
     /**

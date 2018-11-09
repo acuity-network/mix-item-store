@@ -14,71 +14,71 @@ interface ItemStoreInterface {
      * @param childId itemId of the new child.
      * @param i Index of the new child.
      */
-    event AddChild(bytes32 indexed itemId, bytes32 childId, uint i);
+    event AddChild(bytes32 indexed itemId, address indexed owner, bytes32 childId, uint i);
 
     /**
      * @dev A revision has been retracted.
      * @param itemId itemId of the item.
      * @param revisionId Id of the revision.
      */
-    event RetractRevision(bytes32 indexed itemId, uint revisionId);
+    event RetractRevision(bytes32 indexed itemId, address indexed owner, uint revisionId);
 
     /**
      * @dev An entire item has been retracted. This cannot be undone.
      * @param itemId itemId of the item.
      */
-    event Retract(bytes32 indexed itemId);
+    event Retract(bytes32 indexed itemId, address indexed owner);
 
     /**
      * @dev Transfering ownership of an item to a specific account has been enabled.
      * @param itemId itemId of the item.
      * @param recipient The account that the item can be transferred to.
      */
-    event EnableTransfer(bytes32 indexed itemId, address recipient);
+    event EnableTransfer(bytes32 indexed itemId, address indexed owner, address indexed recipient);
 
     /**
      * @dev Transfering ownership of an item to a specific account has been disabled.
      * @param itemId itemId of the item.
      * @param recipient The account that the item cannot be transferred to.
      */
-    event DisableTransfer(bytes32 indexed itemId, address recipient);
+    event DisableTransfer(bytes32 indexed itemId, address indexed owner, address indexed recipient);
 
     /**
      * @dev An item has been transferred to a new owner.
      * @param itemId itemId of the item.
      * @param recipient The account that now owns the item.
      */
-    event Transfer(bytes32 indexed itemId, address recipient);
+    event Transfer(bytes32 indexed itemId, address indexed owner, address indexed recipient);
 
     /**
      * @dev An item has been disowned. This cannot be undone.
      * @param itemId itemId of the item.
      */
-    event Disown(bytes32 indexed itemId);
+    event Disown(bytes32 indexed itemId, address indexed owner);
 
     /**
      * @dev An item has been set as not updatable. This cannot be undone.
      * @param itemId itemId of the item.
      */
-    event SetNotUpdatable(bytes32 indexed itemId);
+    event SetNotUpdatable(bytes32 indexed itemId, address indexed owner);
 
     /**
      * @dev An item has been set as enforcing revisions. This cannot be undone.
      * @param itemId itemId of the item.
      */
-    event SetEnforceRevisions(bytes32 indexed itemId);
+    event SetEnforceRevisions(bytes32 indexed itemId, address indexed owner);
 
     /**
      * @dev An item has been set as not retractable. This cannot be undone.
      * @param itemId itemId of the item.
      */
-    event SetNotRetractable(bytes32 indexed itemId);
+    event SetNotRetractable(bytes32 indexed itemId, address indexed owner);
 
     /**
      * @dev An item has been set as not transferable. This cannot be undone.
      * @param itemId itemId of the item.
      */
-    event SetNotTransferable(bytes32 indexed itemId);
+    event SetNotTransferable(bytes32 indexed itemId, address indexed owner);
 
     /**
      * @dev Generates an itemId from sender and nonce and checks that it is unused.
