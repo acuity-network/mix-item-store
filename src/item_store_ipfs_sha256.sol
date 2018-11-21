@@ -18,9 +18,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     struct ItemState {
         bool inUse;             // Has this itemId ever been used.
         byte flags;             // Packed item settings.
-        uint16 parentCount;     // Number of parents.
-        uint16 childCount;      // Number of children.
-        uint16 revisionCount;   // Number of revisions including revision 0.
+        uint32 revisionCount;   // Number of revisions including revision 0.
         uint32 timestamp;       // Timestamp of revision 0.
         address owner;          // Who owns this item.
     }
@@ -39,16 +37,6 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @dev Mapping of itemId to mapping of revision number to IPFS hash.
      */
     mapping (bytes32 => mapping (uint => bytes32)) itemRevisionIpfsHashes;
-
-    /**
-     * @dev Mapping of itemId to mapping of index to parent itemId.
-     */
-    mapping (bytes32 => mapping(uint => bytes32)) itemParentIds;
-
-    /**
-     * @dev Mapping of itemId to mapping of index to child itemId.
-     */
-    mapping (bytes32 => mapping(uint => bytes32)) itemChildIds;
 
     /**
      * @dev Mapping of itemId to mapping of transfer recipient addresses to enabled.
@@ -165,26 +153,6 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     }
 
     /**
-     * @dev Revert if a specific item parent does not exist.
-     * @param itemId itemId of the item.
-     * @param i Index of the parent.
-     */
-    modifier parentExists(bytes32 itemId, uint i) {
-        require (i < itemState[itemId].parentCount);
-        _;
-    }
-
-    /**
-     * @dev Revert if a specific item child does not exist.
-     * @param itemId itemId of the item.
-     * @param i Index of the child.
-     */
-    modifier childExists(bytes32 itemId, uint i) {
-        require (i < itemState[itemId].childCount);
-        _;
-    }
-
-    /**
      * @param _itemStoreRegistry Address of the ItemStoreRegistry contract.
      */
     constructor(ItemStoreRegistry _itemStoreRegistry) public {
@@ -223,8 +191,6 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
         itemState[itemId] = ItemState({
             inUse: true,
             flags: flags,
-            parentCount: 0,
-            childCount: 0,
             revisionCount: 1,
             timestamp: uint32(block.timestamp),
             owner: owner
@@ -235,133 +201,6 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
         emit Create(itemId, owner, flags);
         // Log the first revision.
         emit PublishRevision(itemId, owner, 0, ipfsHash);
-    }
-
-    /**
-     * @dev Add an item to its parent.
-     * @param itemId itemitemId of the item.
-     * @param parentId itemId of the parent.
-     */
-    function _addItemToParent(bytes32 itemId, bytes32 parentId) internal {
-        // Ensure child and parent are not the same.
-        require (itemId != parentId);
-        // Is the parent in this item store contract?
-        if (parentId & CONTRACT_ID_MASK == contractId) {
-            // Get item state of the parent.
-            ItemState storage parentState = itemState[parentId];
-            // Ensure the parent exists.
-            require (parentState.inUse);
-            // Get the index of the new child.
-            uint i = parentState.childCount;
-            // Attach the item to the parent.
-            itemChildIds[parentId][i] = itemId;
-            // Increment the child count.
-            parentState.childCount = uint16(i + 1);
-            // Log the child.
-            emit AddChild(parentId, parentState.owner, itemId, i);
-        }
-        else {
-            // Inform the item store contract of the parent that we are its child.
-            itemStoreRegistry.getItemStore(parentId).addForeignChild(parentId, itemId);
-        }
-    }
-
-    /**
-     * @dev Creates an item with one parent. It is guaranteed that different users will never receive the same itemId, even before consensus has been reached. This prevents itemId sniping.
-     * @param flagsNonce Nonce that this address has never passed before; first byte is creation flags.
-     * @param ipfsHash Hash of the IPFS object where revision 0 is stored.
-     * @param parentId itemId of parent.
-     * @return itemId itemId of the new item.
-     */
-    function createWithParent(bytes32 flagsNonce, bytes32 ipfsHash, bytes32 parentId) external returns (bytes32 itemId) {
-        // Determine the itemId.
-        itemId = getNewItemId(flagsNonce);
-        // Extract the flags.
-        byte flags = byte(flagsNonce);
-        // Determine the owner.
-        address owner = (flags & DISOWN == 0) ? msg.sender : address(0);
-        // Store item state.
-        itemState[itemId] = ItemState({
-            inUse: true,
-            flags: flags,
-            parentCount: 1,
-            childCount: 0,
-            revisionCount: 1,
-            timestamp: uint32(block.timestamp),
-            owner: owner
-        });
-        // Store the parentId.
-        itemParentIds[itemId][0] = parentId;
-        _addItemToParent(itemId, parentId);
-        // Store the IPFS hash.
-        itemRevisionIpfsHashes[itemId][0] = ipfsHash;
-        // Log item creation.
-        emit Create(itemId, owner, flags);
-        // Log the first revision.
-        emit PublishRevision(itemId, owner, 0, ipfsHash);
-    }
-
-    /**
-     * @dev Creates an item with multiple parents. It is guaranteed that different users will never receive the same itemId, even before consensus has been reached. This prevents itemId sniping.
-     * @param flagsNonce Nonce that this address has never passed before; first byte is creation flags.
-     * @param ipfsHash Hash of the IPFS object where revision 0 is stored.
-     * @param parentIds itemIds of parents.
-     * @return itemId itemId of the new item.
-     */
-    function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] calldata parentIds) external returns (bytes32 itemId) {
-        // Determine the itemId.
-        itemId = getNewItemId(flagsNonce);
-        // Extract the flags.
-        byte flags = byte(flagsNonce);
-        // Get parent count.
-        uint parentCount = parentIds.length;
-        // Determine the owner.
-        address owner = (flags & DISOWN == 0) ? msg.sender : address(0);
-        // Store item state.
-        itemState[itemId] = ItemState({
-            inUse: true,
-            flags: flags,
-            parentCount: uint16(parentCount),
-            childCount: 0,
-            revisionCount: 1,
-            timestamp: uint32(block.timestamp),
-            owner: owner
-        });
-        // Process the parentIds.
-        for (uint i = 0; i < parentCount; i++) {
-            bytes32 parentId = parentIds[i];
-            // Store the parentId.
-            itemParentIds[itemId][i] = parentId;
-            _addItemToParent(itemId, parentId);
-        }
-        // Store the IPFS hash.
-        itemRevisionIpfsHashes[itemId][0] = ipfsHash;
-        // Log item creation.
-        emit Create(itemId, owner, flags);
-        // Log the first revision.
-        emit PublishRevision(itemId, owner, 0, ipfsHash);
-    }
-
-    /**
-     * @dev Add a child from another item store contract.
-     * @param itemId itemId of parent.
-     * @param childId itemId of child.
-     */
-    function addForeignChild(bytes32 itemId, bytes32 childId) external inUse(itemId) {
-        // Get the item store of the child.
-        ItemStoreInterface itemStore = itemStoreRegistry.getItemStore(childId);
-        // Ensure the call is coming from the item store of the child.
-        require (address(itemStore) == msg.sender);
-        // Get item state.
-        ItemState storage state = itemState[itemId];
-        // Get the index of the new child.
-        uint i = state.childCount;
-        // Store the childId.
-        itemChildIds[itemId][i] = childId;
-        // Increment the child count.
-        state.childCount = uint16(i + 1);
-        // Log the child.
-        emit AddChild(itemId, state.owner, childId, i);
     }
 
     /**
@@ -499,8 +338,6 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
         itemState[itemId] = ItemState({
             inUse: true,
             flags: 0,
-            parentCount: itemState[itemId].parentCount,
-            childCount: itemState[itemId].childCount,
             revisionCount: 0,
             timestamp: 0,
             owner: address(0)
@@ -682,32 +519,6 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     }
 
     /**
-     * @dev Get all of an item's parent itemIds.
-     * @param itemId itemId of the item.
-     * @return parentIds itemIds of the parents.
-     */
-    function _getAllParentIds(bytes32 itemId) internal view returns (bytes32[] memory parentIds) {
-        uint count = itemState[itemId].parentCount;
-        parentIds = new bytes32[](count);
-        for (uint i = 0; i < count; i++) {
-            parentIds[i] = itemParentIds[itemId][i];
-        }
-    }
-
-    /**
-     * @dev Get all of an item's child itemIds.
-     * @param itemId itemitemId of the item.
-     * @return childIds itemIds of the children.
-     */
-    function _getAllChildIds(bytes32 itemId) internal view returns (bytes32[] memory childIds) {
-        uint count = itemState[itemId].childCount;
-        childIds = new bytes32[](count);
-        for (uint i = 0; i < count; i++) {
-            childIds[i] = itemChildIds[itemId][i];
-        }
-    }
-
-    /**
      * @dev Get an item.
      * @param itemId itemId of the item.
      * @return flags Packed item settings.
@@ -718,15 +529,13 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @return parentIds itemIds of all parents.
      * @return childIds itemIds of all children.
      */
-    function getItem(bytes32 itemId) external view inUse(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] memory ipfsHashes, uint[] memory timestamps, bytes32[] memory parentIds, bytes32[] memory childIds) {
+    function getItem(bytes32 itemId) external view inUse(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] memory ipfsHashes, uint[] memory timestamps) {
         ItemState storage state = itemState[itemId];
         flags = state.flags;
         owner = state.owner;
         revisionCount = state.revisionCount;
         ipfsHashes = _getAllRevisionIpfsHashes(itemId);
         timestamps = _getAllRevisionTimestamps(itemId);
-        parentIds = _getAllParentIds(itemId);
-        childIds = _getAllChildIds(itemId);
     }
 
     /**
@@ -828,62 +637,6 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      */
     function getAllRevisionTimestamps(bytes32 itemId) external view inUse(itemId) returns (uint[] memory) {
         return _getAllRevisionTimestamps(itemId);
-    }
-
-    /**
-     * @dev Get the number of parents an item has.
-     * @param itemId itemId of the item.
-     * @return How many parents the item has.
-     */
-    function getParentCount(bytes32 itemId) external view inUse(itemId) returns (uint) {
-        return itemState[itemId].parentCount;
-    }
-
-    /**
-     * @dev Get a specific parent.
-     * @param itemId itemId of the item.
-     * @param i Index of the parent.
-     * @return itemId of the parent.
-     */
-    function getParentId(bytes32 itemId, uint i) external view parentExists(itemId, i) returns (bytes32) {
-        return itemParentIds[itemId][i];
-    }
-
-    /**
-     * @dev Get all of an item's parents.
-     * @param itemId itemId of the item.
-     * @return itemIds of the parents.
-     */
-    function getAllParentIds(bytes32 itemId) external view inUse(itemId) returns (bytes32[] memory) {
-        return _getAllParentIds(itemId);
-    }
-
-    /**
-     * @dev Get the number of children an item has.
-     * @param itemId itemId of the item.
-     * @return How many children the item has.
-     */
-    function getChildCount(bytes32 itemId) external view inUse(itemId) returns (uint) {
-        return itemState[itemId].childCount;
-    }
-
-    /**
-     * @dev Get a specific child.
-     * @param itemId itemId of the item.
-     * @param i Index of the child.
-     * @return itemId of the child.
-     */
-    function getChildId(bytes32 itemId, uint i) external view childExists(itemId, i) returns (bytes32) {
-        return itemChildIds[itemId][i];
-    }
-
-    /**
-     * @dev Get all of an item's children.
-     * @param itemId itemId of the item.
-     * @return itemIds of the children.
-     */
-    function getAllChildIds(bytes32 itemId) external view inUse(itemId) returns (bytes32[] memory) {
-        return _getAllChildIds(itemId);
     }
 
 }

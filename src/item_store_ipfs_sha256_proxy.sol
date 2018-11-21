@@ -28,18 +28,6 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
         itemId = itemStore.create(flagsNonce, ipfsHash);
     }
 
-    function createWithParent(bytes32 flagsNonce, bytes32 ipfsHash, bytes32 parentId) external returns (bytes32 itemId) {
-        itemId = itemStore.createWithParent(flagsNonce, ipfsHash, parentId);
-    }
-
-    function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] calldata parentIds) external returns (bytes32 itemId) {
-        itemId = itemStore.createWithParents(flagsNonce, ipfsHash, parentIds);
-    }
-
-    function addForeignChild(bytes32 itemId, bytes32 child) external {
-        itemStore.addForeignChild(itemId, child);
-    }
-
     function createNewRevision(bytes32 itemId, bytes32 ipfsHash) external returns (uint revisionId) {
         revisionId = itemStore.createNewRevision(itemId, ipfsHash);
     }
@@ -126,22 +114,6 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     function getRevisionCount(bytes32 itemId) external view returns (uint) {
         return itemStore.getRevisionCount(itemId);
-    }
-
-    function getParentCount(bytes32 itemId) external view returns (uint) {
-        return itemStore.getParentCount(itemId);
-    }
-
-    function getParentId(bytes32 itemId, uint i) external view returns (bytes32) {
-        return itemStore.getParentId(itemId, i);
-    }
-
-    function getChildCount(bytes32 itemId) external view returns (uint) {
-        return itemStore.getChildCount(itemId);
-    }
-
-    function getChildId(bytes32 itemId, uint i) external view returns (bytes32) {
-        return itemStore.getChildId(itemId, i);
     }
 
 }
