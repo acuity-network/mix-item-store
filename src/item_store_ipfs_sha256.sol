@@ -1,6 +1,7 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import "./item_store_interface.sol";
+import "./item_store_constants.sol";
 import "./item_store_registry.sol";
 
 
@@ -9,15 +10,7 @@ import "./item_store_registry.sol";
  * @author Jonathan Brown <jbrown@mix-blockchain.org>
  * @dev ItemStore implementation where each item revision is a SHA256 IPFS hash.
  */
-contract ItemStoreIpfsSha256 is ItemStoreInterface {
-
-    byte constant UPDATABLE = 0x01;           // True if the item is updatable. After creation can only be disabled.
-    byte constant ENFORCE_REVISIONS = 0x02;   // True if the item is enforcing revisions. After creation can only be enabled.
-    byte constant RETRACTABLE = 0x04;         // True if the item can be retracted. After creation can only be disabled.
-    byte constant TRANSFERABLE = 0x08;        // True if the item can be transferred to another user or disowned. After creation can only be disabled.
-    byte constant DISOWN = 0x10;              // True if the item should not have an owner at creation.
-
-    uint constant ABI_VERSION = 0;
+contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
 
     /**
      * @dev Single slot structure of item state.
@@ -63,7 +56,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
     mapping (bytes32 => mapping (address => bool)) itemTransferEnabled;
 
     /**
-     * @dev Item Store Registry contract.
+     * @dev ItemStoreRegistry contract.
      */
     ItemStoreRegistry itemStoreRegistry;
 
@@ -208,7 +201,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      */
     function getNewItemId(bytes32 nonce) public view returns (bytes32 itemId) {
         // Combine contractId with hash of sender and nonce.
-        itemId = (keccak256(abi.encodePacked(address(this), msg.sender, nonce)) & (bytes32(uint192(-1)) << 64)) | contractId;
+        itemId = (keccak256(abi.encodePacked(address(this), msg.sender, nonce)) & ITEM_ID_MASK) | contractId;
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
     }
@@ -225,7 +218,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Extract the flags.
         byte flags = byte(flagsNonce);
         // Determine the owner.
-        address owner = (flags & DISOWN == 0) ? msg.sender : 0;
+        address owner = (flags & DISOWN == 0) ? msg.sender : address(0);
         // Store item state.
         itemState[itemId] = ItemState({
             inUse: true,
@@ -253,7 +246,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Ensure child and parent are not the same.
         require (itemId != parentId);
         // Is the parent in this item store contract?
-        if (parentId & bytes32(uint64(-1)) == contractId) {
+        if (parentId & CONTRACT_ID_MASK == contractId) {
             // Get item state of the parent.
             ItemState storage parentState = itemState[parentId];
             // Ensure the parent exists.
@@ -286,7 +279,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Extract the flags.
         byte flags = byte(flagsNonce);
         // Determine the owner.
-        address owner = (flags & DISOWN == 0) ? msg.sender : 0;
+        address owner = (flags & DISOWN == 0) ? msg.sender : address(0);
         // Store item state.
         itemState[itemId] = ItemState({
             inUse: true,
@@ -315,7 +308,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param parentIds itemIds of parents.
      * @return itemId itemId of the new item.
      */
-    function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] parentIds) external returns (bytes32 itemId) {
+    function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] calldata parentIds) external returns (bytes32 itemId) {
         // Determine the itemId.
         itemId = getNewItemId(flagsNonce);
         // Extract the flags.
@@ -323,7 +316,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Get parent count.
         uint parentCount = parentIds.length;
         // Determine the owner.
-        address owner = (flags & DISOWN == 0) ? msg.sender : 0;
+        address owner = (flags & DISOWN == 0) ? msg.sender : address(0);
         // Store item state.
         itemState[itemId] = ItemState({
             inUse: true,
@@ -358,7 +351,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Get the item store of the child.
         ItemStoreInterface itemStore = itemStoreRegistry.getItemStore(childId);
         // Ensure the call is coming from the item store of the child.
-        require (itemStore == msg.sender);
+        require (address(itemStore) == msg.sender);
         // Get item state.
         ItemState storage state = itemState[itemId];
         // Get the index of the new child.
@@ -382,9 +375,9 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         // Calculate the shift.
         uint shift = (offset % 8) * 32;
         // Wipe the previous timestamp.
-        slot &= ~(bytes32(uint32(-1)) << shift);
+        slot &= ~(bytes32(uint256(uint32(-1))) << shift);
         // Insert the current timestamp.
-        slot |= bytes32(uint32(block.timestamp)) << shift;
+        slot |= bytes32(uint256(uint32(block.timestamp))) << shift;
         // Store the slot.
         itemPackedTimestamps[itemId][offset / 8] = slot;
     }
@@ -510,7 +503,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
             childCount: itemState[itemId].childCount,
             revisionCount: 0,
             timestamp: 0,
-            owner: 0
+            owner: address(0)
         });
     }
 
@@ -647,7 +640,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return ipfsHashes Revision IPFS hashes.
      */
-    function _getAllRevisionIpfsHashes(bytes32 itemId) internal view returns (bytes32[] ipfsHashes) {
+    function _getAllRevisionIpfsHashes(bytes32 itemId) internal view returns (bytes32[] memory ipfsHashes) {
         uint revisionCount = itemState[itemId].revisionCount;
         ipfsHashes = new bytes32[](revisionCount);
         for (uint revisionId = 0; revisionId < revisionCount; revisionId++) {
@@ -667,7 +660,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
         }
         else {
             uint offset = revisionId - 1;
-            timestamp = uint32(itemPackedTimestamps[itemId][offset / 8] >> ((offset % 8) * 32));
+            timestamp = uint32(uint256(itemPackedTimestamps[itemId][offset / 8] >> ((offset % 8) * 32)));
         }
         // Check if the revision has been confirmed yet.
         if (timestamp == block.timestamp) {
@@ -680,7 +673,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return timestamps Revision timestamps.
      */
-    function _getAllRevisionTimestamps(bytes32 itemId) internal view returns (uint[] timestamps) {
+    function _getAllRevisionTimestamps(bytes32 itemId) internal view returns (uint[] memory timestamps) {
         uint count = itemState[itemId].revisionCount;
         timestamps = new uint[](count);
         for (uint revisionId = 0; revisionId < count; revisionId++) {
@@ -693,7 +686,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return parentIds itemIds of the parents.
      */
-    function _getAllParentIds(bytes32 itemId) internal view returns (bytes32[] parentIds) {
+    function _getAllParentIds(bytes32 itemId) internal view returns (bytes32[] memory parentIds) {
         uint count = itemState[itemId].parentCount;
         parentIds = new bytes32[](count);
         for (uint i = 0; i < count; i++) {
@@ -706,7 +699,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemitemId of the item.
      * @return childIds itemIds of the children.
      */
-    function _getAllChildIds(bytes32 itemId) internal view returns (bytes32[] childIds) {
+    function _getAllChildIds(bytes32 itemId) internal view returns (bytes32[] memory childIds) {
         uint count = itemState[itemId].childCount;
         childIds = new bytes32[](count);
         for (uint i = 0; i < count; i++) {
@@ -725,7 +718,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @return parentIds itemIds of all parents.
      * @return childIds itemIds of all children.
      */
-    function getItem(bytes32 itemId) external view inUse(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] ipfsHashes, uint[] timestamps, bytes32[] parentIds, bytes32[] childIds) {
+    function getItem(bytes32 itemId) external view inUse(itemId) returns (byte flags, address owner, uint revisionCount, bytes32[] memory ipfsHashes, uint[] memory timestamps, bytes32[] memory parentIds, bytes32[] memory childIds) {
         ItemState storage state = itemState[itemId];
         flags = state.flags;
         owner = state.owner;
@@ -814,7 +807,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return IPFS hashes of all revisions of the item.
      */
-    function getAllRevisionIpfsHashes(bytes32 itemId) external view inUse(itemId) returns (bytes32[]) {
+    function getAllRevisionIpfsHashes(bytes32 itemId) external view inUse(itemId) returns (bytes32[] memory) {
         return _getAllRevisionIpfsHashes(itemId);
     }
 
@@ -833,7 +826,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return Timestamps of all revisions of the item.
      */
-    function getAllRevisionTimestamps(bytes32 itemId) external view inUse(itemId) returns (uint[]) {
+    function getAllRevisionTimestamps(bytes32 itemId) external view inUse(itemId) returns (uint[] memory) {
         return _getAllRevisionTimestamps(itemId);
     }
 
@@ -861,7 +854,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return itemIds of the parents.
      */
-    function getAllParentIds(bytes32 itemId) external view inUse(itemId) returns (bytes32[]) {
+    function getAllParentIds(bytes32 itemId) external view inUse(itemId) returns (bytes32[] memory) {
         return _getAllParentIds(itemId);
     }
 
@@ -889,7 +882,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface {
      * @param itemId itemId of the item.
      * @return itemIds of the children.
      */
-    function getAllChildIds(bytes32 itemId) external view inUse(itemId) returns (bytes32[]) {
+    function getAllChildIds(bytes32 itemId) external view inUse(itemId) returns (bytes32[] memory) {
         return _getAllChildIds(itemId);
     }
 

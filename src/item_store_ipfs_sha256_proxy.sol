@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import "./item_store_interface.sol";
 import "./item_store_ipfs_sha256.sol";
@@ -32,7 +32,7 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
         itemId = itemStore.createWithParent(flagsNonce, ipfsHash, parentId);
     }
 
-    function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] parentIds) external returns (bytes32 itemId) {
+    function createWithParents(bytes32 flagsNonce, bytes32 ipfsHash, bytes32[] calldata parentIds) external returns (bytes32 itemId) {
         itemId = itemStore.createWithParents(flagsNonce, ipfsHash, parentIds);
     }
 

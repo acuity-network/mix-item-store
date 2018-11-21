@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import "ds-test/test.sol";
 
@@ -19,20 +19,20 @@ contract ItemStoreShortIdTest is DSTest {
     }
 
     function testControlCreateShortIdAlreadyExists() public {
-        itemStoreShortId.createShortId(0x1234);
-        itemStoreShortId.createShortId(0x2345);
+        itemStoreShortId.createShortId(hex"1234");
+        itemStoreShortId.createShortId(hex"2345");
     }
 
     function testFailCreateShortIdAlreadyExists() public {
-        itemStoreShortId.createShortId(0x1234);
-        itemStoreShortId.createShortId(0x1234);
+        itemStoreShortId.createShortId(hex"1234");
+        itemStoreShortId.createShortId(hex"1234");
     }
 
     function testCreateShortId() public {
-        bytes32 itemId0 = 0x1234;
-        bytes32 itemId1 = 0x2345;
-        bytes32 itemId2 = 0x3456;
-        bytes32 itemId3 = 0x4567;
+        bytes32 itemId0 = hex"1234";
+        bytes32 itemId1 = hex"2345";
+        bytes32 itemId2 = hex"3456";
+        bytes32 itemId3 = hex"4567";
 
         bytes4 shortId0 = itemStoreShortId.createShortId(itemId0);
         bytes4 shortId1 = itemStoreShortId.createShortId(itemId1);

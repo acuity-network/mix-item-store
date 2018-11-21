@@ -1,14 +1,14 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
+import "./item_store_constants.sol";
 import "./item_store_interface.sol";
-
 
 /**
  * @title ItemStoreRegistry
  * @author Jonathan Brown <jbrown@mix-blockchain.org>
  * @dev Contract that every ItemStore implementation must register with.
  */
-contract ItemStoreRegistry {
+contract ItemStoreRegistry is ItemStoreConstants {
 
     /**
      * @dev Mapping of contractIds to contract addresses.
@@ -28,7 +28,7 @@ contract ItemStoreRegistry {
      */
     function register() external returns (bytes32 contractId) {
         // Create contractId.
-        contractId = keccak256(abi.encodePacked(msg.sender)) & bytes32(uint64(-1));
+        contractId = keccak256(abi.encodePacked(msg.sender)) & CONTRACT_ID_MASK;
         // Make sure this contractId has not been used before (highly unlikely).
         require (contracts[contractId] == ItemStoreInterface(0));
         // Record the calling contract address.
@@ -43,8 +43,8 @@ contract ItemStoreRegistry {
      * @return itemStore itemStore contract of the item.
      */
     function getItemStore(bytes32 itemId) external view returns (ItemStoreInterface itemStore) {
-        itemStore = contracts[itemId & bytes32(uint64(-1))];
-        require (address(itemStore) != 0);
+        itemStore = contracts[itemId & CONTRACT_ID_MASK];
+        require (address(itemStore) != address(0));
     }
 
 }

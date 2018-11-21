@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import "ds-test/test.sol";
 
@@ -39,7 +39,7 @@ contract ItemStoreRegistryTest is DSTest {
     }
 
     function testGetItemStore() public {
-        assertEq(itemStoreRegistry.getItemStore(bytes32(itemStore.getContractId()) >> 192), itemStore);
+        assertEq(address(itemStoreRegistry.getItemStore(bytes32(itemStore.getContractId()) >> 192)), address(itemStore));
     }
 
 }
