@@ -163,13 +163,14 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     }
 
     /**
-     * @dev Generates an itemId from sender and nonce and checks that it is unused.
-     * @param nonce Nonce that this sender has never used before.
-     * @return itemId itemId of the item with this sender and nonce.
+     * @dev Generates an itemId from owner and nonce and checks that it is unused.
+     * @param owner Address that will own the item.
+     * @param nonce Nonce that this owner has never used before.
+     * @return itemId itemId of the item with this owner and nonce.
      */
-    function getNewItemId(bytes32 nonce) public view returns (bytes32 itemId) {
+    function getNewItemId(address owner, bytes32 nonce) public view returns (bytes32 itemId) {
         // Combine contractId with hash of sender and nonce.
-        itemId = (keccak256(abi.encodePacked(address(this), msg.sender, nonce)) & ITEM_ID_MASK) | contractId;
+        itemId = (keccak256(abi.encodePacked(address(this), owner, nonce)) & ITEM_ID_MASK) | contractId;
         // Make sure this itemId has not been used before.
         require (!itemState[itemId].inUse);
     }
@@ -182,7 +183,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      */
     function create(bytes32 flagsNonce, bytes32 ipfsHash) external returns (bytes32 itemId) {
         // Determine the itemId.
-        itemId = getNewItemId(flagsNonce);
+        itemId = getNewItemId(msg.sender, flagsNonce);
         // Extract the flags.
         byte flags = byte(flagsNonce);
         // Determine the owner.

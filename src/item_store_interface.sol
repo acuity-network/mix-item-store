@@ -73,11 +73,12 @@ interface ItemStoreInterface {
     event SetNotTransferable(bytes32 indexed itemId, address indexed owner);
 
     /**
-     * @dev Generates an itemId from sender and nonce and checks that it is unused.
-     * @param nonce Nonce that this sender has never used before.
-     * @return itemId itemId of the item with this sender and nonce.
+     * @dev Generates an itemId from owner and nonce and checks that it is unused.
+     * @param owner Address that will own the item.
+     * @param nonce Nonce that this owner has never used before.
+     * @return itemId itemId of the item with this owner and nonce.
      */
-    function getNewItemId(bytes32 nonce) external view returns (bytes32 itemId);
+    function getNewItemId(address owner, bytes32 nonce) external view returns (bytes32 itemId);
 
     /**
      * @dev Retract an item's latest revision. Revision 0 cannot be retracted.

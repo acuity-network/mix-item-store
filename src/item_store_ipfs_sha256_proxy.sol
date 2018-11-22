@@ -20,8 +20,8 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
         itemStore = _itemStore;
     }
 
-    function getNewItemId(bytes32 nonce) public view returns (bytes32 itemId) {
-        itemId = itemStore.getNewItemId(nonce);
+    function getNewItemId(address owner, bytes32 nonce) public view returns (bytes32 itemId) {
+        itemId = itemStore.getNewItemId(owner, nonce);
     }
 
     function create(bytes32 flagsNonce, bytes32 ipfsHash) external returns (bytes32 itemId) {

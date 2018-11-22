@@ -27,19 +27,19 @@ contract ItemStoreIpfsSha256Test is DSTest, ItemStoreConstants {
 
     function testControlCreateSameItemId() public {
         itemStore.create(hex"1234", hex"1234");
-        itemStore.getNewItemId(hex"2345");
+        itemStore.getNewItemId(address(this), hex"2345");
     }
 
     function testFailCreateSameItemId() public {
         itemStore.create(hex"1234", hex"1234");
-        itemStore.getNewItemId(hex"1234");
+        itemStore.getNewItemId(address(this), hex"1234");
     }
 
     function testGetNewItemId() public {
-        assertEq((itemStore.getNewItemId(hex"1234") & CONTRACT_ID_MASK) << 192, itemStore.getContractId());
-        assertEq(itemStore.getNewItemId(hex"1234"), itemStore.getNewItemId(hex"1234"));
-        assertTrue(itemStore.getNewItemId(hex"1234") != itemStore.getNewItemId(hex"2345"));
-        assertTrue(itemStore.getNewItemId(hex"1234") != itemStoreProxy.getNewItemId(hex"1234"));
+        assertEq((itemStore.getNewItemId(address(this), hex"1234") & CONTRACT_ID_MASK) << 192, itemStore.getContractId());
+        assertEq(itemStore.getNewItemId(address(this), hex"1234"), itemStore.getNewItemId(address(this), hex"1234"));
+        assertTrue(itemStore.getNewItemId(address(this), hex"1234") != itemStore.getNewItemId(address(this), hex"2345"));
+        assertTrue(itemStore.getNewItemId(address(this), hex"1234") != itemStore.getNewItemId(address(0), hex"1234"));
     }
 
     function testCreate() public {
