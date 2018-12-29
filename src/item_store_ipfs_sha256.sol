@@ -189,13 +189,12 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
         // Determine the owner.
         address owner = (flags & DISOWN == 0) ? msg.sender : address(0);
         // Store item state.
-        itemState[itemId] = ItemState({
-            inUse: true,
-            flags: flags,
-            revisionCount: 1,
-            timestamp: uint32(block.timestamp),
-            owner: owner
-        });
+        ItemState storage state = itemState[itemId];
+        state.inUse = true;
+        state.flags = flags;
+        state.revisionCount = 1;
+        state.timestamp = uint32(block.timestamp);
+        state.owner = owner;
         // Store the IPFS hash.
         itemRevisionIpfsHashes[itemId][0] = ipfsHash;
         // Log item creation.
@@ -336,13 +335,11 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
         // Log the item retraction.
         emit Retract(itemId, state.owner);
         // Mark this item as retracted.
-        itemState[itemId] = ItemState({
-            inUse: true,
-            flags: 0,
-            revisionCount: 0,
-            timestamp: 0,
-            owner: address(0)
-        });
+        state.inUse = true;
+        state.flags = 0;
+        state.revisionCount = 0;
+        state.timestamp = 0;
+        state.owner = address(0);
     }
 
     /**
