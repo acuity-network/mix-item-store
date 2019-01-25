@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
 import "./item_store_constants.sol";
 import "./item_store_interface.sol";
