@@ -70,6 +70,14 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     event PublishRevision(bytes32 indexed itemId, address indexed owner, uint revisionId, bytes32 ipfsHash);
 
     /**
+     * @dev An item revision has been retracted.
+     * @param itemId itemId of the item.
+     * @param revisionId Id of the revision.
+     * @param ipfsHash Hash of the IPFS object where the item revision is stored.
+     */
+    event RetractRevision(bytes32 indexed itemId, address indexed owner, uint revisionId, bytes32 ipfsHash);
+
+    /**
      * @dev Revert if the itemId is not in use.
      * @param itemId itemId of the item.
      */
@@ -246,12 +254,15 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param ipfsHash Hash of the IPFS object where the item revision is stored.
      */
     function updateLatestRevision(bytes32 itemId, bytes32 ipfsHash) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) {
-        // Get item state.
+        // Get item state and ipfsHashes.
         ItemState storage state = itemState[itemId];
+        mapping (uint => bytes32) storage ipfsHashes = itemRevisionIpfsHashes[itemId];
         // Determine the revisionId.
         uint revisionId = state.revisionCount - 1;
+        // Log the revision retraction.
+        emit RetractRevision(itemId, state.owner, revisionId, ipfsHashes[revisionId]);
         // Update the IPFS hash.
-        itemRevisionIpfsHashes[itemId][revisionId] = ipfsHash;
+        ipfsHashes[revisionId] = ipfsHash;
         // Update the timestamp.
         if (revisionId == 0) {
             state.timestamp = uint32(block.timestamp);
@@ -270,16 +281,17 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     function retractLatestRevision(bytes32 itemId) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) hasAdditionalRevisions(itemId) {
         // Get item state.
         ItemState storage state = itemState[itemId];
+        mapping (uint => bytes32) storage ipfsHashes = itemRevisionIpfsHashes[itemId];
         // Decrement the number of revisions.
         uint revisionId = --state.revisionCount;
+        // Log the revision retraction.
+        emit RetractRevision(itemId, state.owner, revisionId, ipfsHashes[revisionId]);
         // Delete the IPFS hash.
-        delete itemRevisionIpfsHashes[itemId][revisionId];
+        delete ipfsHashes[revisionId];
         // Delete the packed timestamp slot if it is no longer required.
         if (revisionId % 8 == 1) {
             delete itemPackedTimestamps[itemId][revisionId / 8];
         }
-        // Log the revision retraction.
-        emit RetractRevision(itemId, state.owner, revisionId);
     }
 
     /**
@@ -304,17 +316,21 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     function restart(bytes32 itemId, bytes32 ipfsHash) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) {
         // Get item state.
         ItemState storage state = itemState[itemId];
-        // Delete all the IPFS hashes except the first one.
-        for (uint i = 1; i < state.revisionCount; i++) {
-            delete itemRevisionIpfsHashes[itemId][i];
+        mapping (uint => bytes32) storage ipfsHashes = itemRevisionIpfsHashes[itemId];
+        // Log and delete all the IPFS hashes except the first one.
+        for (uint revisionId = 1; revisionId < state.revisionCount; revisionId++) {
+            emit RetractRevision(itemId, state.owner, revisionId, ipfsHashes[revisionId]);
+            delete ipfsHashes[revisionId];
         }
         // Delete all the packed revision timestamps.
         _deleteAllPackedRevisionTimestamps(itemId);
         // Update the item state.
         state.revisionCount = 1;
         state.timestamp = uint32(block.timestamp);
+        // Log the revision retraction.
+        emit RetractRevision(itemId, state.owner, 0, ipfsHashes[0]);
         // Update the first IPFS hash.
-        itemRevisionIpfsHashes[itemId][0] = ipfsHash;
+        ipfsHashes[0] = ipfsHash;
         // Log the revision.
         emit PublishRevision(itemId, state.owner, 0, ipfsHash);
     }
@@ -326,9 +342,11 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     function retract(bytes32 itemId) external isOwner(itemId) isRetractable(itemId) {
         // Get item state.
         ItemState storage state = itemState[itemId];
-        // Delete all the IPFS hashes.
-        for (uint i = 0; i < state.revisionCount; i++) {
-            delete itemRevisionIpfsHashes[itemId][i];
+        mapping (uint => bytes32) storage ipfsHashes = itemRevisionIpfsHashes[itemId];
+        // Log and delete all the IPFS hashes.
+        for (uint revisionId = 0; revisionId < state.revisionCount; revisionId++) {
+            emit RetractRevision(itemId, state.owner, revisionId, ipfsHashes[revisionId]);
+            delete ipfsHashes[revisionId];
         }
         // Delete all the packed revision timestamps.
         _deleteAllPackedRevisionTimestamps(itemId);

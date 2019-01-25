@@ -9,13 +9,6 @@ pragma solidity ^0.5.2;
 interface ItemStoreInterface {
 
     /**
-     * @dev A revision has been retracted.
-     * @param itemId itemId of the item.
-     * @param revisionId Id of the revision.
-     */
-    event RetractRevision(bytes32 indexed itemId, address indexed owner, uint revisionId);
-
-    /**
      * @dev An entire item has been retracted. This cannot be undone.
      * @param itemId itemId of the item.
      */
