@@ -46,7 +46,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     /**
      * @dev ItemStoreRegistry contract.
      */
-    ItemStoreRegistry itemStoreRegistry;
+    ItemStoreRegistry public itemStoreRegistry;
 
     /**
      * @dev Id of this instance of ItemStore. Stored as bytes32 instead of bytes8 to reduce gas usage.
