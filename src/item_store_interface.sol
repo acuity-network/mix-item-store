@@ -9,10 +9,31 @@ pragma solidity ^0.5.9;
 interface ItemStoreInterface {
 
     /**
+     * @dev A new item has been created.
+     * @param itemId itemId of the item.
+     * @param owner Address of the item owner.
+     */
+    event Create(bytes32 indexed itemId, address indexed owner, byte flags);
+
+    /**
      * @dev An entire item has been retracted. This cannot be undone.
      * @param itemId itemId of the item.
      */
     event Retract(bytes32 indexed itemId, address indexed owner);
+
+    /**
+     * @dev An item revision has been published.
+     * @param itemId itemId of the item.
+     * @param revisionId Id of the revision (highest at time of logging).
+     */
+    event PublishRevision(bytes32 indexed itemId, address indexed owner, uint revisionId);
+
+    /**
+     * @dev An item revision has been retracted.
+     * @param itemId itemId of the item.
+     * @param revisionId Id of the revision (highest at time of logging).
+     */
+    event RetractRevision(bytes32 indexed itemId, address indexed owner, uint revisionId);
 
     /**
      * @dev Transfering ownership of an item to a specific account has been enabled.
@@ -154,6 +175,13 @@ interface ItemStoreInterface {
     function getInUse(bytes32 itemId) external view returns (bool);
 
     /**
+     * @dev Get an item's flags.
+     * @param itemId itemId of the item.
+     * @return Packed item settings.
+     */
+    function getFlags(bytes32 itemId) external view returns (byte);
+
+    /**
      * @dev Determine if an item is updatable.
      * @param itemId itemId of the item.
      * @return True if the item is updatable.
@@ -194,5 +222,20 @@ interface ItemStoreInterface {
      * @return How many revisions the item has.
      */
     function getRevisionCount(bytes32 itemId) external view returns (uint);
+
+    /**
+     * @dev Get the timestamp for a specific item revision.
+     * @param itemId itemId of the item.
+     * @param revisionId Id of the revision.
+     * @return Timestamp of the specified revision.
+     */
+    function getRevisionTimestamp(bytes32 itemId, uint revisionId) external view returns (uint);
+
+    /**
+     * @dev Get the timestamps for all of an item's revisions.
+     * @param itemId itemId of the item.
+     * @return Timestamps of all revisions of the item.
+     */
+    function getAllRevisionTimestamps(bytes32 itemId) external view returns (uint[] memory);
 
 }

@@ -92,6 +92,14 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
         return itemStore.getInUse(itemId);
     }
 
+    function getItem(bytes32 itemId) external view returns (byte flags, address owner, uint revisionCount, uint[] memory timestamps, bytes32[] memory ipfsHashes) {
+        (flags, owner, revisionCount, timestamps, ipfsHashes) = itemStore.getItem(itemId);
+    }
+
+    function getFlags(bytes32 itemId) external view returns (byte) {
+        return itemStore.getFlags(itemId);
+    }
+
     function getUpdatable(bytes32 itemId) external view returns (bool) {
         return itemStore.getUpdatable(itemId);
     }
@@ -114,6 +122,22 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
 
     function getRevisionCount(bytes32 itemId) external view returns (uint) {
         return itemStore.getRevisionCount(itemId);
+    }
+
+    function getRevisionTimestamp(bytes32 itemId, uint revisionId) external view returns (uint) {
+        return itemStore.getRevisionTimestamp(itemId, revisionId);
+    }
+
+    function getAllRevisionTimestamps(bytes32 itemId) external view returns (uint[] memory) {
+        return itemStore.getAllRevisionTimestamps(itemId);
+    }
+
+    function getRevisionIpfsHash(bytes32 itemId, uint revisionId) external view returns (bytes32) {
+        return itemStore.getRevisionIpfsHash(itemId, revisionId);
+    }
+
+    function getAllRevisionIpfsHashes(bytes32 itemId) external view returns (bytes32[] memory) {
+        return itemStore.getAllRevisionIpfsHashes(itemId);
     }
 
 }
