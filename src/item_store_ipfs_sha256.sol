@@ -510,10 +510,8 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @return flags Packed item settings.
      * @return owner Owner of the item.
      * @return revisionCount How many revisions the item has.
-     * @return ipfsHashes IPFS hash of each revision.
      * @return timestamps Timestamp of each revision.
-     * @return parentIds itemIds of all parents.
-     * @return childIds itemIds of all children.
+     * @return ipfsHashes IPFS hash of each revision.
      */
     function getItem(bytes32 itemId) external view inUse(itemId) returns (byte flags, address owner, uint revisionCount, uint[] memory timestamps, bytes32[] memory ipfsHashes) {
         ItemState storage state = itemState[itemId];
