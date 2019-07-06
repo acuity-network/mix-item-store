@@ -1,7 +1,8 @@
 pragma solidity ^0.5.9;
 
-import "./item_store_constants.sol";
-import "./item_store_interface.sol";
+import "./ItemStoreConstants.sol";
+import "./ItemStoreInterface.sol";
+
 
 /**
  * @title ItemStoreRegistry

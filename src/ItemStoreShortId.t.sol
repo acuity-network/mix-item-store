@@ -2,7 +2,7 @@ pragma solidity ^0.5.9;
 
 import "ds-test/test.sol";
 
-import "./item_store_short_id.sol";
+import "./ItemStoreShortId.sol";
 
 
 /**

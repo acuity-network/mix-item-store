@@ -1,7 +1,7 @@
 pragma solidity ^0.5.9;
 
-import "./item_store_interface.sol";
-import "./item_store_ipfs_sha256.sol";
+import "./ItemStoreInterface.sol";
+import "./ItemStoreIpfsSha256.sol";
 
 
 /**
