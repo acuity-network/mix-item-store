@@ -58,7 +58,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param itemId itemId of the item.
      */
     modifier inUse(bytes32 itemId) {
-        require (itemState[itemId].inUse);
+        require (itemState[itemId].inUse, "Item not in use.");
         _;
     }
 
@@ -67,7 +67,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param itemId itemId of the item.
      */
     modifier isOwner(bytes32 itemId) {
-        require (itemState[itemId].owner == msg.sender);
+        require (itemState[itemId].owner == msg.sender, "Sender is not owner of item.");
         _;
     }
 
@@ -76,7 +76,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param itemId itemId of the item.
      */
     modifier isUpdatable(bytes32 itemId) {
-        require (itemState[itemId].flags & UPDATABLE != 0);
+        require (itemState[itemId].flags & UPDATABLE != 0, "Item is not updatable.");
         _;
     }
 
@@ -85,7 +85,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param itemId itemId of the item.
      */
     modifier isNotEnforceRevisions(bytes32 itemId) {
-        require (itemState[itemId].flags & ENFORCE_REVISIONS == 0);
+        require (itemState[itemId].flags & ENFORCE_REVISIONS == 0, "Item is enforcing revisions.");
         _;
     }
 
@@ -94,7 +94,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param itemId itemId of the item.
      */
     modifier isRetractable(bytes32 itemId) {
-        require (itemState[itemId].flags & RETRACTABLE != 0);
+        require (itemState[itemId].flags & RETRACTABLE != 0, "Item is not retractable.");
         _;
     }
 
@@ -103,7 +103,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param itemId itemId of the item.
      */
     modifier isTransferable(bytes32 itemId) {
-        require (itemState[itemId].flags & TRANSFERABLE != 0);
+        require (itemState[itemId].flags & TRANSFERABLE != 0, "Item is not transferable.");
         _;
     }
 
@@ -113,7 +113,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param recipient Address of the user.
      */
     modifier isTransferEnabled(bytes32 itemId, address recipient) {
-        require (itemTransferEnabled[itemId][recipient]);
+        require (itemTransferEnabled[itemId][recipient], "Item transfer to recipient not enabled.");
         _;
     }
 
@@ -122,7 +122,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param itemId itemId of the item.
      */
     modifier hasAdditionalRevisions(bytes32 itemId) {
-        require (itemState[itemId].revisionCount > 1);
+        require (itemState[itemId].revisionCount > 1, "Item only has 1 revision.");
         _;
     }
 
@@ -132,7 +132,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @param revisionId Id of the revision.
      */
     modifier revisionExists(bytes32 itemId, uint revisionId) {
-        require (revisionId < itemState[itemId].revisionCount);
+        require (revisionId < itemState[itemId].revisionCount, "Revision does not exist.");
         _;
     }
 
@@ -156,7 +156,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
         // Combine contractId with hash of sender and nonce.
         itemId = (keccak256(abi.encodePacked(address(this), owner, nonce)) & ITEM_ID_MASK) | contractId;
         // Make sure this itemId has not been used before.
-        require (!itemState[itemId].inUse);
+        require (!itemState[itemId].inUse, "itemId already in use.");
     }
 
     /**

@@ -31,7 +31,7 @@ contract ItemStoreRegistry is ItemStoreConstants {
         // Create contractId.
         contractId = keccak256(abi.encodePacked(msg.sender)) & CONTRACT_ID_MASK;
         // Make sure this contractId has not been used before (highly unlikely).
-        require (contracts[contractId] == ItemStoreInterface(0));
+        require (contracts[contractId] == ItemStoreInterface(0), "contractId already exists.");
         // Record the calling contract address.
         contracts[contractId] = ItemStoreInterface(msg.sender);
         // Log the registration.
@@ -45,7 +45,7 @@ contract ItemStoreRegistry is ItemStoreConstants {
      */
     function getItemStore(bytes32 itemId) external view returns (ItemStoreInterface itemStore) {
         itemStore = contracts[itemId & CONTRACT_ID_MASK];
-        require (address(itemStore) != address(0));
+        require (address(itemStore) != address(0), "itemId does not have an itemStore contract.");
     }
 
 }
