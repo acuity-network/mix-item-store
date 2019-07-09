@@ -23,7 +23,7 @@ contract ItemStoreShortId {
      * @param itemId itemId of the item.
      * @param shortId shortId of the item
      */
-    event CreateShortId(bytes32 indexed itemId, bytes32 shortId);
+    event CreateShortId(bytes32 indexed itemId, bytes32 indexed shortId);
 
     /**
      * @dev Revert if the itemId already has a shortId.
