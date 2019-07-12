@@ -513,11 +513,10 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
      * @return timestamps Timestamp of each revision.
      * @return ipfsHashes IPFS hash of each revision.
      */
-    function getItem(bytes32 itemId) external view inUse(itemId) returns (byte flags, address owner, uint revisionCount, uint[] memory timestamps, bytes32[] memory ipfsHashes) {
+    function getItem(bytes32 itemId) external view inUse(itemId) returns (byte flags, address owner, uint[] memory timestamps, bytes32[] memory ipfsHashes) {
         ItemState storage state = itemState[itemId];
         flags = state.flags;
         owner = state.owner;
-        revisionCount = state.revisionCount;
         ipfsHashes = _getAllRevisionIpfsHashes(itemId);
         timestamps = _getAllRevisionTimestamps(itemId);
     }

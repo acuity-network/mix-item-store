@@ -92,8 +92,8 @@ contract ItemStoreIpfsSha256Proxy is ItemStoreInterface {
         return itemStore.getInUse(itemId);
     }
 
-    function getItem(bytes32 itemId) external view returns (byte flags, address owner, uint revisionCount, uint[] memory timestamps, bytes32[] memory ipfsHashes) {
-        (flags, owner, revisionCount, timestamps, ipfsHashes) = itemStore.getItem(itemId);
+    function getItem(bytes32 itemId) external view returns (byte flags, address owner, uint[] memory timestamps, bytes32[] memory ipfsHashes) {
+        (flags, owner, timestamps, ipfsHashes) = itemStore.getItem(itemId);
     }
 
     function getFlags(bytes32 itemId) external view returns (byte) {

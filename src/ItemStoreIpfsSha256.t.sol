@@ -107,7 +107,7 @@ contract ItemStoreIpfsSha256Test is DSTest, ItemStoreConstants {
     }
 
     function testCreateNewRevision() public {
-        bytes32 itemId = itemStore.create(UPDATABLE, 0);
+        bytes32 itemId = itemStore.create(UPDATABLE, hex"00");
         uint revisionId = itemStore.createNewRevision(itemId, hex"01");
         assertEq(revisionId, 1);
         revisionId = itemStore.createNewRevision(itemId, hex"02");
@@ -527,6 +527,96 @@ contract ItemStoreIpfsSha256Test is DSTest, ItemStoreConstants {
 
     function testGetAbiVersion() public {
         assertEq(itemStore.getAbiVersion(), 0);
+    }
+
+    function testMultipleGetters() public {
+        bytes32 itemId = itemStore.create(UPDATABLE, hex"00");
+        itemStore.createNewRevision(itemId, hex"01");
+        itemStore.createNewRevision(itemId, hex"02");
+        itemStore.createNewRevision(itemId, hex"03");
+        itemStore.createNewRevision(itemId, hex"04");
+        itemStore.createNewRevision(itemId, hex"05");
+        itemStore.createNewRevision(itemId, hex"06");
+        itemStore.createNewRevision(itemId, hex"07");
+        itemStore.createNewRevision(itemId, hex"08");
+        itemStore.createNewRevision(itemId, hex"09");
+        itemStore.createNewRevision(itemId, hex"10");
+        itemStore.createNewRevision(itemId, hex"11");
+        itemStore.createNewRevision(itemId, hex"12");
+        itemStore.createNewRevision(itemId, hex"13");
+
+        (byte flags, address owner, uint[] memory timestamps, bytes32[] memory ipfsHashes) = itemStore.getItem(itemId);
+
+        assertEq(flags, UPDATABLE);
+        assertEq(owner, address(this));
+
+        assertEq(timestamps.length, 14);
+        assertEq(timestamps[0], 0);
+        assertEq(timestamps[1], 0);
+        assertEq(timestamps[2], 0);
+        assertEq(timestamps[3], 0);
+        assertEq(timestamps[4], 0);
+        assertEq(timestamps[5], 0);
+        assertEq(timestamps[6], 0);
+        assertEq(timestamps[7], 0);
+        assertEq(timestamps[8], 0);
+        assertEq(timestamps[9], 0);
+        assertEq(timestamps[10], 0);
+        assertEq(timestamps[11], 0);
+        assertEq(timestamps[12], 0);
+        assertEq(timestamps[13], 0);
+
+        assertEq(ipfsHashes.length, 14);
+        assertEq(ipfsHashes[0], hex"00");
+        assertEq(ipfsHashes[1], hex"01");
+        assertEq(ipfsHashes[2], hex"02");
+        assertEq(ipfsHashes[3], hex"03");
+        assertEq(ipfsHashes[4], hex"04");
+        assertEq(ipfsHashes[5], hex"05");
+        assertEq(ipfsHashes[6], hex"06");
+        assertEq(ipfsHashes[7], hex"07");
+        assertEq(ipfsHashes[8], hex"08");
+        assertEq(ipfsHashes[9], hex"09");
+        assertEq(ipfsHashes[10], hex"10");
+        assertEq(ipfsHashes[11], hex"11");
+        assertEq(ipfsHashes[12], hex"12");
+        assertEq(ipfsHashes[13], hex"13");
+
+        timestamps = itemStore.getAllRevisionTimestamps(itemId);
+
+        assertEq(timestamps.length, 14);
+        assertEq(timestamps[0], 0);
+        assertEq(timestamps[1], 0);
+        assertEq(timestamps[2], 0);
+        assertEq(timestamps[3], 0);
+        assertEq(timestamps[4], 0);
+        assertEq(timestamps[5], 0);
+        assertEq(timestamps[6], 0);
+        assertEq(timestamps[7], 0);
+        assertEq(timestamps[8], 0);
+        assertEq(timestamps[9], 0);
+        assertEq(timestamps[10], 0);
+        assertEq(timestamps[11], 0);
+        assertEq(timestamps[12], 0);
+        assertEq(timestamps[13], 0);
+
+        ipfsHashes = itemStore.getAllRevisionIpfsHashes(itemId);
+
+        assertEq(ipfsHashes.length, 14);
+        assertEq(ipfsHashes[0], hex"00");
+        assertEq(ipfsHashes[1], hex"01");
+        assertEq(ipfsHashes[2], hex"02");
+        assertEq(ipfsHashes[3], hex"03");
+        assertEq(ipfsHashes[4], hex"04");
+        assertEq(ipfsHashes[5], hex"05");
+        assertEq(ipfsHashes[6], hex"06");
+        assertEq(ipfsHashes[7], hex"07");
+        assertEq(ipfsHashes[8], hex"08");
+        assertEq(ipfsHashes[9], hex"09");
+        assertEq(ipfsHashes[10], hex"10");
+        assertEq(ipfsHashes[11], hex"11");
+        assertEq(ipfsHashes[12], hex"12");
+        assertEq(ipfsHashes[13], hex"13");
     }
 
 }
