@@ -1,16 +1,16 @@
 pragma solidity ^0.5.10;
 
-import "./ItemStoreInterface.sol";
-import "./ItemStoreConstants.sol";
-import "./ItemStoreRegistry.sol";
+import "./MixItemStoreInterface.sol";
+import "./MixItemStoreConstants.sol";
+import "./MixItemStoreRegistry.sol";
 
 
 /**
- * @title ItemStoreIpfsSha256
+ * @title MixItemStoreIpfsSha256
  * @author Jonathan Brown <jbrown@mix-blockchain.org>
- * @dev ItemStore implementation where each item revision is a SHA256 IPFS hash.
+ * @dev MixItemStoreInterface implementation where each item revision is a SHA256 IPFS hash.
  */
-contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
+contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants {
 
     /**
      * @dev Single slot structure of item state.
@@ -44,12 +44,12 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     mapping (bytes32 => mapping (address => bool)) itemTransferEnabled;
 
     /**
-     * @dev ItemStoreRegistry contract.
+     * @dev MixItemStoreRegistry contract.
      */
-    ItemStoreRegistry public itemStoreRegistry;
+    MixItemStoreRegistry public itemStoreRegistry;
 
     /**
-     * @dev Id of this instance of ItemStore. Stored as bytes32 instead of bytes8 to reduce gas usage.
+     * @dev Id of this instance of MixItemStoreInterface. Stored as bytes32 instead of bytes8 to reduce gas usage.
      */
     bytes32 contractId;
 
@@ -137,10 +137,10 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     }
 
     /**
-     * @param _itemStoreRegistry Address of the ItemStoreRegistry contract.
+     * @param _itemStoreRegistry Address of the MixItemStoreRegistry contract.
      */
-    constructor(ItemStoreRegistry _itemStoreRegistry) public {
-        // Store the address of the ItemStoreRegistry contract.
+    constructor(MixItemStoreRegistry _itemStoreRegistry) public {
+        // Store the address of the MixItemStoreRegistry contract.
         itemStoreRegistry = _itemStoreRegistry;
         // Register this contract.
         contractId = itemStoreRegistry.register();
@@ -434,7 +434,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     }
 
     /**
-     * @dev Get the ABI version for this ItemStore contract.
+     * @dev Get the ABI version for this contract.
      * @return ABI version.
      */
     function getAbiVersion() external view returns (uint) {
@@ -442,7 +442,7 @@ contract ItemStoreIpfsSha256 is ItemStoreInterface, ItemStoreConstants {
     }
 
     /**
-     * @dev Get the id for this ItemStore contract.
+     * @dev Get the id for this contract.
      * @return Id of the contract.
      */
     function getContractId() external view returns (bytes8) {

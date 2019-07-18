@@ -2,11 +2,11 @@ pragma solidity ^0.5.10;
 
 
 /**
- * @title ItemStoreShortId
+ * @title MixItemStoreShortId
  * @author Jonathan Brown <jbrown@mix-blockchain.org>
- * @dev Maintain bidirectional mapping between 32 byte itemIds and 4 byte shortIds.
+ * @dev Maintains a bidirectional mapping between 32 byte itemIds and 4 byte shortIds.
  */
-contract ItemStoreShortId {
+contract MixItemStoreShortId {
 
     /**
      * @dev Mapping of itemId to shortId.

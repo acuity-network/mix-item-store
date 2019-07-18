@@ -2,11 +2,11 @@ pragma solidity ^0.5.10;
 
 
 /**
- * @title ItemStoreInterface
+ * @title MixItemStoreInterface
  * @author Jonathan Brown <jbrown@mix-blockchain.org>
- * @dev ItemStore implementation interface.
+ * @dev Implementation interface for item store contracts.
  */
-interface ItemStoreInterface {
+interface MixItemStoreInterface {
 
     /**
      * @dev A new item has been created.
@@ -156,13 +156,13 @@ interface ItemStoreInterface {
     function setNotTransferable(bytes32 itemId) external;
 
     /**
-     * @dev Get the ABI version for this ItemStore contract.
+     * @dev Get the ABI version for this contract.
      * @return ABI version.
      */
     function getAbiVersion() external view returns (uint);
 
     /**
-     * @dev Get the id for this ItemStore contract.
+     * @dev Get the id for this contract.
      * @return Id of the contract.
      */
     function getContractId() external view returns (bytes8);

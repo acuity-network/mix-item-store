@@ -2,11 +2,11 @@ pragma solidity ^0.5.10;
 
 
 /**
- * @title ItemStoreConstants
+ * @title MixItemStoreConstants
  * @author Jonathan Brown <jbrown@mix-blockchain.org>
- * @dev Provides contants for other ItemStore contracts.
+ * @dev Provides constants for item store.
  */
-contract ItemStoreConstants {
+contract MixItemStoreConstants {
 
     byte constant UPDATABLE         = hex"01";  // True if the item is updatable. After creation can only be disabled.
     byte constant ENFORCE_REVISIONS = hex"02";  // True if the item is enforcing revisions. After creation can only be enabled.
