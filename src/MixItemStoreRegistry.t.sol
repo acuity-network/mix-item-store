@@ -26,15 +26,15 @@ contract MixItemStoreRegistryTest is DSTest {
     }
 
     function testControlMixItemStoreNotRegistered() public view {
-        mixItemStoreRegistry.getMixItemStore(bytes32(mixItemStoreIpfsSha256.getContractId()) >> 192);
+        mixItemStoreRegistry.getItemStore(bytes32(mixItemStoreIpfsSha256.getContractId()) >> 192);
     }
 
     function testFailMixItemStoreNotRegistered() public view {
-        mixItemStoreRegistry.getMixItemStore(0);
+        mixItemStoreRegistry.getItemStore(0);
     }
 
-    function testGetMixItemStore() public {
-        assertEq(address(mixItemStoreRegistry.getMixItemStore(bytes32(mixItemStoreIpfsSha256.getContractId()) >> 192)), address(mixItemStoreIpfsSha256));
+    function testGetItemStore() public {
+        assertEq(address(mixItemStoreRegistry.getItemStore(bytes32(mixItemStoreIpfsSha256.getContractId()) >> 192)), address(mixItemStoreIpfsSha256));
     }
 
 }

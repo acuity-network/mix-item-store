@@ -43,7 +43,7 @@ contract MixItemStoreRegistry is MixItemStoreConstants {
      * @param itemId itemId of the item to determine the itemStore contract of.
      * @return itemStore itemStore contract of the item.
      */
-    function getMixItemStore(bytes32 itemId) external view returns (MixItemStoreInterface itemStore) {
+    function getItemStore(bytes32 itemId) external view returns (MixItemStoreInterface itemStore) {
         itemStore = contracts[itemId & CONTRACT_ID_MASK];
         require (address(itemStore) != address(0), "itemId does not have an itemStore contract.");
     }
