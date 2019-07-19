@@ -30,7 +30,7 @@ contract MixItemStoreShortId {
      * @param itemId itemId of the item.
      */
     modifier noShortId(bytes32 itemId) {
-        require (itemIdShortId[itemId] == 0, "itemId does not have a shortId.");
+        require (itemIdShortId[itemId] == 0, "itemId already has a shortId.");
         _;
     }
 
