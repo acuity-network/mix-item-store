@@ -1,4 +1,4 @@
-pragma solidity ^0.5.10;
+pragma solidity ^0.6.6;
 
 import "./MixItemStoreInterface.sol";
 import "./MixItemStoreConstants.sol";
@@ -152,7 +152,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param nonce Nonce that this owner has never used before.
      * @return itemId itemId of the item with this owner and nonce.
      */
-    function getNewItemId(address owner, bytes32 nonce) public view returns (bytes32 itemId) {
+    function getNewItemId(address owner, bytes32 nonce) override public view returns (bytes32 itemId) {
         // Combine contractId with hash of sender and nonce.
         itemId = (keccak256(abi.encodePacked(address(this), owner, nonce)) & ITEM_ID_MASK) | contractId;
         // Make sure this itemId has not been used before.
@@ -251,7 +251,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Retract an item's latest revision. Revision 0 cannot be retracted.
      * @param itemId itemId of the item.
      */
-    function retractLatestRevision(bytes32 itemId) external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) hasAdditionalRevisions(itemId) {
+    function retractLatestRevision(bytes32 itemId) override external isOwner(itemId) isUpdatable(itemId) isNotEnforceRevisions(itemId) hasAdditionalRevisions(itemId) {
         // Get item state.
         ItemState storage state = itemState[itemId];
         // Decrement the number of revisions.
@@ -309,7 +309,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Retract an item.
      * @param itemId itemId of the item. This itemId can never be used again.
      */
-    function retract(bytes32 itemId) external isOwner(itemId) isRetractable(itemId) {
+    function retract(bytes32 itemId) override external isOwner(itemId) isRetractable(itemId) {
         // Get item state and IPFS hashes.
         ItemState storage state = itemState[itemId];
         mapping (uint => bytes32) storage ipfsHashes = itemRevisionIpfsHashes[itemId];
@@ -334,7 +334,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Enable transfer of an item to the current user.
      * @param itemId itemId of the item.
      */
-    function transferEnable(bytes32 itemId) external isTransferable(itemId) {
+    function transferEnable(bytes32 itemId) override external isTransferable(itemId) {
         // Record in state that the current user will accept this item.
         itemTransferEnabled[itemId][msg.sender] = true;
         // Log that transfer to this user is enabled.
@@ -345,7 +345,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Disable transfer of an item to the current user.
      * @param itemId itemId of the item.
      */
-    function transferDisable(bytes32 itemId) external isTransferEnabled(itemId, msg.sender) {
+    function transferDisable(bytes32 itemId) override external isTransferEnabled(itemId, msg.sender) {
         // Record in state that the current user will not accept this item.
         itemTransferEnabled[itemId][msg.sender] = false;
         // Log that transfer to this user is disabled.
@@ -357,7 +357,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @param recipient Address of the user to transfer to item to.
      */
-    function transfer(bytes32 itemId, address recipient) external isOwner(itemId) isTransferable(itemId) isTransferEnabled(itemId, recipient) {
+    function transfer(bytes32 itemId, address recipient) override external isOwner(itemId) isTransferable(itemId) isTransferEnabled(itemId, recipient) {
         // Get item state.
         ItemState storage state = itemState[itemId];
         // Log the transfer.
@@ -372,7 +372,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Disown an item.
      * @param itemId itemId of the item.
      */
-    function disown(bytes32 itemId) external isOwner(itemId) isTransferable(itemId) {
+    function disown(bytes32 itemId) override external isOwner(itemId) isTransferable(itemId) {
         // Get item state.
         ItemState storage state = itemState[itemId];
         // Log that the item has been disowned.
@@ -385,7 +385,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Set an item as not updatable.
      * @param itemId itemId of the item.
      */
-    function setNotUpdatable(bytes32 itemId) external isOwner(itemId) {
+    function setNotUpdatable(bytes32 itemId) override external isOwner(itemId) {
         // Get item state.
         ItemState storage state = itemState[itemId];
         // Record in state that the item is not updatable.
@@ -398,7 +398,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Set an item to enforce revisions.
      * @param itemId itemId of the item.
      */
-    function setEnforceRevisions(bytes32 itemId) external isOwner(itemId) {
+    function setEnforceRevisions(bytes32 itemId) override external isOwner(itemId) {
         // Get item state.
         ItemState storage state = itemState[itemId];
         // Record in state that all changes to this item must be new revisions.
@@ -411,7 +411,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Set an item to not be retractable.
      * @param itemId itemId of the item.
      */
-    function setNotRetractable(bytes32 itemId) external isOwner(itemId) {
+    function setNotRetractable(bytes32 itemId) override external isOwner(itemId) {
         // Get item state.
         ItemState storage state = itemState[itemId];
         // Record in state that the item is not retractable.
@@ -424,7 +424,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Set an item to not be transferable.
      * @param itemId itemId of the item.
      */
-    function setNotTransferable(bytes32 itemId) external isOwner(itemId) {
+    function setNotTransferable(bytes32 itemId) override external isOwner(itemId) {
         // Get item state.
         ItemState storage state = itemState[itemId];
         // Record in state that the item is not transferable.
@@ -437,7 +437,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Get the ABI version for this contract.
      * @return ABI version.
      */
-    function getAbiVersion() external view returns (uint) {
+    function getAbiVersion() override external view returns (uint) {
         return ABI_VERSION;
     }
 
@@ -445,7 +445,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @dev Get the id for this contract.
      * @return Id of the contract.
      */
-    function getContractId() external view returns (bytes8) {
+    function getContractId() override external view returns (bytes8) {
         return bytes8(contractId << 192);
     }
 
@@ -454,7 +454,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return True if the itemId is in use.
      */
-    function getInUse(bytes32 itemId) external view returns (bool) {
+    function getInUse(bytes32 itemId) override external view returns (bool) {
         return itemState[itemId].inUse;
     }
 
@@ -509,7 +509,6 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return flags Packed item settings.
      * @return owner Owner of the item.
-     * @return revisionCount How many revisions the item has.
      * @return timestamps Timestamp of each revision.
      * @return ipfsHashes IPFS hash of each revision.
      */
@@ -526,7 +525,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return Packed item settings.
      */
-    function getFlags(bytes32 itemId) external view inUse(itemId) returns (byte) {
+    function getFlags(bytes32 itemId) override external view inUse(itemId) returns (byte) {
         return itemState[itemId].flags;
     }
 
@@ -535,7 +534,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return True if the item is updatable.
      */
-    function getUpdatable(bytes32 itemId) external view inUse(itemId) returns (bool) {
+    function getUpdatable(bytes32 itemId) override external view inUse(itemId) returns (bool) {
         return itemState[itemId].flags & UPDATABLE != 0;
     }
 
@@ -544,7 +543,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return True if the item enforces revisions.
      */
-    function getEnforceRevisions(bytes32 itemId) external view inUse(itemId) returns (bool) {
+    function getEnforceRevisions(bytes32 itemId) override external view inUse(itemId) returns (bool) {
         return itemState[itemId].flags & ENFORCE_REVISIONS != 0;
     }
 
@@ -553,7 +552,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return True if the item is item retractable.
      */
-    function getRetractable(bytes32 itemId) external view inUse(itemId) returns (bool) {
+    function getRetractable(bytes32 itemId) override external view inUse(itemId) returns (bool) {
         return itemState[itemId].flags & RETRACTABLE != 0;
     }
 
@@ -562,7 +561,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return True if the item is transferable.
      */
-    function getTransferable(bytes32 itemId) external view inUse(itemId) returns (bool) {
+    function getTransferable(bytes32 itemId) override external view inUse(itemId) returns (bool) {
         return itemState[itemId].flags & TRANSFERABLE != 0;
     }
 
@@ -571,7 +570,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return Owner of the item.
      */
-    function getOwner(bytes32 itemId) external view inUse(itemId) returns (address) {
+    function getOwner(bytes32 itemId) override external view inUse(itemId) returns (address) {
         return itemState[itemId].owner;
     }
 
@@ -580,7 +579,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return How many revisions the item has.
      */
-    function getRevisionCount(bytes32 itemId) external view inUse(itemId) returns (uint) {
+    function getRevisionCount(bytes32 itemId) override external view inUse(itemId) returns (uint) {
         return itemState[itemId].revisionCount;
     }
 
@@ -590,7 +589,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param revisionId Id of the revision.
      * @return Timestamp of the specified revision.
      */
-    function getRevisionTimestamp(bytes32 itemId, uint revisionId) external view revisionExists(itemId, revisionId) returns (uint) {
+    function getRevisionTimestamp(bytes32 itemId, uint revisionId) override external view revisionExists(itemId, revisionId) returns (uint) {
         return _getRevisionTimestamp(itemId, revisionId);
     }
 
@@ -599,7 +598,7 @@ contract MixItemStoreIpfsSha256 is MixItemStoreInterface, MixItemStoreConstants 
      * @param itemId itemId of the item.
      * @return Timestamps of all revisions of the item.
      */
-    function getAllRevisionTimestamps(bytes32 itemId) external view inUse(itemId) returns (uint[] memory) {
+    function getAllRevisionTimestamps(bytes32 itemId) override external view inUse(itemId) returns (uint[] memory) {
         return _getAllRevisionTimestamps(itemId);
     }
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.10;
+pragma solidity ^0.6.6;
 
 import "./MixItemStoreInterface.sol";
 import "./MixItemStoreIpfsSha256.sol";
@@ -12,7 +12,7 @@ contract MixItemStoreIpfsSha256Proxy is MixItemStoreInterface {
         mixItemStoreIpfsSha256 = _mixItemStore;
     }
 
-    function getNewItemId(address owner, bytes32 nonce) public view returns (bytes32 itemId) {
+    function getNewItemId(address owner, bytes32 nonce) override public view returns (bytes32 itemId) {
         itemId = mixItemStoreIpfsSha256.getNewItemId(owner, nonce);
     }
 
@@ -28,7 +28,7 @@ contract MixItemStoreIpfsSha256Proxy is MixItemStoreInterface {
         mixItemStoreIpfsSha256.updateLatestRevision(itemId, ipfsHash);
     }
 
-    function retractLatestRevision(bytes32 itemId) external {
+    function retractLatestRevision(bytes32 itemId) override external {
         mixItemStoreIpfsSha256.retractLatestRevision(itemId);
     }
 
@@ -36,51 +36,51 @@ contract MixItemStoreIpfsSha256Proxy is MixItemStoreInterface {
         mixItemStoreIpfsSha256.restart(itemId, ipfsHash);
     }
 
-    function retract(bytes32 itemId) external {
+    function retract(bytes32 itemId) override external {
         mixItemStoreIpfsSha256.retract(itemId);
     }
 
-    function transfer(bytes32 itemId, address recipient) external {
+    function transfer(bytes32 itemId, address recipient) override external {
         mixItemStoreIpfsSha256.transfer(itemId, recipient);
     }
 
-    function disown(bytes32 itemId) external {
+    function disown(bytes32 itemId) override external {
         mixItemStoreIpfsSha256.disown(itemId);
     }
 
-    function setEnforceRevisions(bytes32 itemId) external {
+    function setEnforceRevisions(bytes32 itemId) override external {
         mixItemStoreIpfsSha256.setEnforceRevisions(itemId);
     }
 
-    function setNotRetractable(bytes32 itemId) external {
+    function setNotRetractable(bytes32 itemId) override external {
         mixItemStoreIpfsSha256.setNotRetractable(itemId);
     }
 
-    function setNotTransferable(bytes32 itemId) external {
+    function setNotTransferable(bytes32 itemId) override external {
         mixItemStoreIpfsSha256.setNotTransferable(itemId);
     }
 
-    function transferEnable(bytes32 itemId) external {
+    function transferEnable(bytes32 itemId) override external {
         mixItemStoreIpfsSha256.transferEnable(itemId);
     }
 
-    function transferDisable(bytes32 itemId) external {
+    function transferDisable(bytes32 itemId) override external {
         mixItemStoreIpfsSha256.transferDisable(itemId);
     }
 
-    function setNotUpdatable(bytes32 itemId) external {
+    function setNotUpdatable(bytes32 itemId) override external {
         mixItemStoreIpfsSha256.setNotUpdatable(itemId);
     }
 
-    function getAbiVersion() external view returns (uint) {
+    function getAbiVersion() override external view returns (uint) {
         return mixItemStoreIpfsSha256.getAbiVersion();
     }
 
-    function getContractId() external view returns (bytes8) {
+    function getContractId() override external view returns (bytes8) {
         return mixItemStoreIpfsSha256.getContractId();
     }
 
-    function getInUse(bytes32 itemId) public view returns (bool) {
+    function getInUse(bytes32 itemId) override public view returns (bool) {
         return mixItemStoreIpfsSha256.getInUse(itemId);
     }
 
@@ -88,39 +88,39 @@ contract MixItemStoreIpfsSha256Proxy is MixItemStoreInterface {
         (flags, owner, timestamps, ipfsHashes) = mixItemStoreIpfsSha256.getItem(itemId);
     }
 
-    function getFlags(bytes32 itemId) external view returns (byte) {
+    function getFlags(bytes32 itemId) override external view returns (byte) {
         return mixItemStoreIpfsSha256.getFlags(itemId);
     }
 
-    function getUpdatable(bytes32 itemId) external view returns (bool) {
+    function getUpdatable(bytes32 itemId) override external view returns (bool) {
         return mixItemStoreIpfsSha256.getUpdatable(itemId);
     }
 
-    function getEnforceRevisions(bytes32 itemId) external view returns (bool) {
+    function getEnforceRevisions(bytes32 itemId) override external view returns (bool) {
         return mixItemStoreIpfsSha256.getEnforceRevisions(itemId);
     }
 
-    function getRetractable(bytes32 itemId) external view returns (bool) {
+    function getRetractable(bytes32 itemId) override external view returns (bool) {
         return mixItemStoreIpfsSha256.getRetractable(itemId);
     }
 
-    function getTransferable(bytes32 itemId) external view returns (bool) {
+    function getTransferable(bytes32 itemId) override external view returns (bool) {
         return mixItemStoreIpfsSha256.getTransferable(itemId);
     }
 
-    function getOwner(bytes32 itemId) external view returns (address) {
+    function getOwner(bytes32 itemId) override external view returns (address) {
         return mixItemStoreIpfsSha256.getOwner(itemId);
     }
 
-    function getRevisionCount(bytes32 itemId) external view returns (uint) {
+    function getRevisionCount(bytes32 itemId) override external view returns (uint) {
         return mixItemStoreIpfsSha256.getRevisionCount(itemId);
     }
 
-    function getRevisionTimestamp(bytes32 itemId, uint revisionId) external view returns (uint) {
+    function getRevisionTimestamp(bytes32 itemId, uint revisionId) override external view returns (uint) {
         return mixItemStoreIpfsSha256.getRevisionTimestamp(itemId, revisionId);
     }
 
-    function getAllRevisionTimestamps(bytes32 itemId) external view returns (uint[] memory) {
+    function getAllRevisionTimestamps(bytes32 itemId) override external view returns (uint[] memory) {
         return mixItemStoreIpfsSha256.getAllRevisionTimestamps(itemId);
     }
 
